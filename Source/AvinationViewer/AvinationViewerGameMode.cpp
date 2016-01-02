@@ -49,7 +49,6 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
         delete creator;
     creator = new ObjectCreator(this);
     
-    /*
     FGuid id;
     //FGuid::Parse(TEXT("77540e8e-5064-4cf9-aa77-ad6617d73508"), id);
     FGuid::Parse(TEXT("8e3377b1-ccc7-4f7b-981d-f30ccae8121d"), id);
@@ -57,7 +56,6 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
     OnAssetFetched d;
     d.BindUObject(this, &AAvinationViewerGameMode::CreateNewActor);
     AssetCache::Get().Fetch(id, d);
-    */
 }
 
 AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data)
@@ -103,7 +101,7 @@ AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data,
     return act;
 }
 
-void AAvinationViewerGameMode::CreateNewActor(FGuid id, int status, TArray<uint8_t> data)
+void AAvinationViewerGameMode::CreateNewActor(FGuid id, TArray<uint8_t> data)
 {
     AssetDecode adec(data);
     TArray<uint8_t> xml;
@@ -188,6 +186,7 @@ bool ObjectCreator::Init()
 
 uint32_t ObjectCreator::Run()
 {
+    return 0;
     struct stat st;
     stat("/Users/melanie/UnrealViewerData/primsback.xml", &st);
     int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);

@@ -98,3 +98,16 @@ void SceneObjectGroup::CheckAssetsDone()
     }
     fetchLock.Unlock();
 }
+
+void SceneObjectGroup::GatherTextures()
+{
+    partsLock.Lock();
+    for (auto it = parts.CreateConstIterator() ; it ; ++it)
+        (*it)->GatherTextures();
+    partsLock.Unlock();
+}
+
+void SceneObjectGroup::AddTexture(FGuid id)
+{
+    groupTextures.Add(id);
+}

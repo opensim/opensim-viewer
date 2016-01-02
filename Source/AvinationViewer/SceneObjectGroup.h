@@ -27,6 +27,12 @@ public:
     bool startingFetch;
     
     void CheckAssetsDone();
+    virtual void GatherTextures() override;
+    virtual SceneObject inline Type() override { return ObjectGroup; }
+    void AddTexture(FGuid id);
+    
+    TArray<FGuid> groupTextures;
+    
 private:
     FPThreadsCriticalSection partsLock;
     TArray<SceneObjectBase *> parts;

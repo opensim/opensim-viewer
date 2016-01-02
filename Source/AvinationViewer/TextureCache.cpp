@@ -83,7 +83,7 @@ void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArr
 //            doneFetches.Add(id, req);
     }
     
-    if (activeFetches.Num() < concurrentFetches)
+    while (activeFetches.Num() < concurrentFetches)
     {
         auto it = pendingFetches.CreateIterator();
         if (it)
@@ -95,12 +95,13 @@ void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArr
     }
     
     queueLock.Unlock();
-    
-    //while (ThreadedProcessDoneRequests())
-    //    ;
-    
-    //while (DispatchDecodedRequest())
-    //    ;
+ 
+    for (auto it = req->OnTextureFetched.CreateConstIterator() ; it ; ++it)
+    {
+        (*it).ExecuteIfBound(id, 0);
+    }
+
+    delete req;
 }
 
 /*

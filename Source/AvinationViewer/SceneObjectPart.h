@@ -24,10 +24,12 @@ public:
     bool MeshPrim();
     bool MeshSculpt(TArray<uint8_t> data);
     void DeleteMeshData();
-    
-    virtual bool inline IsObjectPart() override { return true; }
+    virtual void GatherTextures() override;
+
     LLSDItem * GetMeshData(int lod);
     
+    virtual SceneObject inline Type() override { return ObjectGroup; }
+
     FVector groupPosition;
     FVector position;
     FVector scale;

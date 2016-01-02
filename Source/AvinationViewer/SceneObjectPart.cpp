@@ -616,3 +616,9 @@ void SceneObjectPart::DeleteMeshData()
     sculptData = 0;
     meshAssetData.Empty();
 }
+
+void SceneObjectPart::GatherTextures()
+{
+    for (int i = 0 ; i < numFaces ; ++i)
+        group->AddTexture(textures[i].textureId);
+}

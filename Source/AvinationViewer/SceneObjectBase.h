@@ -3,6 +3,7 @@
 #pragma once
 
 class SceneObjectGroup;
+enum SceneObject { ObjectBase = 0, ObjectGroup = 1, ObjectPart = 2};
 /**
  * 
  */
@@ -15,10 +16,12 @@ public:
 	virtual ~SceneObjectBase();
     
     virtual void FetchAssets();
+    virtual void GatherTextures() = 0;
+    
     SceneObjectBase *parent;
     SceneObjectGroup *group;
     
-    virtual bool inline IsObjectPart() { return false; }
+    virtual SceneObject inline Type() { return ObjectBase; }
 protected:
     bool haveAllAssets;
 
