@@ -22,9 +22,18 @@ public class AvinationViewer : ModuleRules
 		//			DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 		//		}
 		// }
-
-        PublicAdditionalLibraries.Add("/usr/lib/libz.dylib");
-        PublicAdditionalLibraries.Add("/usr/local/lib/libopenjp2.dylib");
-        PublicIncludePaths.Add("/usr/local/include/openjpeg-2.1");
-	}
+	
+	if ( Target.Platform == UnrealTargetPlatform.Linux )
+	{
+	  PublicAdditionalLibraries.Add("/lib/libz");
+	  PublicAdditionalLibraries.Add("/usr/lib64/libopenjp2.so");
+	  PublicIncludePaths.Add("/usr/include");
+	  PublicIncludePaths.Add("/usr/include/openjpeg-2.1");	
+        } 
+        else if ( Target.Platform == UnrealTargetPlatform.Mac )
+        {
+	  PublicAdditionalLibraries.Add("/usr/lib/libz.dylib");
+	  PublicAdditionalLibraries.Add("/usr/local/lib/libopenjp2.dylib");
+	  PublicIncludePaths.Add("/usr/local/include/openjpeg-2.1");
+        } // additional platforms
 }
