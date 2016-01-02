@@ -38,11 +38,11 @@ void AssetCache::Fetch(FGuid id, OnAssetFetched delegate)
             
             if (data.Num() == 0)
             {
-                delegate.ExecuteIfBound(id, 404, data);
+                delegate.ExecuteIfBound(id, data);
             }
             else
             {
-                delegate.ExecuteIfBound(id, 200, data);
+                delegate.ExecuteIfBound(id, data);
             }
             return;
         }
@@ -85,7 +85,7 @@ void AssetCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray
     
     for (auto it = req->OnAssetFetched.CreateConstIterator() ; it ; ++it)
     {
-        (*it).ExecuteIfBound(id, status, data);
+        (*it).ExecuteIfBound(id, data);
     }
     
     delete req;

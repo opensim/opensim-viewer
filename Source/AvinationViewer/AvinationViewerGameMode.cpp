@@ -34,6 +34,9 @@ private:
     FPThreadsCriticalSection readyLock;
     TArray<AMeshActor *> ready;
     
+    FPThreadsCriticalSection textureLock;
+    TArray<AMeshActor *> textures;
+    
     void ObjectReady(AMeshActor *act);
 };
 

@@ -4,7 +4,7 @@
 #include "ImageUtils.h"
 #include "HttpAssetFetcher.h"
 
-DECLARE_DELEGATE_ThreeParams(OnTextureFetched, FGuid, int, UTexture2D *)
+DECLARE_DELEGATE_TwoParams(OnTextureFetched, FGuid, UTexture2D *)
 
 /**
  * 
@@ -15,7 +15,7 @@ public:
 	~TextureCache();
     static TextureCache& Get();
     
-    //void Fetch(FGuid id, OnTextureFetched delegate);
+    void Fetch(FGuid id, OnTextureFetched delegate);
     
     //static UObject *outer;
     
@@ -34,17 +34,18 @@ protected:
     
     bool stopThis = false;
     
-    /*
-     int concurrentFetches = 2;
+    int concurrentFetches = 2;
     TMap<FGuid, HttpAssetFetcher *> pendingFetches;
     TMap<FGuid, HttpAssetFetcher *> activeFetches;
+    FPThreadsCriticalSection queueLock;
+    
+    void RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray<uint8_t> data);
+    /*
     TMap<FGuid, HttpAssetFetcher *> doneFetches;
     TMap<FGuid, HttpAssetFetcher *> decodedFetches;
     TMap<FGuid, UTexture2D *> cache;
     
-    void RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray<uint8_t> data);
     
-    FPThreadsCriticalSection queueLock;
     FPThreadsCriticalSection cacheLock;
      HttpAssetFetcher *currentDispatch = 0;
      int currentIndex = 0;
