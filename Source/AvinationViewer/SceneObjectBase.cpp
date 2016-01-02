@@ -13,7 +13,7 @@ SceneObjectBase::~SceneObjectBase()
 {
 }
 
-void SceneObjectBase::AssetReceived(FGuid id, int status, TArray<uint8_t> data)
+void SceneObjectBase::AssetReceived(FGuid id, TArray<uint8_t> data)
 {
     
 }

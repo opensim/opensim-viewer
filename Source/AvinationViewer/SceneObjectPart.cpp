@@ -234,7 +234,7 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     return true;
 }
 
-void SceneObjectPart::AssetReceived(FGuid id, int status, TArray<uint8_t> data)
+void SceneObjectPart::AssetReceived(FGuid id, TArray<uint8_t> data)
 {
     haveAllAssets = true;
     

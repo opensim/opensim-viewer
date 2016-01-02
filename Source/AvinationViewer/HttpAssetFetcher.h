@@ -12,8 +12,8 @@
 class HttpAssetFetcher;
 class J2KDecode;
 
-DECLARE_DELEGATE_ThreeParams(AssetFetchedDelegate, FGuid, int, TArray<uint8_t>)
-DECLARE_DELEGATE_ThreeParams(TextureFetchedDelegate, FGuid, int, UTexture2D *)
+DECLARE_DELEGATE_TwoParams(AssetFetchedDelegate, FGuid, TArray<uint8_t>)
+DECLARE_DELEGATE_TwoParams(TextureFetchedDelegate, FGuid, UTexture2D *)
 
 DECLARE_DELEGATE_FourParams(RequestDoneDelegate, HttpAssetFetcher *, FGuid, int, TArray<uint8_t>)
 

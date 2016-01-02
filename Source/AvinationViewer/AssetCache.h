@@ -4,7 +4,7 @@
 
 #include "HttpAssetFetcher.h"
 
-DECLARE_DELEGATE_ThreeParams(OnAssetFetched, FGuid, int, TArray<uint8_t>)
+DECLARE_DELEGATE_TwoParams(OnAssetFetched, FGuid, TArray<uint8_t>)
 
 /**
  * 

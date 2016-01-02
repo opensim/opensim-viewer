@@ -23,5 +23,5 @@ protected:
     bool haveAllAssets;
 
 private:
-    virtual void AssetReceived(FGuid id, int status, TArray<uint8_t> data);
+    virtual void AssetReceived(FGuid id, TArray<uint8_t> data);
 };

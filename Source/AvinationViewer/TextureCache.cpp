@@ -30,6 +30,79 @@ TextureCache& TextureCache::Get()
     return *instance;
 }
 
+void TextureCache::Fetch(FGuid id, OnTextureFetched delegate)
+{
+    HttpAssetFetcher *req = new HttpAssetFetcher(id);
+    
+    req->OnTextureFetched.Add(delegate);
+    req->OnRequestDone.BindRaw(this, &TextureCache::RequestDone);
+    
+    queueLock.Lock();
+    if (activeFetches.Num() >= concurrentFetches)
+    {
+        pendingFetches.Add(id, req);
+        queueLock.Unlock();
+    }
+    else
+    {
+        activeFetches.Add(id, req);
+        queueLock.Unlock();
+        req->StartFetch();
+    }
+    
+}
+
+void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray<uint8_t> data)
+{
+    if (status == -1)
+    {
+        // TODO: Implement retry
+        queueLock.Lock();
+        activeFetches.Remove(id);
+        queueLock.Unlock();
+        delete req;
+        return;
+    }
+    
+    if (data.Num() == 0)
+    {
+        // TODO: Intelligent failure handling
+        queueLock.Lock();
+        activeFetches.Remove(id);
+        queueLock.Unlock();
+        delete req;
+        return;
+    }
+    
+    queueLock.Lock();
+    
+    if (activeFetches.Contains(id))
+    {
+        activeFetches.Remove(id);
+//        if (status != -1)
+//            doneFetches.Add(id, req);
+    }
+    
+    if (activeFetches.Num() < concurrentFetches)
+    {
+        auto it = pendingFetches.CreateIterator();
+        if (it)
+        {
+            activeFetches.Add(it.Key(), it.Value());
+            it.Value()->StartFetch();
+            pendingFetches.Remove(it.Key());
+        }
+    }
+    
+    queueLock.Unlock();
+    
+    //while (ThreadedProcessDoneRequests())
+    //    ;
+    
+    //while (DispatchDecodedRequest())
+    //    ;
+}
+
 /*
 void TextureCache::Fetch(FGuid id, OnTextureFetched delegate)
 {

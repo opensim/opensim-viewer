@@ -73,7 +73,7 @@ public:
     PrimMesh *primData;
     SculptMesh *sculptData;
 private:
-    void AssetReceived(FGuid id, int status, TArray<uint8_t> data) override;
+    void AssetReceived(FGuid id, TArray<uint8_t> data) override;
     float ReadFloatValue(rapidxml::xml_node<> *parent, const char *name, float def);
     int ReadIntValue(rapidxml::xml_node<> *parent, const char *name, int def);
     FString ReadStringValue(rapidxml::xml_node<> *parent, const char *name, FString def);
