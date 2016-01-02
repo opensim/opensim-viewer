@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 using UnrealBuildTool;
+using System;
+using System.IO;
 
 public class AvinationViewer : ModuleRules
 {
@@ -22,19 +24,31 @@ public class AvinationViewer : ModuleRules
 		//			DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 		//		}
 		// }
-	
-	if ( Target.Platform == UnrealTargetPlatform.Linux )
-	{
-	  PublicAdditionalLibraries.Add("/lib/libz");
-	  PublicAdditionalLibraries.Add("/usr/lib64/libopenjp2.so");
-	  PublicIncludePaths.Add("/usr/include");
-	  PublicIncludePaths.Add("/usr/include/openjpeg-2.1");	
-        } 
-        else if ( Target.Platform == UnrealTargetPlatform.Mac )
-        {
-	  PublicAdditionalLibraries.Add("/usr/lib/libz.dylib");
-	  PublicAdditionalLibraries.Add("/usr/local/lib/libopenjp2.dylib");
-	  PublicIncludePaths.Add("/usr/local/include/openjpeg-2.1");
-        } // additional platforms
-    }
+		var thisPath = Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name));
+		var depsPath = Path.Combine(thisPath,"..","..","Deps");
+
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			var windeps = Path.Combine(depsPath,"Windows");
+			PublicIncludePaths.Add(windeps);
+			PublicAdditionalLibraries.Add(Path.Combine(windeps,"zlibwapi.lib"));
+			PublicAdditionalLibraries.Add(Path.Combine(windeps,"openjp2.lib"));
+//			PrivateIncludePathModuleNames.Add("TextureCompressor");
+//			PrivateIncludePaths.AddRange(new string[] {
+//				"Developer/Windows/WindowsTargetPlatform/Private"});
+		}
+		else if ( Target.Platform == UnrealTargetPlatform.Linux )
+		{
+		PublicAdditionalLibraries.Add("/lib/libz");
+		PublicAdditionalLibraries.Add("/usr/lib64/libopenjp2.so");
+		PublicIncludePaths.Add("/usr/include");
+		PublicIncludePaths.Add("/usr/include/openjpeg-2.1");	
+		} 
+		else if ( Target.Platform == UnrealTargetPlatform.Mac )
+		{
+		PublicAdditionalLibraries.Add("/usr/lib/libz.dylib");
+		PublicAdditionalLibraries.Add("/usr/local/lib/libopenjp2.dylib");
+		PublicIncludePaths.Add("/usr/local/include/openjpeg-2.1");
+		} // additional platforms
+	}
 }
