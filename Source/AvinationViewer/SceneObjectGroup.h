@@ -4,6 +4,7 @@
 
 #include "SceneObjectBase.h"
 #include "SceneObjectPart.h"
+#include "core.h"
 
 /**
  * 
@@ -22,7 +23,7 @@ public:
     void FetchAssets() override;
     SceneObjectReadyDelegate OnObjectReady;
     
-    FPThreadsCriticalSection fetchLock;
+    FCriticalSection fetchLock;
     int activeFetches;
     bool startingFetch;
     
@@ -34,6 +35,6 @@ public:
     TArray<FGuid> groupTextures;
     
 private:
-    FPThreadsCriticalSection partsLock;
+    FCriticalSection partsLock;
     TArray<SceneObjectBase *> parts;
 };

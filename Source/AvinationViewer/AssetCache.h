@@ -26,7 +26,7 @@ protected:
     
     void RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray<uint8_t> data);
     
-    FPThreadsCriticalSection queueLock;
+    FCriticalSection queueLock;
     
     static AssetCache *instance;
 };

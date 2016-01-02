@@ -37,7 +37,7 @@ protected:
     int concurrentFetches = 2;
     TMap<FGuid, HttpAssetFetcher *> pendingFetches;
     TMap<FGuid, HttpAssetFetcher *> activeFetches;
-    FPThreadsCriticalSection queueLock;
+    FCriticalSection queueLock;
     
     void RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray<uint8_t> data);
     /*

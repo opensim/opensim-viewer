@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AvinationViewer.h"
-#include "AssetDecode.h"
 #include <exception>
+#include "AssetDecode.h"
 #include "Base64.h"
 
 asset_decode_exception::asset_decode_exception(const char *d)

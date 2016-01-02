@@ -11,7 +11,7 @@ class AVINATIONVIEWER_API TextureEntry
 {
 public:
 	TextureEntry();
-    TextureEntry(TextureEntry& source);
+//    TextureEntry(TextureEntry& source);
 	~TextureEntry();
     static bool Parse(TArray<uint8_t> in, TextureEntry& defaultEntry, TArray<TextureEntry>& entries);
     FLinearColor color;

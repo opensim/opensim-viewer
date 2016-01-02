@@ -343,7 +343,8 @@ bool SceneObjectPart::MeshPrim()
     {
         GeneratePrimMesh(lodWanted);
     }
-    catch (std::exception& ex)
+//    catch (std::exception& ex)
+    catch (...)
     {
         return false;
     }
@@ -547,11 +548,17 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
     {
         GenerateSculptMesh(data);
     }
-    catch (std::exception& ex)
+/*
+    catch (asset_decode_exception& ex)
     {
         return false;
     }
-    catch (asset_decode_exception& ex)
+    catch (std::exception& ex)
+    {
+    return false;
+    }
+*/
+    catch (...)
     {
         return false;
     }

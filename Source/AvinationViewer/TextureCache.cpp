@@ -322,7 +322,7 @@ uint32_t TextureCache::Run()
 //        while (ThreadedProcessDoneRequests())
 //            ;
         
-        usleep(10000);
+       AVNSleep(10000);
     }
     return 0;
 }

@@ -7,7 +7,7 @@
 typedef enum _LLSDType
 {
     UNDEF,
-    BOOLEAN,
+    LBOOLEAN,
     INTEGER,
     DOUBLE,
     UUID,

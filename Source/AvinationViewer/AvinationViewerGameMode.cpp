@@ -2,7 +2,15 @@
 
 #include "AvinationViewer.h"
 #include "AvinationViewerGameMode.h"
+
+#if PLATFORM_WINDOWS
+#include "AllowWindowsPlatformTypes.h"
+#include <io.h>
+#include "HideWindowsPlatformTypes.h"
+#else
 #include <unistd.h>
+#endif
+
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -28,13 +36,13 @@ private:
     bool runThis = true;
     AAvinationViewerGameMode *mode;
     
-    FPThreadsCriticalSection poolLock;
+    FCriticalSection poolLock;
     TArray<AMeshActor *> pool;
     
-    FPThreadsCriticalSection readyLock;
+    FCriticalSection readyLock;
     TArray<AMeshActor *> ready;
     
-    FPThreadsCriticalSection textureLock;
+    FCriticalSection textureLock;
     TArray<AMeshActor *> textures;
     
     void ObjectReady(AMeshActor *act);
@@ -114,7 +122,8 @@ void AAvinationViewerGameMode::CreateNewActor(FGuid id, TArray<uint8_t> data)
     {
         doc.parse<0>((char *)xml.GetData());
     }
-    catch (std::exception& e)
+//    catch (std::exception& e)
+    catch (...)
     {
         return;
     }
@@ -210,7 +219,7 @@ uint32_t ObjectCreator::Run()
         if (pool.Num() == 0)
         {
             poolLock.Unlock();
-            usleep(10000);
+            AVNSleep(10000);
             continue;
         }
         

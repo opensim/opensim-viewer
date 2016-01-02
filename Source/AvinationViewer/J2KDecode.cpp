@@ -42,7 +42,7 @@ J2KDecode::~J2KDecode()
         return false;
     }
     
-    bool success = opj_setup_decoder(codec, &parameters);
+    OPJ_BOOL success = opj_setup_decoder(codec, &parameters);
     if (!success)
     {
         opj_destroy_codec(codec);
@@ -59,10 +59,10 @@ J2KDecode::~J2KDecode()
         return false;
     }
     
-    opj_stream_set_read_function(str, &MemStream::read);
-    opj_stream_set_seek_function(str, &MemStream::seek);
-    opj_stream_set_skip_function(str, &MemStream::skip);
-    opj_stream_set_user_data(str, memstr, &MemStream::free);
+    opj_stream_set_read_function(str, MemStream::read);
+    opj_stream_set_seek_function(str, MemStream::seek);
+    opj_stream_set_skip_function(str, MemStream::skip);
+    opj_stream_set_user_data(str, memstr, MemStream::free);
     opj_stream_set_user_data_length(str, data.Num());
     //opj_set_info_handler(codec, showMsg, 0);
     //opj_set_warning_handler(codec, showMsg, 0);

@@ -386,7 +386,8 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
     float stopAngle = profileEnd * twoPi;
     
     try { angles.makeAngles(sides, startAngle, stopAngle); }
-    catch (std::exception& ex)
+//    catch (std::exception& ex)
+    catch (...)
     {
         
 //        errorMessage = "makeAngles failed: Exception: " + ex.ToString()
@@ -407,7 +408,8 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
         else
         {
             try { hollowAngles.makeAngles(hollowSides, startAngle, stopAngle); }
-            catch (std::exception& ex)
+//            catch (std::exception& ex)
+            catch (...)
             {
 //                errorMessage = "makeAngles failed: Exception: " + ex.ToString()
 //                + "\nsides: " + sides.ToString() + " startAngle: " + startAngle.ToString() + " stopAngle: " + stopAngle.ToString();

@@ -1,12 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AvinationViewer.h"
-#include "LLSDDecode.h"
-
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
+#include "LLSDDecode.h"
+
+#if PLATFORM_WINDOWS
+#include "AllowWindowsPlatformTypes.h"
+#include <winsock2.h>
+#include "HideWindowsPlatformTypes.h"
+#elif
+//#include <arpa/inet.h>
+//#include <netinet/in.h>
+#endif
+
+
 
 LLSDDecode::LLSDDecode()
 {
@@ -55,11 +63,11 @@ LLSDItem *LLSDDecode::DecodeItem(uint8_t **d)
             ret->type = UNDEF;
             break;
         case '1':
-            ret->type = BOOLEAN;
+            ret->type = LBOOLEAN;
             ret->data.booleanData = true;
             break;
         case '0':
-            ret->type = BOOLEAN;
+            ret->type = LBOOLEAN;
             ret->data.booleanData = false;
             break;
         case 'i':
@@ -182,9 +190,9 @@ void LLSDDecode::DebugDump()
 
 void LLSDDecode::DumpItem(LLSDItem *item, bool indent)
 {
-    static int level = 0;
+    static int32 level = 0;
     
-    uint32_t i;
+    int32 i;
     if (indent)
     {
         for (i = 0 ; i < level ; i++)
@@ -198,7 +206,7 @@ void LLSDDecode::DumpItem(LLSDItem *item, bool indent)
         case UNDEF:
             printf("UNDEF\n");
             break;
-        case BOOLEAN:
+        case LBOOLEAN:
             printf("BOOLEAN: %s\n", item->data.booleanData ? "TRUE" : "FALSE");
             break;
         case INTEGER:
