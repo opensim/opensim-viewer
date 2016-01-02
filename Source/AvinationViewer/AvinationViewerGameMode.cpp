@@ -71,7 +71,7 @@ void AAvinationViewerGameMode::HandleObjectReady(AMeshActor *act)
     
     act->SetActorLocationAndRotation(pos /* act->sog->GetRootPart()->groupPosition * 100 */, act->sog->GetRootPart()->rotation);
     
-    act->RegsterComponents();
+    act->RegisterComponents();
     act->SetActorHiddenInGame(false);
 }
 
