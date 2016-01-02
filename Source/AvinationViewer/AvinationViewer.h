@@ -10,6 +10,6 @@
 #define AVNSleep(x) Sleep(x);
 #include "HideWindowsPlatformTypes.h"
 #elif
-#define AVNSleep(x) usleep(x);
+#define AVNSleep(x) usleep(x * 10000);
 #endif
 

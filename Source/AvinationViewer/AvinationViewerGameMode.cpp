@@ -219,7 +219,7 @@ uint32_t ObjectCreator::Run()
         if (pool.Num() == 0)
         {
             poolLock.Unlock();
-            AVNSleep(10000);
+            AVNSleep(10);
             continue;
         }
         
