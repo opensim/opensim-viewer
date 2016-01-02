@@ -36,4 +36,5 @@ public class AvinationViewer : ModuleRules
 	  PublicAdditionalLibraries.Add("/usr/local/lib/libopenjp2.dylib");
 	  PublicIncludePaths.Add("/usr/local/include/openjpeg-2.1");
         } // additional platforms
+    }
 }
