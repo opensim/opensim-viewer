@@ -15,25 +15,27 @@ public:
 	~TextureCache();
     static TextureCache& Get();
     
-    void Fetch(FGuid id, OnTextureFetched delegate);
+    //void Fetch(FGuid id, OnTextureFetched delegate);
     
-    static UObject *outer;
+    //static UObject *outer;
     
-    bool ThreadedProcessDoneRequests();
-    bool DispatchDecodedRequest();
+    //bool ThreadedProcessDoneRequests();
+    //bool DispatchDecodedRequest();
 
     virtual bool Init() override;
     uint32_t Run();
     virtual void Stop() override;
     
 protected:
+    TextureCache();
+    
+    static TextureCache *instance;
     FRunnableThread *thread;
     
     bool stopThis = false;
-    int concurrentFetches = 2;
     
-    TextureCache();
-    
+    /*
+     int concurrentFetches = 2;
     TMap<FGuid, HttpAssetFetcher *> pendingFetches;
     TMap<FGuid, HttpAssetFetcher *> activeFetches;
     TMap<FGuid, HttpAssetFetcher *> doneFetches;
@@ -44,8 +46,8 @@ protected:
     
     FPThreadsCriticalSection queueLock;
     FPThreadsCriticalSection cacheLock;
-    
-    static TextureCache *instance;
-    HttpAssetFetcher *currentDispatch = 0;
-    int currentIndex = 0;
+     HttpAssetFetcher *currentDispatch = 0;
+     int currentIndex = 0;
+
+    */
 };

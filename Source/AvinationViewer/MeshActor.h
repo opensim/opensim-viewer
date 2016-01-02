@@ -32,14 +32,13 @@ public:
     
     SceneObjectGroup *sog;
     
-    void RegsterComponents();
+    void RegisterComponents();
     
     ObjectReadyDelegate OnObjectReady;
     
 private:
     UMaterial *baseMaterial;
     UMaterial *baseMaterialTranslucent;
-    TMap<FGuid, UTexture2D *> objectTextures;
     
     UProceduralMeshComponent *BuildComponent(SceneObjectPart *sop);
     UProceduralMeshComponent *BuildComponentFromMesh(SceneObjectPart *sop);
@@ -47,6 +46,6 @@ private:
     UProceduralMeshComponent *BuildComponentFromSculpt(SceneObjectPart *sop);
     
     void ObjectReady();
-    void GotTexture(FGuid id, int status, UTexture2D *texture, UProceduralMeshComponent *mesh, int textureIndex, SceneObjectPart *sop);
+    //void GotTexture(FGuid id, int status, UTexture2D *texture, UProceduralMeshComponent *mesh, int textureIndex, SceneObjectPart *sop);
     UMaterialInstanceDynamic *SetUpMaterial(UProceduralMeshComponent *mesh, int textureIndex, UMaterial *baseMaterial, TextureEntry& te);
 };

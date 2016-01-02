@@ -150,6 +150,18 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     scale.Y = atof(y->value());
     scale.Z = atof(z->value());
     
+    if (scale.X == 0)
+        scale.X = 0.001;
+    if (scale.Y == 0)
+        scale.Y = 0.001;
+    if (scale.Z == 0)
+        scale.Z = 0.001;
+    
+    if (fabs(scale.X) < 1 && fabs(scale.Y) < 1 && fabs(scale.Z) < 1)
+        maxLod = 1;
+    if (fabs(scale.X) < 0.1 && fabs(scale.Y) < 0.1 && fabs(scale.Z) < 0.1)
+        maxLod = 2;
+    
     rapidxml::xml_node<> *rotationNode = xml->first_node("RotationOffset");
     
     if (!rotationNode)
@@ -276,7 +288,7 @@ void SceneObjectPart::FetchAssets()
     }
 }
 
-LLSDItem *SceneObjectPart::GetMeshData()
+LLSDItem *SceneObjectPart::GetMeshData(int lod)
 {
     if ((sculptType & 0x3f) == 5) // Mesh
     {
@@ -292,9 +304,20 @@ LLSDItem *SceneObjectPart::GetMeshData()
         
         TArray<uint8_t> data = dec->AsBase64DecodeArray();
         
+        if (lod < maxLod)
+            lod = maxLod;
+        
+        FString lodLevel = TEXT("high_lod");
+        if (lod == 1)
+            lodLevel = TEXT("medium_lod");
+        else if (lod == 2)
+            lodLevel = TEXT("low_lod");
+        
         LLSDItem *lodData = LLSDMeshDecode::Decode(data.GetData(), TEXT("high_lod"));
         
         delete dec;
+        
+        numFaces = lodData->arrayData.Num();
         
         return lodData;
     }
@@ -309,12 +332,16 @@ inline static bool SortByFace(const ViewerFace& f1, const ViewerFace& f2)
 
 bool SceneObjectPart::MeshPrim()
 {
+    int lodWanted = 0;
+    if (lodWanted < maxLod)
+        lodWanted = maxLod;
+    
     if (meshed)
         return true;
     
     try
     {
-        GeneratePrimMesh(0);
+        GeneratePrimMesh(lodWanted);
     }
     catch (std::exception& ex)
     {
@@ -529,6 +556,8 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
         return false;
     }
 
+    numFaces = 1;
+    
     meshed = true;
     return true;
 }
@@ -575,4 +604,15 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata)
     sculptData = new SculptMesh(rows, (SculptType)sculptType, true, mirror, invert);
     
     delete idec;
+}
+
+void SceneObjectPart::DeleteMeshData()
+{
+    if (primData)
+        delete primData;
+    if (sculptData)
+        delete sculptData;
+    primData = 0;
+    sculptData = 0;
+    meshAssetData.Empty();
 }

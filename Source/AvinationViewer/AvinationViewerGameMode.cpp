@@ -39,8 +39,8 @@ private:
 
 void AAvinationViewerGameMode::HandleMatchHasStarted()
 {
-    delete &TextureCache::Get();
-    TextureCache::outer = this;
+    //delete &TextureCache::Get();
+    //TextureCache::outer = this;
    
     if (creator)
         delete creator;
@@ -130,7 +130,7 @@ void AAvinationViewerGameMode::Tick(float deltaSeconds)
     //static int gap = 2;
     Super::Tick(deltaSeconds);
     
-    TextureCache::Get().DispatchDecodedRequest();
+    //TextureCache::Get().DispatchDecodedRequest();
     creator->TickPool();
     
     /*
@@ -155,7 +155,8 @@ ObjectCreator::ObjectCreator(AAvinationViewerGameMode *m)
 
 ObjectCreator::~ObjectCreator()
 {
-    thread->Kill();
+    runThis = false;
+    //thread->Kill();
     thread->WaitForCompletion();
 }
 
@@ -267,7 +268,7 @@ void ObjectCreator::TickPool()
         ready.RemoveAt(0);
         
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
-        act->RegsterComponents();
+        act->RegisterComponents();
         act->SetActorHiddenInGame(false);
     }
     readyLock.Unlock();

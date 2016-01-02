@@ -23,9 +23,10 @@ public:
     void FetchAssets() override;
     bool MeshPrim();
     bool MeshSculpt(TArray<uint8_t> data);
+    void DeleteMeshData();
     
     virtual bool inline IsObjectPart() override { return true; }
-    LLSDItem * GetMeshData();
+    LLSDItem * GetMeshData(int lod);
     
     FVector groupPosition;
     FVector position;
@@ -42,6 +43,7 @@ public:
     bool isMesh;
     
     int sculptType;
+    int maxLod = 0;
     
     FString meshAssetId;
     

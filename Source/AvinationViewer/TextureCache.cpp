@@ -6,7 +6,7 @@
 #include "AssetDecode.h"
 
 TextureCache *TextureCache::instance = 0;
-UObject *TextureCache::outer = 0;
+//UObject *TextureCache::outer = 0;
 
 TextureCache::TextureCache()
 {
@@ -15,7 +15,7 @@ TextureCache::TextureCache()
 
 TextureCache::~TextureCache()
 {
-    thread->Kill();
+    stopThis = true;
     thread->WaitForCompletion();
     instance = 0;
 }
@@ -30,9 +30,10 @@ TextureCache& TextureCache::Get()
     return *instance;
 }
 
+/*
 void TextureCache::Fetch(FGuid id, OnTextureFetched delegate)
 {
-    return;
+    //return;
     cacheLock.Lock();
     
     if (cache.Contains(id))
@@ -180,12 +181,6 @@ bool TextureCache::ThreadedProcessDoneRequests()
         return true;
     }
     
-    cacheLock.Lock();
-    req->tex = req->dec->CreateTexture(outer, id);
-    
-    cache.Add(id, req->tex);
-    
-    queueLock.Lock();
     doneFetches.Remove(id);
     decodedFetches.Add(id, req);
     queueLock.Unlock();
@@ -233,20 +228,27 @@ bool TextureCache::DispatchDecodedRequest()
     
     queueLock.Unlock();
 
+    cacheLock.Lock();
+    req->tex = req->dec->CreateTexture(outer, id);
+    
+    // TODO: Fix cache
+    //cache.Add(id, req->tex);
+    cacheLock.Unlock();
+    
     currentDispatch = req;
     currentIndex = 0;
     
     return true;
 }
-
+*/
 uint32_t TextureCache::Run()
 {
     while (!stopThis)
     {
-        while (ThreadedProcessDoneRequests())
-            ;
+//        while (ThreadedProcessDoneRequests())
+//            ;
         
-        usleep(100);
+        usleep(10000);
     }
     return 0;
 }

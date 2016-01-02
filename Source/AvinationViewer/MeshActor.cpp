@@ -19,8 +19,9 @@
 // Sets default values
 AMeshActor::AMeshActor()
 {
-    PrimaryActorTick.bCanEverTick = false;
- 
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bStartWithTickEnabled = false;
+    
     SetActorHiddenInGame(true);
     SetActorEnableCollision(false);
     
@@ -66,7 +67,10 @@ void AMeshActor::ObjectReady()
 {
     ClearInstanceComponents(true);
 
-    UProceduralMeshComponent *mesh = BuildComponent(sog->GetRootPart());
+    SceneObjectPart *sop = sog->GetRootPart();
+    UProceduralMeshComponent *mesh = BuildComponent(sop);
+    
+    sop->DeleteMeshData();
     
     SetRootComponent(mesh);
 
@@ -79,7 +83,7 @@ void AMeshActor::ObjectReady()
     
     for (auto it = parts.CreateConstIterator() ; it ; ++it)
     {
-        SceneObjectPart *sop = (SceneObjectPart *)(*it);
+        sop = (SceneObjectPart *)(*it);
         
         // Skip root part
         if (index > 0)
@@ -93,13 +97,16 @@ void AMeshActor::ObjectReady()
             subMesh->SetRelativeLocation(p / sog->GetRootPart()->scale);
             subMesh->SetRelativeRotation(sop->rotation);
         }
+        
+        sop->DeleteMeshData();
+        
         ++index;
     }
     
     OnObjectReady.ExecuteIfBound(this);
 }
 
-void AMeshActor::RegsterComponents()
+void AMeshActor::RegisterComponents()
 {
     for (auto it = GetComponents().CreateConstIterator() ; it ; ++it)
     {
@@ -109,14 +116,19 @@ void AMeshActor::RegsterComponents()
 
 UProceduralMeshComponent *AMeshActor::BuildComponent(SceneObjectPart *sop)
 {
-    if (sop->sculptType == 0) // Prim
-        return BuildComponentFromPrim(sop);
-    else if (sop->sculptType == 5) // Mesh
-        return BuildComponentFromMesh(sop);
-    else
-        return BuildComponentFromSculpt(sop);
+    UProceduralMeshComponent *mesh;
     
-    return 0;
+    if (sop->sculptType == 0) // Prim
+        mesh = BuildComponentFromPrim(sop);
+    else if (sop->sculptType == 5) // Mesh
+        mesh = BuildComponentFromMesh(sop);
+    else
+        mesh = BuildComponentFromSculpt(sop);
+    
+    mesh->SetCullDistance(12800);
+    mesh->SetCachedMaxDrawDistance(12800);
+    
+    return mesh;
 }
 
 UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *sop)
@@ -124,10 +136,10 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
     UProceduralMeshComponent *mesh = NewObject<UProceduralMeshComponent>(this, *sop->uuid.ToString());
     
     mesh->Mobility = EComponentMobility::Movable;
+    
     //mesh->RegisterComponent();
     
-    
-    LLSDItem * data = sop->GetMeshData();
+    LLSDItem * data = sop->GetMeshData(1);
     if (!data)
         return mesh;
     
@@ -250,26 +262,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
         
         mesh->CreateMeshSection(textureIndex, vertices, triangles, normals, uv0, vertexColors, tangents, false);
         
-        UMaterialInstanceDynamic* mat;
-        
-        TextureEntry te = sop->textures[textureIndex];
-        
-        if (objectTextures.Contains(te.textureId))
-        {
-            UTexture2D *t = objectTextures[te.textureId];
-            if (!t->CompressionNoAlpha)
-                mat = SetUpMaterial(mesh, textureIndex, baseMaterialTranslucent, te);
-            else
-                mat = SetUpMaterial(mesh, textureIndex, baseMaterial, te);
-            mat->SetTextureParameterValue(TEXT("Texture"), t);
-        }
-        else
-        {
-            OnTextureFetched del;
-            del.BindUObject(this, &AMeshActor::GotTexture, mesh, textureIndex, sop);
-            TextureCache::Get().Fetch(te.textureId, del);
-        }
-        
         textureIndex++;
     }
     delete data;
@@ -366,26 +358,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
         }
         
         mesh->CreateMeshSection(primFace, vertices, triangles, normals, uv0, vertexColors, tangents, false);
-        
-        UMaterialInstanceDynamic* mat;
-        
-        TextureEntry te = sop->textures[primFace];
-        
-        if (objectTextures.Contains(te.textureId))
-        {
-            UTexture2D *t = objectTextures[te.textureId];
-            if (!t->CompressionNoAlpha)
-                mat = SetUpMaterial(mesh, primFace, baseMaterialTranslucent, te);
-            else
-                mat = SetUpMaterial(mesh, primFace, baseMaterial, te);
-            mat->SetTextureParameterValue(TEXT("Texture"), t);
-        }
-        else
-        {
-            OnTextureFetched del;
-            del.BindUObject(this, &AMeshActor::GotTexture, mesh, primFace, sop);
-            TextureCache::Get().Fetch(te.textureId, del);
-        }
     }
     
     delete sop->primData;
@@ -413,7 +385,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
     if (!sop->sculptData)
         return mesh;
     
-    int numFaces = 1; // Sculpts have only one face
     SculptMesh *prim = sop->sculptData;
     
     TArray<FVector> vertices;
@@ -501,26 +472,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
     delete sop->sculptData;
     sop->sculptData = 0;
     
-    UMaterialInstanceDynamic* mat;
-    
-    TextureEntry te = sop->textures[0];
-    
-    if (objectTextures.Contains(te.textureId))
-    {
-        UTexture2D *t = objectTextures[te.textureId];
-        if (!t->CompressionNoAlpha)
-            mat = SetUpMaterial(mesh, 0, baseMaterialTranslucent, te);
-        else
-            mat = SetUpMaterial(mesh, 0, baseMaterial, te);
-        mat->SetTextureParameterValue(TEXT("Texture"), t);
-    }
-    else
-    {
-        OnTextureFetched del;
-        del.BindUObject(this, &AMeshActor::GotTexture, mesh, 0, sop);
-        TextureCache::Get().Fetch(te.textureId, del);
-    }
-    
     return mesh;
 }
 
@@ -541,6 +492,7 @@ UMaterialInstanceDynamic *AMeshActor::SetUpMaterial(UProceduralMeshComponent *me
     return mat;
 }
 
+/*
 void AMeshActor::GotTexture(FGuid id, int status, UTexture2D *texture, UProceduralMeshComponent *mesh, int textureIndex, SceneObjectPart *sop)
 {
     TextureEntry te = sop->textures[textureIndex];
@@ -576,3 +528,4 @@ void AMeshActor::GotTexture(FGuid id, int status, UTexture2D *texture, UProcedur
         mat->SetTextureParameterValue(TEXT("Texture"), tex);
     }
 }
+*/
