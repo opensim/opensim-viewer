@@ -67,11 +67,11 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
 
     matrix.AddDefaulted(matrixHeight);
     
-    for (v = 0, vv = 0 ; v < height ; ++vv, v += verticalStepHeight)
+    for (v = 0, vv = 0 ; v < (int)height ; ++vv, v += verticalStepHeight)
     {
         matrix[vv].AddDefaulted(matrixWidth);
         
-        for (h = 0, hh = 0 ; h < width ; ++hh, h += horizontalStepWidth)
+        for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += horizontalStepWidth)
         {
             matrix[vv][hh] = rows[v][h];
         }
@@ -92,7 +92,7 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
     
     matrix[vv].AddDefaulted(matrixWidth);
     
-    for (h = 0, hh = 0 ; h < width ; ++hh, h += horizontalStepWidth)
+    for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += horizontalStepWidth)
     {
         if (verticalStepHeight > 1)
         {

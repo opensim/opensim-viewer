@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#define _USE_MATH_DEFINES
 #include "Coord.h"
 #include "PrimQuat.h"
 #include <math.h>
