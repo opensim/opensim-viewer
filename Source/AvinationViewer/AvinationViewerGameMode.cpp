@@ -38,6 +38,7 @@ private:
     TArray<AMeshActor *> textures;
     
     void ObjectReady(AMeshActor *act);
+    void GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act);
 };
 
 void AAvinationViewerGameMode::HandleMatchHasStarted()
@@ -49,6 +50,7 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
         delete creator;
     creator = new ObjectCreator(this);
     
+    /*
     FGuid id;
     //FGuid::Parse(TEXT("77540e8e-5064-4cf9-aa77-ad6617d73508"), id);
     FGuid::Parse(TEXT("8e3377b1-ccc7-4f7b-981d-f30ccae8121d"), id);
@@ -56,6 +58,7 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
     OnAssetFetched d;
     d.BindUObject(this, &AAvinationViewerGameMode::CreateNewActor);
     AssetCache::Get().Fetch(id, d);
+    */
 }
 
 AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data)
@@ -74,6 +77,9 @@ void AAvinationViewerGameMode::HandleObjectReady(AMeshActor *act)
     
     act->RegisterComponents();
     act->SetActorHiddenInGame(false);
+    act->sog->GatherTextures();
+    
+    UE_LOG(LogTemp, Warning, TEXT("%d textures on object"), act->sog->groupTextures.Num());
 }
 
 AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data, ObjectReadyDelegate d, AMeshActor *act)
@@ -186,7 +192,6 @@ bool ObjectCreator::Init()
 
 uint32_t ObjectCreator::Run()
 {
-    return 0;
     struct stat st;
     stat("/Users/melanie/UnrealViewerData/primsback.xml", &st);
     int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
@@ -242,6 +247,14 @@ uint32_t ObjectCreator::Run()
 
 void ObjectCreator::ObjectReady(AMeshActor *act)
 {
+    act->sog->GatherTextures();
+    
+    for (auto it = act->sog->groupTextures.CreateConstIterator() ; it ; ++it)
+    {
+        TextureFetchedDelegate d;
+        d.BindRaw(this, &ObjectCreator::GotTexture, act);
+        TextureCache::Get().Fetch((*it), d);
+    }
     readyLock.Lock();
     ready.Add(act);
     readyLock.Unlock();
@@ -274,4 +287,9 @@ void ObjectCreator::TickPool()
         act->SetActorHiddenInGame(false);
     }
     readyLock.Unlock();
+}
+
+void ObjectCreator::GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act)
+{
+    
 }

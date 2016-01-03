@@ -19,7 +19,7 @@ public:
     
     //static UObject *outer;
     
-    //bool ThreadedProcessDoneRequests();
+    bool ThreadedProcessDoneRequests();
     //bool DispatchDecodedRequest();
 
     virtual bool Init() override;
@@ -37,11 +37,11 @@ protected:
     int concurrentFetches = 2;
     TMap<FGuid, HttpAssetFetcher *> pendingFetches;
     TMap<FGuid, HttpAssetFetcher *> activeFetches;
+    TMap<FGuid, HttpAssetFetcher *> doneFetches;
     FPThreadsCriticalSection queueLock;
     
     void RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray<uint8_t> data);
     /*
-    TMap<FGuid, HttpAssetFetcher *> doneFetches;
     TMap<FGuid, HttpAssetFetcher *> decodedFetches;
     TMap<FGuid, UTexture2D *> cache;
     

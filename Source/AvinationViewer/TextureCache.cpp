@@ -79,8 +79,7 @@ void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArr
     if (activeFetches.Contains(id))
     {
         activeFetches.Remove(id);
-//        if (status != -1)
-//            doneFetches.Add(id, req);
+        doneFetches.Add(id, req);
     }
     
     while (activeFetches.Num() < concurrentFetches)
@@ -95,13 +94,6 @@ void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArr
     }
     
     queueLock.Unlock();
- 
-    for (auto it = req->OnTextureFetched.CreateConstIterator() ; it ; ++it)
-    {
-        (*it).ExecuteIfBound(id, 0);
-    }
-
-    delete req;
 }
 
 /*
@@ -217,6 +209,7 @@ void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArr
     //    ;
 }
 
+*/
 bool TextureCache::ThreadedProcessDoneRequests()
 {
     queueLock.Lock();
@@ -240,30 +233,42 @@ bool TextureCache::ThreadedProcessDoneRequests()
     
     queueLock.Unlock();
     
-    AssetDecode dec(req->data);
+    J2KDecode jdec;
     
-    req->dec = new J2KDecode();
-    
-    if (!req->dec->Decode(dec.AsBase64DecodeArray()))
+    try
     {
-        queueLock.Lock();
-        doneFetches.Remove(id);
-        queueLock.Unlock();
-        
-        // TODO: Broken texture handling
+        AssetDecode dec(req->data);
+        if (!jdec.Decode(dec.AsBase64DecodeArray()))
+        {
+            delete req;
+            return true;
+        }
+    }
+    catch (std::exception& ex)
+    {
         delete req;
         return true;
     }
     
-    doneFetches.Remove(id);
-    decodedFetches.Add(id, req);
-    queueLock.Unlock();
+    UTexture2D *tex = UTexture2D::CreateTransient(jdec.image->comps[0].w, jdec.image->comps[0].h);
     
-    cacheLock.Unlock();
+    for (auto it = req->OnTextureFetched.CreateConstIterator() ; it ; ++it)
+    {
+        (*it).ExecuteIfBound(id, 0);
+    }
+    
+    delete req;
+
+    
+    queueLock.Lock();
+    doneFetches.Remove(id);
+//    decodedFetches.Add(id, req);
+    queueLock.Unlock();
     
     return true;
 }
 
+/*
 bool TextureCache::DispatchDecodedRequest()
 {
     if (currentDispatch)
@@ -319,8 +324,8 @@ uint32_t TextureCache::Run()
 {
     while (!stopThis)
     {
-//        while (ThreadedProcessDoneRequests())
-//            ;
+        while (ThreadedProcessDoneRequests())
+            ;
         
         usleep(10000);
     }
