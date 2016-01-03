@@ -54,35 +54,15 @@ void TextureCache::Fetch(FGuid id, OnTextureFetched delegate)
 
 void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArray<uint8_t> data)
 {
-    if (status == -1)
-    {
-        // TODO: Implement retry
-        queueLock.Lock();
-        activeFetches.Remove(id);
-        queueLock.Unlock();
-        delete req;
-        return;
-    }
-    
-    if (data.Num() == 0)
-    {
-        // TODO: Intelligent failure handling
-        queueLock.Lock();
-        activeFetches.Remove(id);
-        queueLock.Unlock();
-        delete req;
-        return;
-    }
-    
     queueLock.Lock();
-    
-    if (activeFetches.Contains(id))
+    if (!activeFetches.Contains(id))
     {
-        activeFetches.Remove(id);
-        doneFetches.Add(id, req);
+        queueLock.Unlock();
+        delete req;
+        return;
     }
     
-    while (activeFetches.Num() < concurrentFetches)
+    while (activeFetches.Num() - 1 < concurrentFetches)
     {
         auto it = pendingFetches.CreateIterator();
         if (it)
@@ -92,6 +72,27 @@ void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArr
             pendingFetches.Remove(it.Key());
         }
     }
+    
+    if (status == -1)
+    {
+        // TODO: Implement retry
+        activeFetches.Remove(id);
+        queueLock.Unlock();
+        delete req;
+        return;
+    }
+    
+    if (data.Num() == 0)
+    {
+        // TODO: Intelligent failure handling
+        activeFetches.Remove(id);
+        queueLock.Unlock();
+        delete req;
+        return;
+    }
+    
+    activeFetches.Remove(id);
+    doneFetches.Add(id, req);
     
     queueLock.Unlock();
 }
@@ -233,6 +234,9 @@ bool TextureCache::ThreadedProcessDoneRequests()
     
     queueLock.Unlock();
     
+    if (req->status < 0)
+        return false;
+    
     J2KDecode jdec;
     
     try
@@ -252,18 +256,17 @@ bool TextureCache::ThreadedProcessDoneRequests()
     
     UTexture2D *tex = UTexture2D::CreateTransient(jdec.image->comps[0].w, jdec.image->comps[0].h);
     
-    for (auto it = req->OnTextureFetched.CreateConstIterator() ; it ; ++it)
+    for (auto it2 = req->OnTextureFetched.CreateConstIterator() ; it2 ; ++it2)
     {
-        (*it).ExecuteIfBound(id, 0);
+        (*it2).ExecuteIfBound(id, 0);
     }
-    
-    delete req;
-
     
     queueLock.Lock();
     doneFetches.Remove(id);
 //    decodedFetches.Add(id, req);
     queueLock.Unlock();
+    
+    delete req;
     
     return true;
 }
