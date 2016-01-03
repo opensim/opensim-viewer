@@ -8,7 +8,7 @@
 #include "AllowWindowsPlatformTypes.h"
 #include <windows.h>
 #include <thread>
-#define usleep(x) std::this_thread::sleep_for(std::chrono::microseconds(x));
+#define usleep(x) std::this_thread::sleep_for(std::chrono::microseconds((unsigned long long )x));
 #include "HideWindowsPlatformTypes.h"
 #endif
 
