@@ -1,13 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AvinationViewer.h"
-#include "MemStream.h"
 #include <string.h>
+#include "MemStream.h"
 
-MemStream::MemStream(uint8_t *buffer, size_t length)
+
+MemStream::MemStream(uint8_t *buffer, size_t l)
 {
     data = buffer;
-    this->length = length;
+    length = l;
     offset = 0;
 }
 
@@ -31,7 +32,7 @@ size_t MemStream::read(void *buf, size_t len)
     return len;
 }
 
-off_t MemStream::skip(off_t len)
+off_t MemStream::_skip(off_t  len)
 {
     if (len < 0)
         return -1;
@@ -44,7 +45,7 @@ off_t MemStream::skip(off_t len)
     return len;
 }
 
-bool MemStream::seek(off_t pos)
+bool MemStream::_seek(off_t pos)
 {
     if (pos < 0)
         return OPJ_FALSE;

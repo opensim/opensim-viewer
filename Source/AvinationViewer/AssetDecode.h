@@ -7,7 +7,7 @@
  * 
  */
 
-class asset_decode_exception : std::exception
+class asset_decode_exception : public std::exception
 {
 public:
     asset_decode_exception(const char *d);

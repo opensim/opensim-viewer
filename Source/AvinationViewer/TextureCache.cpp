@@ -330,7 +330,7 @@ uint32_t TextureCache::Run()
         while (ThreadedProcessDoneRequests())
             ;
         
-        usleep(10000);
+       usleep(10);
     }
     return 0;
 }

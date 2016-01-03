@@ -2,7 +2,7 @@
 
 #include "AvinationViewer.h"
 #include "ZlibDecompress.h"
-#include <zlib.h>
+#include "zlib.h"
 
 ZlibDecompress::ZlibDecompress()
 {

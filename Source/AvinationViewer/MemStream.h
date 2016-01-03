@@ -4,25 +4,33 @@
 
 #include "openjpeg.h"
 #include <stdlib.h>
+#if PLATFORM_WINDOWS
+#include "AllowWindowsPlatformTypes.h"
+#include <io.h>
+#include "HideWindowsPlatformTypes.h"
+#else
 #include <unistd.h>
+#endif
 
 class MemStream
 {
 public:
     MemStream(uint8_t *buffer, OPJ_SIZE_T length);
     ~MemStream();
-    
-    static OPJ_SIZE_T inline read(void *buf, OPJ_SIZE_T len, void *me) { return ((MemStream *)me)->read(buf, len); }
-    static OPJ_OFF_T inline skip(OPJ_OFF_T len, void *me) { return ((MemStream *)me)->skip(len); }
-    static OPJ_BOOL inline seek(OPJ_OFF_T pos, void *me) { return ((MemStream *)me)->seek(pos); }
+
+//    typedef OPJ_BOOL(*opj_stream_seek_fn) (OPJ_OFF_T p_nb_bytes, void * p_user_data);
+  
+    static size_t inline read(void *buf, size_t len, void *me) { return ((MemStream *)me)->read(buf, len); }
+    static OPJ_OFF_T inline skip(OPJ_OFF_T  len, void *me) { return ((MemStream *)me)->_skip(len); }
+    static OPJ_BOOL inline seek(OPJ_OFF_T  pos, void *me) { return ((MemStream *)me)->_seek(pos); }
     static void inline free(void *buf) { }
     
 private:
     uint8_t *data;
-    OPJ_SIZE_T length;
-    OPJ_OFF_T offset;
+    off_t  length;
+    off_t  offset;
     
-    OPJ_SIZE_T read(void *buf, OPJ_SIZE_T len);
-    OPJ_OFF_T skip(OPJ_OFF_T len);
-    bool seek(OPJ_OFF_T pos);
+    size_t read(void *buf, size_t len);
+    off_t  _skip(off_t  len);
+    bool _seek(off_t  pos);
 };

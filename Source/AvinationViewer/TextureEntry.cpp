@@ -2,8 +2,14 @@
 
 #include "AvinationViewer.h"
 #include "TextureEntry.h"
-#include <arpa/inet.h>
-#include <netinet/in.h>
+#if PLATFORM_WINDOWS
+#include "AllowWindowsPlatformTypes.h"
+#include <winsock2.h>
+#include "HideWindowsPlatformTypes.h"
+#elseif
+//#include <arpa/inet.h>
+//#include <netinet/in.h>
+#endif
 
 TextureEntry::TextureEntry()
 {
@@ -17,7 +23,7 @@ TextureEntry::TextureEntry()
     material = 0;
     media = 0;
 }
-
+/*
 TextureEntry::TextureEntry(TextureEntry& source)
 {
     color = source.color;
@@ -32,7 +38,7 @@ TextureEntry::TextureEntry(TextureEntry& source)
     textureId = source.textureId;
     materialId = source.materialId;
 }
-
+*/
 TextureEntry::~TextureEntry()
 {
 }
