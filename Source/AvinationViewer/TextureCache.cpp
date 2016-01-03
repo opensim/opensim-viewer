@@ -4,6 +4,9 @@
 #include "TextureCache.h"
 #include "J2KDecode.h"
 #include "AssetDecode.h"
+#if !PLATFORM_WINDOWS
+#include <unistd.h>
+#endif
 
 TextureCache *TextureCache::instance = 0;
 //UObject *TextureCache::outer = 0;
@@ -322,7 +325,7 @@ uint32_t TextureCache::Run()
 //        while (ThreadedProcessDoneRequests())
 //            ;
         
-       AVNSleep(10);
+       usleep(10000);
     }
     return 0;
 }

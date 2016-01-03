@@ -7,9 +7,8 @@
 #if PLATFORM_WINDOWS
 #include "AllowWindowsPlatformTypes.h"
 #include <windows.h>
-#define AVNSleep(x) Sleep(x);
+#include <thread>
+#define usleep(x) std::this_thread::sleep_for(std::chrono::microseconds(x));
 #include "HideWindowsPlatformTypes.h"
-#else
-#define AVNSleep(x) usleep(x * 10000);
 #endif
 
