@@ -7,8 +7,8 @@
 #include <winsock2.h>
 #include "HideWindowsPlatformTypes.h"
 #elseif
-//#include <arpa/inet.h>
-//#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #endif
 
 TextureEntry::TextureEntry()
