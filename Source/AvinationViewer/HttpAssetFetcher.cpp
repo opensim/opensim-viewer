@@ -17,11 +17,11 @@ HttpAssetFetcher::~HttpAssetFetcher()
 
 void HttpAssetFetcher::StartFetch()
 {
-    FString url(TEXT("http://asset00.3dhosting.de:8300/assets/"));
+    FString url(TEXT("http://grid-a.3dhosting.de:8400/assets/"));
     
     if (assetID.A > 0x7f000000)
     {
-        url = TEXT("http://asset80.3dhosting.de:8300/assets/");
+        url = TEXT("http://grid-b.3dhosting.de:8400/assets/");
     }
     
     url.Append(assetID.ToString(EGuidFormats::DigitsWithHyphens).ToLower());
@@ -29,6 +29,7 @@ void HttpAssetFetcher::StartFetch()
     //UE_LOG(LogTemp, Warning, TEXT("URL is %s"), *url);
     
     TSharedRef<IHttpRequest> req = (&FHttpModule::Get())->CreateRequest();
+    req->SetHeader(TEXT("Authorization"), TEXT("Basic YXNzZXRzOmdqMzI5dWQ="));
     req->SetVerb(TEXT("GET"));
     req->SetURL(url);
     req->OnProcessRequestComplete().BindRaw(this, &HttpAssetFetcher::requestDone);
