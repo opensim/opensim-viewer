@@ -541,12 +541,16 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
 
 bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
 {
-    if (meshed)
+    int lodWanted = 0;
+    if (lodWanted < maxLod)
+        lodWanted = maxLod;
+    
+   if (meshed)
         return true;
     
     try
     {
-        GenerateSculptMesh(data);
+        GenerateSculptMesh(data, lodWanted);
     }
 /*
     catch (asset_decode_exception& ex)
@@ -569,7 +573,7 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
     return true;
 }
 
-void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata)
+void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata, int lod)
 {
     bool mirror = (sculptType & 0x80) ? true : false;
     bool invert = (sculptType & 0x40) ? true : false;
@@ -608,7 +612,7 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata)
         }
     }
     
-    sculptData = new SculptMesh(rows, (SculptType)sculptType, true, mirror, invert);
+    sculptData = new SculptMesh(rows, (SculptType)sculptType, true, mirror, invert, lod);
     
     delete idec;
 }

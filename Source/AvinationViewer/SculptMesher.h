@@ -19,9 +19,9 @@ public:
     TArray<Coord> normals;
     TArray<UVCoord> uvs;
     
-    SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert);
+    SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
     
-    void _SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert);
+    void _SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
     
     void AddPos(float x, float y, float z);
     void AddRot(PrimQuat q);

@@ -80,7 +80,7 @@ private:
     int ReadIntValue(rapidxml::xml_node<> *parent, const char *name, int def);
     FString ReadStringValue(rapidxml::xml_node<> *parent, const char *name, FString def);
     void GeneratePrimMesh(int lod);
-    void GenerateSculptMesh(TArray<uint8_t> data);
+    void GenerateSculptMesh(TArray<uint8_t> data, int lod);
     
     bool meshed = false;
     TArray<uint8_t> meshAssetData;
