@@ -9,7 +9,7 @@
 #include <windows.h>
 #define AVNSleep(x) Sleep(x);
 #include "HideWindowsPlatformTypes.h"
-#elif
+#else
 #define AVNSleep(x) usleep(x * 10000);
 #endif
 
