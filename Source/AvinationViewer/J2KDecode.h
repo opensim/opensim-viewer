@@ -18,5 +18,5 @@ public:
 
 private:
     
-    static UTexture2D* CreateTexture2D(int32 SrcWidth, int32 SrcHeight, const int32_t *r, const int32_t *g, const int32_t *b, const int32_t *a, UObject* Outer, const FString& Name, const EObjectFlags &Flags);
+    static UTexture2D* CreateTexture2D(int32_t SrcWidth, int32_t SrcHeight, const int32_t *r, const int32_t *g, const int32_t *b, const int32_t *a, UObject* Outer, const FString& Name, const EObjectFlags &Flags);
 };
