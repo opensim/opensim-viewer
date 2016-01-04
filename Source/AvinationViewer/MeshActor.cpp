@@ -67,7 +67,7 @@ void AMeshActor::ObjectReady()
 {
     ClearInstanceComponents(true);
 
-    RootComponent = nullptr;
+    USceneComponent *rootComponent = nullptr;
   
     SceneObjectPart *sop = sog->GetRootPart();
     FString rootName = TEXT("r-");
@@ -76,8 +76,8 @@ void AMeshActor::ObjectReady()
     // create a component that will hold parts, and other action components
     // its scale will only be changed on operations that scale all sog
     // its position  and rotation is the sog one
-    RootComponent = NewObject<USceneComponent>(this, *rootName);
-    SetRootComponent(RootComponent);
+    rootComponent = NewObject<USceneComponent>(this, *rootName);
+    SetRootComponent(rootComponent);
 
     // sog absolute position and rotation from root part
     FVector p = sop->position * 100;
@@ -110,7 +110,7 @@ void AMeshActor::ObjectReady()
             //subMesh->AttachParent = mesh;
             subMesh->AttachTo(RootComponent);
             subMesh->SetWorldScale3D(sop->scale);
-            FVector p = sop->position * 100;
+            p = sop->position * 100;
             subMesh->SetRelativeLocationAndRotation(p, sop->rotation);
         }
         
