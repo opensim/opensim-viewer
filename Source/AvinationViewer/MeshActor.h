@@ -39,6 +39,8 @@ public:
 private:
     UMaterial *baseMaterial;
     UMaterial *baseMaterialTranslucent;
+
+    USceneComponent *RootComponent;
     
     UProceduralMeshComponent *BuildComponent(SceneObjectPart *sop);
     UProceduralMeshComponent *BuildComponentFromMesh(SceneObjectPart *sop);

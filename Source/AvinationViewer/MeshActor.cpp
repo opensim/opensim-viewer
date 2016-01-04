@@ -67,13 +67,29 @@ void AMeshActor::ObjectReady()
 {
     ClearInstanceComponents(true);
 
+    RootComponent = nullptr;
+  
     SceneObjectPart *sop = sog->GetRootPart();
-    UProceduralMeshComponent *mesh = BuildComponent(sop);
-    
-    sop->DeleteMeshData();
-    
-    SetRootComponent(mesh);
+    FString rootName = TEXT("r-");
+    rootName += *sop->uuid.ToString();
 
+    // create a component that will hold parts, and other action components
+    // its scale will only be changed on operations that scale all sog
+    // its position  and rotation is the sog one
+    RootComponent = NewObject<USceneComponent>(this, *rootName);
+    SetRootComponent(RootComponent);
+
+    // sog absolute position and rotation from root part
+    FVector p = sop->position * 100;
+    RootComponent->SetWorldLocationAndRotation(p, sop->rotation);
+    RootComponent->SetWorldScale3D(FVector(1.0f));
+
+    UProceduralMeshComponent *mesh = BuildComponent(sop);
+    sop->DeleteMeshData();
+
+    mesh->AttachTo(RootComponent);
+    // root part relative position and rotation should always be null
+    // unless explicitly changed (as in edit parts on root prim)
     mesh->SetRelativeLocation(FVector(0.0f));
     mesh->SetWorldScale3D(sog->GetRootPart()->scale);
     
@@ -89,16 +105,14 @@ void AMeshActor::ObjectReady()
         if (index > 0)
         {
             UProceduralMeshComponent *subMesh = BuildComponent(sop);
+            sop->DeleteMeshData();
 
             //subMesh->AttachParent = mesh;
             subMesh->AttachTo(RootComponent);
             subMesh->SetWorldScale3D(sop->scale);
             FVector p = sop->position * 100;
-            subMesh->SetRelativeLocation(p / sog->GetRootPart()->scale);
-            subMesh->SetRelativeRotation(sop->rotation);
+            subMesh->SetRelativeLocationAndRotation(p, sop->rotation);
         }
-        
-        sop->DeleteMeshData();
         
         ++index;
     }
