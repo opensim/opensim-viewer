@@ -37,7 +37,9 @@ public:
     ObjectReadyDelegate OnObjectReady;
     
 private:
+    UPROPERTY()
     UMaterial *baseMaterial;
+    UPROPERTY()
     UMaterial *baseMaterialTranslucent;
 
     UProceduralMeshComponent *BuildComponent(SceneObjectPart *sop);
