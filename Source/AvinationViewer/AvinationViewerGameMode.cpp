@@ -202,9 +202,13 @@ bool ObjectCreator::Init()
 uint32_t ObjectCreator::Run()
 {
     struct stat st;
-    stat("/Users/melanie/UnrealViewerData/primsback.xml", &st);
+    if(stat("/Users/melanie/UnrealViewerData/primsback.xml", &st) < 0)
+        return 0;
     int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
     
+    if (fd < 0 || st.st_size == 0)
+        return 0;
+       
     uint8_t *fileData = new uint8_t[st.st_size + 1];
     read(fd, fileData, st.st_size);
     fileData[st.st_size] = 0;

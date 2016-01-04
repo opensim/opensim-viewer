@@ -251,7 +251,7 @@ bool TextureCache::ThreadedProcessDoneRequests()
             return true;
         }
     }
-    catch (std::exception& ex)
+    catch (...)
     {
         delete req;
         return true;
