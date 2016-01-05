@@ -202,9 +202,9 @@ bool ObjectCreator::Init()
 uint32_t ObjectCreator::Run()
 {
     struct stat st;
-    if(stat("/Users/melanie/UnrealViewerData/primsback.xml", &st) < 0)
+    if(stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
         return 0;
-    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
+    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
     
     if (fd < 0 || st.st_size == 0)
         return 0;
@@ -224,20 +224,11 @@ uint32_t ObjectCreator::Run()
 
     while (runThis)
     {
-        poolLock.Lock();
-        if (pool.Num() == 0)
-        {
-            poolLock.Unlock();
-            usleep(10);
-            continue;
-        }
-        
+        usleep(50);
+       
         if (sog)
         {
-            AMeshActor *act = pool[0];
-            pool.RemoveAt(0);
-            
-            poolLock.Unlock();
+            AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
         
             ObjectReadyDelegate d;
             d.BindRaw(this,&ObjectCreator::ObjectReady);
@@ -281,14 +272,6 @@ void ObjectCreator::Stop()
 // MUST BE CALLED ON GAME THREAD
 void ObjectCreator::TickPool()
 {
-    poolLock.Lock();
-    if (pool.Num() < 100)
-    {
-        AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
-        pool.Add(act);
-    }
-    poolLock.Unlock();
-    
     readyLock.Lock();
     if (ready.Num())
     {
