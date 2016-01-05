@@ -65,7 +65,7 @@ void TextureCache::RequestDone(HttpAssetFetcher *req, FGuid id, int status, TArr
         return;
     }
     
-    while (activeFetches.Num() - 1 < concurrentFetches)
+    while (pendingFetches.Num() > 0 && activeFetches.Num() - 1 < concurrentFetches)
     {
         auto it = pendingFetches.CreateIterator();
         if (it)
