@@ -234,14 +234,16 @@ bool TextureCache::ThreadedProcessDoneRequests()
     
     FGuid id = it.Key();
     HttpAssetFetcher *req = it.Value();
-    
+
+    doneFetches.Remove(id);
+    //    decodedFetches.Add(id, req);
     queueLock.Unlock();
     
     if (req->status < 0)
         return false;
-    
+
     J2KDecode jdec;
-    
+
     try
     {
         AssetDecode dec(req->data);
