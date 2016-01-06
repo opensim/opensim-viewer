@@ -30,7 +30,7 @@ public:
 
     bool Load(rapidxml::xml_node<> *data);
 
-    void doBeginPlay();
+    void DoBeginPlay();
 
     SceneObjectGroup *sog;
     

@@ -43,7 +43,7 @@ void AMeshActor::BeginPlay()
 	
 }
 
-void AMeshActor::doBeginPlay()
+void AMeshActor::DoBeginPlay()
 {
     Super::BeginPlay();
 }

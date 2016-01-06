@@ -289,7 +289,7 @@ void ObjectCreator::TickPool()
     {
         AMeshActor *act = ready[0];
         ready.RemoveAt(0);
-        act->doBeginPlay(); // hack needs review
+        act->DoBeginPlay(); // hack needs review
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
         act->SetActorHiddenInGame(false);
