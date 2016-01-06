@@ -12,9 +12,10 @@ class ObjectCreator;
 UCLASS()
 class AVINATIONVIEWER_API AAvinationViewerGameMode : public AGameMode
 {
-	GENERATED_BODY()
-	
-	
+    GENERATED_BODY()
+
+    
+    AAvinationViewerGameMode(const class FObjectInitializer& ObjectInitializer);
 	virtual void HandleMatchHasStarted() override;
     virtual void Tick(float deltaSeconds) override;
     

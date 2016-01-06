@@ -18,6 +18,7 @@
 #include "AssetCache.h"
 #include "AssetDecode.h"
 #include "TextureCache.h"
+#include "AvnCharacter.h"
 
 class ObjectCreator : public FRunnable
 {
@@ -49,11 +50,19 @@ private:
     void GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act);
 };
 
+AAvinationViewerGameMode::AAvinationViewerGameMode(const class FObjectInitializer& ObjectInitializer)
+    : Super(ObjectInitializer)
+{
+    DefaultPawnClass = AAvnCharacter::StaticClass();
+}
+
 void AAvinationViewerGameMode::HandleMatchHasStarted()
 {
+    Super::HandleMatchHasStarted();
     //delete &TextureCache::Get();
     //TextureCache::outer = this;
-   
+
+    
     if (creator)
         delete creator;
     creator = new ObjectCreator(this);
@@ -202,9 +211,11 @@ bool ObjectCreator::Init()
 uint32_t ObjectCreator::Run()
 {
     struct stat st;
-    if(stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
+    if (stat("/Users/melanie/UnrealViewerData/primsback.xml", &st))
+//    if (stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
         return 0;
-    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
+    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
+//    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
     
     if (fd < 0 || st.st_size == 0)
         return 0;
@@ -228,12 +239,13 @@ uint32_t ObjectCreator::Run()
        
         if (sog)
         {
-            AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
+//            AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
         
             ObjectReadyDelegate d;
             d.BindRaw(this,&ObjectCreator::ObjectReady);
             
-            mode->CreateNewActor(sog, d, act);
+//            mode->CreateNewActor(sog, d, act);
+            mode->CreateNewActor(sog, d);
             sog = sog->next_sibling();
         }
         else
@@ -277,7 +289,7 @@ void ObjectCreator::TickPool()
     {
         AMeshActor *act = ready[0];
         ready.RemoveAt(0);
-        
+        act->doBeginPlay(); // hack needs review
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
         act->SetActorHiddenInGame(false);

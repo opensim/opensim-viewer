@@ -8,6 +8,40 @@
 
 enum PathType { Linear = 0, Circular = 1, Flexible = 2 };
 
+enum ProfileShapeType : uint8_t
+{
+    pstCircle = 0,
+    pstSquare = 1,
+    pstIsometricTriangle = 2,
+    pstEquilateralTriangle = 3,
+    pstRightTriangle = 4,
+    pstHalfCircle = 5
+};
+
+enum HollowShapeType : uint8_t
+{
+    hstSame = 0,
+    hstCircle = 16,
+    hstSquare = 32,
+    hstTriangle = 48
+};
+
+enum ExtrusionType : uint8_t
+{
+    etStraight = 0x10,
+    etCurve1 = 0x20,
+    etCurve2 = 0x30,
+    etFlexible = 0x80
+};
+
+enum LevelDetail
+{
+    Lowest  = 0,
+    Low     = 1,
+    High    = 2,
+    Highest = 3   
+};
+
 /**
  * 
  */

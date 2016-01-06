@@ -45,7 +45,7 @@ public:
     bool isMesh;
     
     int sculptType;
-    int maxLod = 0;
+    LevelDetail maxLod = Highest;
     
     FString meshAssetId;
     
@@ -67,8 +67,8 @@ public:
     float profileBegin;
     float profileEnd;
     float profileHollow;
-    uint8_t profileShape;
-    uint8_t hollowShape;
+    ProfileShapeType profileShape;
+    HollowShapeType hollowShape;
     
     int numFaces;
     

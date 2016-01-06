@@ -29,7 +29,9 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
     bool Load(rapidxml::xml_node<> *data);
-    
+
+    void doBeginPlay();
+
     SceneObjectGroup *sog;
     
     void RegisterComponents();
