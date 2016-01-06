@@ -289,12 +289,16 @@ void ObjectCreator::TickPool()
     {
         AMeshActor *act = ready[0];
         ready.RemoveAt(0);
+        readyLock.Unlock();
         act->DoBeginPlay(); // hack needs review
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
         act->SetActorHiddenInGame(false);
     }
-    readyLock.Unlock();
+    else
+    {
+        readyLock.Unlock();
+    }
 }
 
 void ObjectCreator::GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act)
