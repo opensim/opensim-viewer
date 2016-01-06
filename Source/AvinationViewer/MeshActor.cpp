@@ -260,8 +260,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
                 uint16_t t2 = *trianglesData++;
                 uint16_t t3 = *trianglesData++;
                 triangles.Add(t1);
-                triangles.Add(t2);
                 triangles.Add(t3);
+                triangles.Add(t2);
             }
             
             uint16_t numUvs = (*face)->mapData[TEXT("TexCoord0")]->binaryLength / 4; // 3 * uint16_t
@@ -275,7 +275,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
                 uint16_t v = *uvData++;
                 
                 uv0.Add(FVector2D(AvinationUtils::uint16tofloat(u, minU, maxU),
-                                  -AvinationUtils::uint16tofloat(v, minV, maxV)));
+                                  1.0 - AvinationUtils::uint16tofloat(v, minV, maxV)));
             }
         }
         
@@ -322,8 +322,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i1 = vertices.Num();
             vertices.Add(v1);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv1.U,
- //                             1.0f-prim->viewerFaces[face].uv1.V));
-                                prim->viewerFaces[face].uv1.V));
+                               1.0f-prim->viewerFaces[face].uv1.V));
+//                                prim->viewerFaces[face].uv1.V));
             FVector n1(prim->viewerFaces[face].n1.X,
                       -prim->viewerFaces[face].n1.Y,
                       prim->viewerFaces[face].n1.Z);
@@ -338,8 +338,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i2 = vertices.Num();
             vertices.Add(v2);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv2.U,
-//                            1.0f - prim->viewerFaces[face].uv2.V));
-                            prim->viewerFaces[face].uv2.V));
+                            1.0f - prim->viewerFaces[face].uv2.V));
+//                            prim->viewerFaces[face].uv2.V));
             FVector n2(prim->viewerFaces[face].n2.X,
                       -prim->viewerFaces[face].n2.Y,
                       prim->viewerFaces[face].n2.Z);
@@ -354,8 +354,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i3 = vertices.Num();
             vertices.Add(v3);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv3.U,
-//                            1.0f - prim->viewerFaces[face].uv3.V));
-                            prim->viewerFaces[face].uv3.V));
+                            1.0f - prim->viewerFaces[face].uv3.V));
+//                            prim->viewerFaces[face].uv3.V));
             FVector n3(prim->viewerFaces[face].n3.X,
                       -prim->viewerFaces[face].n3.Y,
                       prim->viewerFaces[face].n3.Z);
@@ -387,6 +387,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
     
     delete sop->primData;
     sop->primData = 0;
+   
     
     return mesh;
 }
@@ -430,7 +431,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
         int i1 = vertices.Num();
         vertices.Add(v1);
         uv0.Add(FVector2D(vf.uv1.U,
-                          -vf.uv1.V));
+                          1.0 - vf.uv1.V));
         FVector n1(vf.n1.X,
                   -vf.n1.Y,
                   vf.n1.Z);
@@ -445,7 +446,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
         int i2 = vertices.Num();
         vertices.Add(v2);
         uv0.Add(FVector2D(vf.uv2.U,
-                          -vf.uv2.V));
+                          1.0 - vf.uv2.V));
         FVector n2(vf.n2.X,
                   -vf.n2.Y,
                   vf.n2.Z);
@@ -460,7 +461,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
         int i3 = vertices.Num();
         vertices.Add(v3);
         uv0.Add(FVector2D(vf.uv3.U,
-                          -vf.uv3.V));
+                          1.0 - vf.uv3.V));
         FVector n3(vf.n3.X,
                   -vf.n3.Y,
                   vf.n3.Z);

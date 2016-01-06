@@ -231,6 +231,31 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
         meshAssetId = FString(innerUuidNode->value());
     }
     
+    pathShearX = pathShearX < 128 ? (float)pathShearX * 0.01f : (float)(pathShearX - 256) * 0.01f;
+    pathShearY = pathShearY < 128 ? (float)pathShearY * 0.01f : (float)(pathShearY - 256) * 0.01f;
+    pathBegin = (float)pathBegin * 2.0e-5f;
+    pathEnd = 1.0f - pathEnd * 2.0e-5f;
+    pathScaleX = (float)(pathScaleX - 100) * 0.01f;
+    pathScaleY = (float)(pathScaleY - 100) * 0.01f;
+
+    profileBegin = (float)profileBegin * 2.0e-5f;
+    profileEnd = 1.0f - (float)profileEnd * 2.0e-5f;
+
+    if (profileBegin < 0.0f)
+        profileBegin = 0.0f;
+
+    if (profileEnd < 0.02f)
+        profileEnd = 0.02f;
+    else if (profileEnd > 1.0f)
+        profileEnd = 1.0f;
+
+    if (profileBegin >= profileEnd)
+        profileBegin = profileEnd - 0.02f;
+
+    profileHollow = (float)profileHollow * 2.0e-5f;
+    if (profileHollow > 0.95f)
+        profileHollow = 0.95f;
+
     return true;
 }
 
@@ -360,11 +385,11 @@ bool SceneObjectPart::MeshPrim()
     {
         return false;
     }
-    
+  
     primData->viewerFaces.Sort(SortByFace);
     
     TArray<ViewerFace> faces;
-    
+
     int face = -1;
     int prevFace = -1;
     for (int viewerFace = 0 ; viewerFace < primData->viewerFaces.Num() ; viewerFace++ )
@@ -385,6 +410,7 @@ bool SceneObjectPart::MeshPrim()
         primData->viewerFaces[viewerFace].primFaceNumber = face;
         faces.Add(primData->viewerFaces[viewerFace]);
     }
+
     primData->viewerFaces = faces;
     primData->numPrimFaces = face + 1;
     
@@ -395,34 +421,11 @@ bool SceneObjectPart::MeshPrim()
 
 void SceneObjectPart::GeneratePrimMesh(int lod)
 {
-    pathShearX = pathShearX < 128 ? (float)pathShearX * 0.01f : (float)(pathShearX - 256) * 0.01f;
-    pathShearY = pathShearY < 128 ? (float)pathShearY * 0.01f : (float)(pathShearY - 256) * 0.01f;
-    pathBegin = (float)pathBegin * 2.0e-5f;
-    pathEnd = 1.0f - pathEnd * 2.0e-5f;
-    pathScaleX = (float)(pathScaleX - 100) * 0.01f;
-    pathScaleY = (float)(pathScaleY - 100) * 0.01f;
-    
-    profileBegin = (float)profileBegin * 2.0e-5f;
-    profileEnd = 1.0f - (float)profileEnd * 2.0e-5f;
-
-    if (profileBegin < 0.0f)
-        profileBegin = 0.0f;
-
-    if (profileEnd < 0.02f)
-        profileEnd = 0.02f;
-    else if (profileEnd > 1.0f)
-        profileEnd = 1.0f;
-
-    if (profileBegin >= profileEnd)
-        profileBegin = profileEnd - 0.02f;
-
-    profileHollow = (float)profileHollow * 2.0e-5f;
-    if (profileHollow > 0.95f)
-        profileHollow = 0.95f;
-    
     int sides = 4;
-    
     bool isSphere = false;
+
+    float gprofileBegin = profileBegin;
+    float gprofileEnd = profileEnd;
 
     if (profileShape == pstEquilateralTriangle
         || profileShape == pstIsometricTriangle
@@ -468,8 +471,8 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
             break;
         }
         
-        profileBegin = 0.5f * profileBegin + 0.5f;
-        profileEnd = 0.5f * profileEnd + 0.5f;
+        gprofileBegin = 0.5f * profileBegin + 0.5f;
+        gprofileEnd = 0.5f * profileEnd + 0.5f;
     }
 
     // fallback to same hole type
@@ -503,7 +506,7 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
             hollowsides = 3;
     }
     
-    PrimMesh *newPrim = new PrimMesh(sides, profileBegin, profileEnd, hollowShape, hollowsides);
+    PrimMesh *newPrim = new PrimMesh(sides, gprofileBegin, gprofileEnd, hollowShape, hollowsides);
     newPrim->viewerMode = true;
     newPrim->sphereMode = isSphere;
     newPrim->holeSizeX = pathScaleX;
@@ -528,8 +531,8 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
     }
     else
     {
-        newPrim->holeSizeX = (200 - pathScaleX) * 0.01f;
-        newPrim->holeSizeY = (200 - pathScaleY) * 0.01f;
+        newPrim->holeSizeX = 1.0f - pathScaleX;
+        newPrim->holeSizeY = 1.0f - pathScaleY;
         newPrim->radius = 0.01f * pathRadiusOffset;
         newPrim->revolutions = 1.0f + 0.015f * pathRevolutions;
         newPrim->skew = 0.01f * pathSkew;

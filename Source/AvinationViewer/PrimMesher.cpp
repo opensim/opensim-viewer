@@ -385,16 +385,7 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
     float startAngle = profileStart * twoPi;
     float stopAngle = profileEnd * twoPi;
     
-    try { angles.makeAngles(sides, startAngle, stopAngle); }
-//    catch (std::exception& ex)
-    catch (...)
-    {
-        
-//        errorMessage = "makeAngles failed: Exception: " + ex.ToString()
-//        + "\nsides: " + sides.ToString() + " startAngle: " + startAngle.ToString() + " stopAngle: " + stopAngle.ToString();
-        
-        return;
-    }
+    angles.makeAngles(sides, startAngle, stopAngle);
     
     numOuterVerts = angles.angles.Num();
     
@@ -406,24 +397,15 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
         if (sides == hollowSides)
             hollowAngles = angles;
         else
-        {
-            try { hollowAngles.makeAngles(hollowSides, startAngle, stopAngle); }
-//            catch (std::exception& ex)
-            catch (...)
-            {
-//                errorMessage = "makeAngles failed: Exception: " + ex.ToString()
-//                + "\nsides: " + sides.ToString() + " startAngle: " + startAngle.ToString() + " stopAngle: " + stopAngle.ToString();
-                
-                return;
-            }
-        }
+            hollowAngles.makeAngles(hollowSides, startAngle, stopAngle);
+
         numHollowVerts = hollowAngles.angles.Num();
     }
     else if (!simpleFace)
     {
         coords.Add(center);
         if (calcVertexNormals)
-            vertexNormals.Add(Coord(0.0f, 0.0f, 1.0f));
+            vertexNormals.Add(faceNormal);
         us.Add(0.0f);
     }
     
