@@ -45,7 +45,7 @@ public:
     bool isMesh;
     
     int sculptType;
-    int maxLod = 0;
+    LevelDetail maxLod = Highest;
     
     FString meshAssetId;
     
@@ -67,8 +67,8 @@ public:
     float profileBegin;
     float profileEnd;
     float profileHollow;
-    uint8_t profileShape;
-    uint8_t hollowShape;
+    ProfileShapeType profileShape;
+    HollowShapeType hollowShape;
     
     int numFaces;
     
@@ -80,7 +80,7 @@ private:
     int ReadIntValue(rapidxml::xml_node<> *parent, const char *name, int def);
     FString ReadStringValue(rapidxml::xml_node<> *parent, const char *name, FString def);
     void GeneratePrimMesh(int lod);
-    void GenerateSculptMesh(TArray<uint8_t> data);
+    void GenerateSculptMesh(TArray<uint8_t> data, int lod);
     
     bool meshed = false;
     TArray<uint8_t> meshAssetData;

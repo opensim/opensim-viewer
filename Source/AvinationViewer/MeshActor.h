@@ -29,7 +29,9 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 
     bool Load(rapidxml::xml_node<> *data);
-    
+
+    void doBeginPlay();
+
     SceneObjectGroup *sog;
     
     void RegisterComponents();
@@ -37,9 +39,11 @@ public:
     ObjectReadyDelegate OnObjectReady;
     
 private:
+    UPROPERTY()
     UMaterial *baseMaterial;
+    UPROPERTY()
     UMaterial *baseMaterialTranslucent;
-    
+
     UProceduralMeshComponent *BuildComponent(SceneObjectPart *sop);
     UProceduralMeshComponent *BuildComponentFromMesh(SceneObjectPart *sop);
     UProceduralMeshComponent *BuildComponentFromPrim(SceneObjectPart *sop);

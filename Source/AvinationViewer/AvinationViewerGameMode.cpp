@@ -18,6 +18,7 @@
 #include "AssetCache.h"
 #include "AssetDecode.h"
 #include "TextureCache.h"
+#include "AvnCharacter.h"
 
 class ObjectCreator : public FRunnable
 {
@@ -46,17 +47,27 @@ private:
     TArray<AMeshActor *> textures;
     
     void ObjectReady(AMeshActor *act);
+    void GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act);
 };
+
+AAvinationViewerGameMode::AAvinationViewerGameMode(const class FObjectInitializer& ObjectInitializer)
+    : Super(ObjectInitializer)
+{
+    DefaultPawnClass = AAvnCharacter::StaticClass();
+}
 
 void AAvinationViewerGameMode::HandleMatchHasStarted()
 {
+    Super::HandleMatchHasStarted();
     //delete &TextureCache::Get();
     //TextureCache::outer = this;
-   
+
+    
     if (creator)
         delete creator;
     creator = new ObjectCreator(this);
     
+    /*
     FGuid id;
     //FGuid::Parse(TEXT("77540e8e-5064-4cf9-aa77-ad6617d73508"), id);
     FGuid::Parse(TEXT("8e3377b1-ccc7-4f7b-981d-f30ccae8121d"), id);
@@ -64,6 +75,7 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
     OnAssetFetched d;
     d.BindUObject(this, &AAvinationViewerGameMode::CreateNewActor);
     AssetCache::Get().Fetch(id, d);
+    */
 }
 
 AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data)
@@ -82,6 +94,9 @@ void AAvinationViewerGameMode::HandleObjectReady(AMeshActor *act)
     
     act->RegisterComponents();
     act->SetActorHiddenInGame(false);
+    act->sog->GatherTextures();
+    
+    UE_LOG(LogTemp, Warning, TEXT("%d textures on object"), act->sog->groupTextures.Num());
 }
 
 AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data, ObjectReadyDelegate d, AMeshActor *act)
@@ -195,11 +210,14 @@ bool ObjectCreator::Init()
 
 uint32_t ObjectCreator::Run()
 {
-    return 0;
     struct stat st;
-    stat("/Users/melanie/UnrealViewerData/primsback.xml", &st);
-    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
+    if(stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
+        return 0;
+    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
     
+    if (fd < 0 || st.st_size == 0)
+        return 0;
+       
     uint8_t *fileData = new uint8_t[st.st_size + 1];
     read(fd, fileData, st.st_size);
     fileData[st.st_size] = 0;
@@ -215,25 +233,17 @@ uint32_t ObjectCreator::Run()
 
     while (runThis)
     {
-        poolLock.Lock();
-        if (pool.Num() == 0)
-        {
-            poolLock.Unlock();
-            usleep(10);
-            continue;
-        }
-        
+        usleep(50);
+       
         if (sog)
         {
-            AMeshActor *act = pool[0];
-            pool.RemoveAt(0);
-            
-            poolLock.Unlock();
+//            AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
         
             ObjectReadyDelegate d;
             d.BindRaw(this,&ObjectCreator::ObjectReady);
             
-            mode->CreateNewActor(sog, d, act);
+//            mode->CreateNewActor(sog, d, act);
+            mode->CreateNewActor(sog, d);
             sog = sog->next_sibling();
         }
         else
@@ -251,6 +261,14 @@ uint32_t ObjectCreator::Run()
 
 void ObjectCreator::ObjectReady(AMeshActor *act)
 {
+    act->sog->GatherTextures();
+    
+    for (auto it = act->sog->groupTextures.CreateConstIterator() ; it ; ++it)
+    {
+        TextureFetchedDelegate d;
+        d.BindRaw(this, &ObjectCreator::GotTexture, act);
+        TextureCache::Get().Fetch((*it), d);
+    }
     readyLock.Lock();
     ready.Add(act);
     readyLock.Unlock();
@@ -264,23 +282,20 @@ void ObjectCreator::Stop()
 // MUST BE CALLED ON GAME THREAD
 void ObjectCreator::TickPool()
 {
-    poolLock.Lock();
-    if (pool.Num() < 100)
-    {
-        AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
-        pool.Add(act);
-    }
-    poolLock.Unlock();
-    
     readyLock.Lock();
     if (ready.Num())
     {
         AMeshActor *act = ready[0];
         ready.RemoveAt(0);
-        
+        act->doBeginPlay();
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
         act->SetActorHiddenInGame(false);
     }
     readyLock.Unlock();
+}
+
+void ObjectCreator::GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act)
+{
+    
 }

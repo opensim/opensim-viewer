@@ -106,33 +106,33 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     profileHollow = ReadFloatValue(shapeNode, "ProfileHollow", 0);
     pathCurve = ReadIntValue(shapeNode, "PathCurve", 16);
     
+    profileShape = pstCircle;
+
     FString txt = ReadStringValue(shapeNode, "ProfileShape", "Square");
     if (txt == "Circle")
-        profileShape = 0;
+        profileShape = pstCircle;
     else if (txt == "Square")
-        profileShape = 1;
+        profileShape = pstSquare;
     else if (txt == "IsometricTriangle" || txt == "IsoTriangle")
-        profileShape = 2;
+        profileShape = pstIsometricTriangle;
     else if (txt == "EquilateralTriangle" || txt == "EqualTriangle")
-        profileShape = 3;
+        profileShape = pstEquilateralTriangle;
     else if (txt == "RightTriangle")
-        profileShape = 4;
+        profileShape = pstRightTriangle;
     else if (txt == "HalfCircle")
-        profileShape = 5;
-    else
-        profileShape = 0;
-    
+        profileShape = pstHalfCircle;
+
+    hollowShape = hstSame;
+
     txt = ReadStringValue(shapeNode, "HollowShape", "Square");
     if (txt == "Same")
-        hollowShape = 0;
+        hollowShape = hstSame;
     else if (txt == "Circle")
-        hollowShape = 0x10;
+        hollowShape = hstCircle;
     else if (txt == "Square")
-        hollowShape = 0x20;
+        hollowShape = hstSquare;
     else if (txt == "Triangle")
-        hollowShape = 0x30;
-    else
-        hollowShape = 0;
+        hollowShape = hstTriangle;
     
     rapidxml::xml_node<> *scaleNode = xml->first_node("Scale");
     if (!scaleNode)
@@ -156,12 +156,12 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
         scale.Y = 0.001;
     if (scale.Z == 0)
         scale.Z = 0.001;
-    
+/*    
     if (fabs(scale.X) < 1 && fabs(scale.Y) < 1 && fabs(scale.Z) < 1)
         maxLod = 1;
     if (fabs(scale.X) < 0.1 && fabs(scale.Y) < 0.1 && fabs(scale.Z) < 0.1)
         maxLod = 2;
-    
+*/    
     rapidxml::xml_node<> *rotationNode = xml->first_node("RotationOffset");
     
     if (!rotationNode)
@@ -304,17 +304,29 @@ LLSDItem *SceneObjectPart::GetMeshData(int lod)
         
         TArray<uint8_t> data = dec->AsBase64DecodeArray();
         
-        if (lod < maxLod)
+        if (lod > maxLod)
             lod = maxLod;
+
+        FString lodLevel;
+        switch ((LevelDetail)lod)
+        {
+            case Highest:
+                lodLevel = TEXT("high_lod");
+                break;
+            case High:
+                lodLevel = TEXT("medium_lod");
+                break;
+            case Low:
+                lodLevel = TEXT("low_lod");
+                break;
+            default:
+                lodLevel = TEXT("lowest_lod");
+                break;
+        }
+  
         
-        FString lodLevel = TEXT("high_lod");
-        if (lod == 1)
-            lodLevel = TEXT("medium_lod");
-        else if (lod == 2)
-            lodLevel = TEXT("low_lod");
-        
+//        LLSDItem *lodData = LLSDMeshDecode::Decode(data.GetData(), lodLevel);
         LLSDItem *lodData = LLSDMeshDecode::Decode(data.GetData(), TEXT("high_lod"));
-        
         delete dec;
         
         numFaces = lodData->arrayData.Num();
@@ -332,8 +344,8 @@ inline static bool SortByFace(const ViewerFace& f1, const ViewerFace& f2)
 
 bool SceneObjectPart::MeshPrim()
 {
-    int lodWanted = 0;
-    if (lodWanted < maxLod)
+    int lodWanted = 3;
+    if (lodWanted > maxLod)
         lodWanted = maxLod;
     
     if (meshed)
@@ -392,71 +404,104 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
     
     profileBegin = (float)profileBegin * 2.0e-5f;
     profileEnd = 1.0f - (float)profileEnd * 2.0e-5f;
+
+    if (profileBegin < 0.0f)
+        profileBegin = 0.0f;
+
+    if (profileEnd < 0.02f)
+        profileEnd = 0.02f;
+    else if (profileEnd > 1.0f)
+        profileEnd = 1.0f;
+
+    if (profileBegin >= profileEnd)
+        profileBegin = profileEnd - 0.02f;
+
     profileHollow = (float)profileHollow * 2.0e-5f;
-    
     if (profileHollow > 0.95f)
         profileHollow = 0.95f;
     
     int sides = 4;
-    int hollowsides = 4;
     
     bool isSphere = false;
-    
-    if ((profileShape & 0x07) == 0)
+
+    if (profileShape == pstEquilateralTriangle
+        || profileShape == pstIsometricTriangle
+        || profileShape == pstRightTriangle)
     {
-        switch (lod)
+        sides = 3;
+    }
+    else if (profileShape == pstCircle)
+    {
+        switch ((LevelDetail)lod)
         {
-            case 2:
-                sides = 6;
+            case Highest:
+                sides = 24;
                 break;
-            case 1:
+            case High:
+                sides = 24;
+                break;
+            case Low:
                 sides = 12;
                 break;
             default:
-                sides = 24;
+                sides = 6;
                 break;
         }
     }
-    else if ((profileShape & 0x07) == 3)
-        sides = 3;
-    else if ((profileShape & 0x07) == 5)
+    else if (profileShape == pstHalfCircle)
     {
         // half circle, prim is a sphere
         isSphere = true;
-        switch (lod)
+        switch ((LevelDetail)lod)
         {
-            case 2:
-                sides = 6;
-                break;
-            case 3:
-                sides = 12;
-                break;
-            default:
-                sides = 24;
-                break;
+        case Highest:
+            sides = 24;
+            break;
+        case High:
+            sides = 24;
+            break;
+        case Low:
+            sides = 12;
+            break;
+        default:
+            sides = 6;
+            break;
         }
+        
         profileBegin = 0.5f * profileBegin + 0.5f;
         profileEnd = 0.5f * profileEnd + 0.5f;
     }
-    if (hollowShape == 0)
-        hollowsides = sides;
-    else if (hollowShape == 0x10)
+
+    // fallback to same hole type
+    int hollowsides = sides;
+
+    if (hollowShape == hstCircle)
     {
-        switch (lod)
+        switch ((LevelDetail)lod)
         {
-            case 2:
-                hollowsides = 6;
+            case Highest:
+                hollowsides = 24;
                 break;
-            case 1:
+            case High:
+                hollowsides = 24;
+                break;
+            case Low:
                 hollowsides = 12;
                 break;
             default:
-                hollowsides = 24;
+                hollowsides = 6;
                 break;
         }
     }
-    else if (hollowShape == 0x30)
-        hollowsides = 3;
+    else if (hollowShape == hstSquare)
+        hollowsides = 4;
+    else if (hollowShape == hstTriangle)
+    {
+        if (profileShape == pstHalfCircle)
+            hollowsides = 6;
+        else
+            hollowsides = 3;
+    }
     
     PrimMesh *newPrim = new PrimMesh(sides, profileBegin, profileEnd, hollowShape, hollowsides);
     newPrim->viewerMode = true;
@@ -471,32 +516,14 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
     newPrim->revolutions = pathRevolutions;
     newPrim->skew = pathSkew;
     newPrim->hollow = profileHollow;
-    
-    
-    switch (lod)
-    {
-        case 2:
-            newPrim->stepsPerRevolution = 6;
-            break;
-        case 1:
-            newPrim->stepsPerRevolution = 12;
-            break;
-        default:
-            newPrim->stepsPerRevolution = 24;
-            break;
-    }
-    
-    if ((pathCurve == 0x10) || (pathCurve == 0x80))
+     
+    if (((ExtrusionType)pathCurve == etStraight) || ((ExtrusionType)pathCurve == etFlexible))
     {
         newPrim->twistBegin = pathTwistBegin * 18 / 10;
         newPrim->twistEnd =pathTwist * 18 / 10;
         newPrim->taperX = pathScaleX;
         newPrim->taperY = pathScaleY;
-        if (profileBegin < 0.0f || profileBegin >= profileEnd || profileEnd > 1.0f)
-        {
-            if (profileBegin < 0.0f) profileBegin = 0.0f;
-            if (profileEnd > 1.0f) profileEnd = 1.0f;
-        }
+ 
         newPrim->ExtrudeLinear();
     }
     else
@@ -510,12 +537,7 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
         newPrim->twistEnd = pathTwist * 36 / 10;
         newPrim->taperX = pathTaperX * 0.01f;
         newPrim->taperY = pathTaperY * 0.01f;
-        
-        if (profileBegin < 0.0f || profileBegin >= profileEnd || profileEnd > 1.0f)
-        {
-            if (profileBegin < 0.0f) profileBegin = 0.0f;
-            if (profileEnd > 1.0f) profileEnd = 1.0f;
-        }
+   
         newPrim->ExtrudeCircular();
     }
     
@@ -541,12 +563,16 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
 
 bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
 {
-    if (meshed)
+    int lodWanted = 3;
+    if (lodWanted > maxLod)
+        lodWanted = maxLod;
+    
+   if (meshed)
         return true;
     
     try
     {
-        GenerateSculptMesh(data);
+        GenerateSculptMesh(data, lodWanted);
     }
 /*
     catch (asset_decode_exception& ex)
@@ -569,7 +595,7 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
     return true;
 }
 
-void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata)
+void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata, int lod)
 {
     bool mirror = (sculptType & 0x80) ? true : false;
     bool invert = (sculptType & 0x40) ? true : false;
@@ -592,12 +618,12 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata)
 
     TArray<TArray<Coord>> rows;
     OPJ_INT32 *r = tex->comps[0].data, *g = tex->comps[1].data, *b = tex->comps[2].data;
-    for (int i = 0 ; i < h ; i++)
+    for (int i = 0; i < h; i++)
         rows.AddDefaulted();
-    
-    for (int i = 0 ; i < h ; i++)
+
+    for (int i = 0; i < h; i++)
     {
-        for (int j = 0 ; j < w ; j++)
+        for (int j = 0; j < w; j++)
         {
             Coord c = Coord((float)(*r++ & 0xff) * pixScale - 0.5f,
                             (float)(*g++ & 0xff) * pixScale - 0.5f,
@@ -608,7 +634,7 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata)
         }
     }
     
-    sculptData = new SculptMesh(rows, (SculptType)sculptType, true, mirror, invert);
+    sculptData = new SculptMesh(rows, (SculptType)sculptType, true, mirror, invert, lod);
     
     delete idec;
 }

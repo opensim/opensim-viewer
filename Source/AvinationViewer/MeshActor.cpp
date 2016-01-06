@@ -39,8 +39,13 @@ void AMeshActor::BeginPlay()
 {
     SetActorHiddenInGame(true);
     SetActorEnableCollision(false);
-	Super::BeginPlay();
+//	Super::BeginPlay(); // this needs to be called from mainthread 
 	
+}
+
+void AMeshActor::doBeginPlay()
+{
+    Super::BeginPlay();
 }
 
 // Called every frame
@@ -67,13 +72,29 @@ void AMeshActor::ObjectReady()
 {
     ClearInstanceComponents(true);
 
+    USceneComponent *rootComponent = nullptr;
+  
     SceneObjectPart *sop = sog->GetRootPart();
-    UProceduralMeshComponent *mesh = BuildComponent(sop);
-    
-    sop->DeleteMeshData();
-    
-    SetRootComponent(mesh);
+    FString rootName = TEXT("r-");
+    rootName += *sop->uuid.ToString();
 
+    // create a component that will hold parts, and other action components
+    // its scale will only be changed on operations that scale all sog
+    // its position  and rotation is the sog one
+    rootComponent = NewObject<USceneComponent>(this, *rootName);
+    SetRootComponent(rootComponent);
+
+    // sog absolute position and rotation from root part
+    FVector p = sop->position * 100;
+    RootComponent->SetWorldLocationAndRotation(p, sop->rotation);
+    RootComponent->SetWorldScale3D(FVector(1.0f));
+
+    UProceduralMeshComponent *mesh = BuildComponent(sop);
+    sop->DeleteMeshData();
+
+    mesh->AttachTo(RootComponent);
+    // root part relative position and rotation should always be null
+    // unless explicitly changed (as in edit parts on root prim)
     mesh->SetRelativeLocation(FVector(0.0f));
     mesh->SetWorldScale3D(sog->GetRootPart()->scale);
     
@@ -89,16 +110,14 @@ void AMeshActor::ObjectReady()
         if (index > 0)
         {
             UProceduralMeshComponent *subMesh = BuildComponent(sop);
+            sop->DeleteMeshData();
 
             //subMesh->AttachParent = mesh;
             subMesh->AttachTo(RootComponent);
             subMesh->SetWorldScale3D(sop->scale);
-            FVector p = sop->position * 100;
-            subMesh->SetRelativeLocation(p / sog->GetRootPart()->scale);
-            subMesh->SetRelativeRotation(sop->rotation);
+            p = sop->position * 100;
+            subMesh->SetRelativeLocationAndRotation(p, sop->rotation);
         }
-        
-        sop->DeleteMeshData();
         
         ++index;
     }
@@ -303,7 +322,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i1 = vertices.Num();
             vertices.Add(v1);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv1.U,
-                              prim->viewerFaces[face].uv1.V));
+                              1.0f-prim->viewerFaces[face].uv1.V));
             FVector n1(prim->viewerFaces[face].n1.X,
                       -prim->viewerFaces[face].n1.Y,
                       prim->viewerFaces[face].n1.Z);
@@ -318,7 +337,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i2 = vertices.Num();
             vertices.Add(v2);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv2.U,
-                              prim->viewerFaces[face].uv2.V));
+                            1.0f - prim->viewerFaces[face].uv2.V));
             FVector n2(prim->viewerFaces[face].n2.X,
                       -prim->viewerFaces[face].n2.Y,
                       prim->viewerFaces[face].n2.Z);
@@ -333,7 +352,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i3 = vertices.Num();
             vertices.Add(v3);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv3.U,
-                              prim->viewerFaces[face].uv3.V));
+                            1.0f - prim->viewerFaces[face].uv3.V));
             FVector n3(prim->viewerFaces[face].n3.X,
                       -prim->viewerFaces[face].n3.Y,
                       prim->viewerFaces[face].n3.Z);
@@ -344,7 +363,9 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             triangles.Add(i1);
             triangles.Add(i2);
             triangles.Add(i3);
-            
+//            triangles.Add(i3);
+//            triangles.Add(i2);
+
             /*
             uv0.Add(FVector2D(prim->viewerFaces[face].uv1.U,
                               prim->viewerFaces[face].uv1.V));
@@ -358,6 +379,7 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
         }
         
         mesh->CreateMeshSection(primFace, vertices, triangles, normals, uv0, vertexColors, tangents, false);
+//        mesh->CreateMeshSection(primFace, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), false);
     }
     
     delete sop->primData;

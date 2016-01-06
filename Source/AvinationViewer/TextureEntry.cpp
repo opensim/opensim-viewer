@@ -6,9 +6,9 @@
 #include "AllowWindowsPlatformTypes.h"
 #include <winsock2.h>
 #include "HideWindowsPlatformTypes.h"
-#elif
-//#include <arpa/inet.h>
-//#include <netinet/in.h>
+#else
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #endif
 
 TextureEntry::TextureEntry()

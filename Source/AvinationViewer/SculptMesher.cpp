@@ -3,45 +3,63 @@
 #include "AvinationViewer.h"
 #include "SculptMesher.h"
 
-SculptMesh::SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert)
+SculptMesh::SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod)
 {
-    _SculptMesh(rows, sculptType, viewerMode, mirror, invert);
+    _SculptMesh(rows, sculptType, viewerMode, mirror, invert, lod);
 }
 
-void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert)
+void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod)
 {
+    uint32_t vertsWanted = 4096;
+    switch ((LevelDetail)lod)
+    {
+    case Highest:
+        vertsWanted = 1024;
+        break;
+    case High:
+        vertsWanted = 512;
+        break;
+    case Low:
+        vertsWanted = 128;
+        break;
+    default:
+        vertsWanted = 32;
+        break;
+    }
+
     // It is defined that the sculpt texture shall be no smaller than 64 pixels
     // and that the behavior with a 32 x 32 texture is
     uint32_t height = rows.Num();
     if (height < 2)
         return;
-    
+
     uint32_t width = rows[0].Num();
     if (width < 2)
         return;
-    
+
     // Sculpt textures must be powers of two.
     if (!((height & (~height + 1)) == height) ||
         !((width & (~width + 1)) == width))
         return;
-    
+
     // Sculpties are limited to 1024 vertices. If the count is exceeded, the texture
     // sample rate will be reduced until the vertex count fits.
     uint16_t horizontalStepWidth = 1;
     uint16_t verticalStepHeight = 1;
-    
+
     uint32_t verts = width * height;
-    
-    while (verts > 1024)
+
+    while (verts > vertsWanted)
     {
         horizontalStepWidth *= 2;
         verticalStepHeight *= 2;
+
+        // In the below cases, this LOD has no geometry (doesn't show)
         if (horizontalStepWidth >= width)
             return;
-        
         if (verticalStepHeight >= height)
             return;
-        
+
         verts = (width / horizontalStepWidth) * (height / verticalStepHeight);
     }
     
