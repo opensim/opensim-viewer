@@ -130,7 +130,7 @@ UTexture2D *J2KDecode::CreateTexture(UObject *outer, FGuid id)
     return tex;
 }
 
-UTexture2D* J2KDecode::CreateTexture2D(int32 SrcWidth, int32 SrcHeight, const int32_t *r, const int32_t *g, const int32_t *b, const int32_t *a, UObject* Outer, const FString& Name, const EObjectFlags &Flags)
+UTexture2D* J2KDecode::CreateTexture2D(int32_t SrcWidth, int32_t SrcHeight, const int32_t *r, const int32_t *g, const int32_t *b, const int32_t *a, UObject* Outer, const FString& Name, const EObjectFlags &Flags)
 {
     UTexture2D* Tex2D;
     
@@ -141,12 +141,12 @@ UTexture2D* J2KDecode::CreateTexture2D(int32 SrcWidth, int32 SrcHeight, const in
     
     // Create base mip for the texture we created.
     uint8* MipData = Tex2D->Source.LockMip(0);
-    for (int32 y=0 ; y < SrcHeight ; y++)
+    for (int32_t y=0 ; y < SrcHeight ; y++)
     {
         //uint8* DestPtr = &MipData[(SrcHeight - 1 - y) * SrcWidth * sizeof(FColor)];
         uint8* DestPtr = &MipData[y * SrcWidth * sizeof(FColor)];
         
-        for( int32 x=0; x<SrcWidth; x++ )
+        for(int32_t x=0; x<SrcWidth; x++)
         {
             if (g)
             {
@@ -188,4 +188,6 @@ UTexture2D* J2KDecode::CreateTexture2D(int32 SrcWidth, int32 SrcHeight, const in
     Tex2D->DeferCompression	= true;
     
     return Tex2D;
+
+//    return nullptr;
 }

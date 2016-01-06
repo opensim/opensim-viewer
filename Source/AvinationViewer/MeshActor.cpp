@@ -322,7 +322,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i1 = vertices.Num();
             vertices.Add(v1);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv1.U,
-                              1.0f-prim->viewerFaces[face].uv1.V));
+ //                             1.0f-prim->viewerFaces[face].uv1.V));
+                                prim->viewerFaces[face].uv1.V));
             FVector n1(prim->viewerFaces[face].n1.X,
                       -prim->viewerFaces[face].n1.Y,
                       prim->viewerFaces[face].n1.Z);
@@ -337,7 +338,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i2 = vertices.Num();
             vertices.Add(v2);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv2.U,
-                            1.0f - prim->viewerFaces[face].uv2.V));
+//                            1.0f - prim->viewerFaces[face].uv2.V));
+                            prim->viewerFaces[face].uv2.V));
             FVector n2(prim->viewerFaces[face].n2.X,
                       -prim->viewerFaces[face].n2.Y,
                       prim->viewerFaces[face].n2.Z);
@@ -352,7 +354,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             int i3 = vertices.Num();
             vertices.Add(v3);
             uv0.Add(FVector2D(prim->viewerFaces[face].uv3.U,
-                            1.0f - prim->viewerFaces[face].uv3.V));
+//                            1.0f - prim->viewerFaces[face].uv3.V));
+                            prim->viewerFaces[face].uv3.V));
             FVector n3(prim->viewerFaces[face].n3.X,
                       -prim->viewerFaces[face].n3.Y,
                       prim->viewerFaces[face].n3.Z);

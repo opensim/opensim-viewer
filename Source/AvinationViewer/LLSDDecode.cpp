@@ -9,9 +9,9 @@
 #include "AllowWindowsPlatformTypes.h"
 #include <winsock2.h>
 #include "HideWindowsPlatformTypes.h"
-#elif
-//#include <arpa/inet.h>
-//#include <netinet/in.h>
+#else
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #endif
 
 
@@ -190,9 +190,9 @@ void LLSDDecode::DebugDump()
 
 void LLSDDecode::DumpItem(LLSDItem *item, bool indent)
 {
-    static int32 level = 0;
+    static int level = 0;
     
-    int32 i;
+    int i;
     if (indent)
     {
         for (i = 0 ; i < level ; i++)
