@@ -10,7 +10,7 @@ SculptMesh::SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool v
 
 void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod)
 {
-    uint32_t vertsWanted = 4096;
+    uint32_t vertsWanted = 1024;
     switch ((LevelDetail)lod)
     {
     case Highest:
