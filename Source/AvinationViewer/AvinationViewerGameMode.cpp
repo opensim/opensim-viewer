@@ -50,11 +50,11 @@ private:
     void GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act);
 };
 
-AAvinationViewerGameMode::AAvinationViewerGameMode(const class FObjectInitializer& ObjectInitializer)
-    : Super(ObjectInitializer)
-{
-    DefaultPawnClass = AAvnCharacter::StaticClass();
-}
+//AAvinationViewerGameMode::AAvinationViewerGameMode(const class FObjectInitializer& ObjectInitializer)
+//    : Super(ObjectInitializer)
+//{
+//    DefaultPawnClass = AAvnCharacter::StaticClass();
+//}
 
 void AAvinationViewerGameMode::HandleMatchHasStarted()
 {
