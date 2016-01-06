@@ -52,6 +52,8 @@ void AAvnCharacter::BeginPlay()
 void AAvnCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    FPS++;
 }
 
 void InitializeDefaultInputBindings()
