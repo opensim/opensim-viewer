@@ -18,7 +18,7 @@ AAvnCharacter::AAvnCharacter()
     capsuleComponent->bShouldUpdatePhysicsVolume = true;
     capsuleComponent->bCanEverAffectNavigation = false;
     capsuleComponent->bDynamicObstacle = true;
-
+    capsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
     capsuleComponent->InitCapsuleSize(50.f, 180.0f);
 
     SetActorLocation(FVector(0));
@@ -40,6 +40,7 @@ void AAvnCharacter::BeginPlay()
     UCharacterMovementComponent* CMovement = GetCharacterMovement();
     CMovement->bCheatFlying = true;
     CMovement->SetMovementMode(MOVE_Flying);
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
     // add some debug display
 
@@ -181,7 +182,7 @@ void AAvnCharacter::ShowFrameRate()
 {
     FVector pos = GetActorLocation();
     GEngine->AddOnScreenDebugMessage(0, 1.f, FColor::Yellow, "FPS: " + FString::FromInt(FPS) +
-        " <" + FString::SanitizeFloat(pos.X / 100.0) + "," + FString::SanitizeFloat(pos.Y / 100.0) +
+        " <" + FString::SanitizeFloat(pos.X / 100.0) + "," + FString::SanitizeFloat(-pos.Y / 100.0) +
         "," + FString::SanitizeFloat(pos.Z / 100.0) + ">");
     FPS = 0;
 }

@@ -105,7 +105,15 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     profileEnd = ReadFloatValue(shapeNode, "ProfileEnd", 0);
     profileHollow = ReadFloatValue(shapeNode, "ProfileHollow", 0);
     pathCurve = ReadIntValue(shapeNode, "PathCurve", 16);
-    
+    primFlags = ReadIntValue(shapeNode, "PathCurve", 0);
+
+
+    physicsShapeType = ReadIntValue(shapeNode, "PathCurve", 0);
+
+    ShouldColide = (physicsShapeType != 1);
+    isPhantom = (((PrimFlags)primFlags & Phantom) != None);
+    isPhysical = (((PrimFlags)primFlags & Physics) != None);
+
     profileShape = pstCircle;
 
     FString txt = ReadStringValue(shapeNode, "ProfileShape", "Square");
@@ -156,12 +164,9 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
         scale.Y = 0.001;
     if (scale.Z == 0)
         scale.Z = 0.001;
-/*    
-    if (fabs(scale.X) < 1 && fabs(scale.Y) < 1 && fabs(scale.Z) < 1)
-        maxLod = 1;
-    if (fabs(scale.X) < 0.1 && fabs(scale.Y) < 0.1 && fabs(scale.Z) < 0.1)
-        maxLod = 2;
-*/    
+
+    scale *= 100.0f;
+
     rapidxml::xml_node<> *rotationNode = xml->first_node("RotationOffset");
     
     if (!rotationNode)

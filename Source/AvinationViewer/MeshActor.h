@@ -37,6 +37,8 @@ public:
     void RegisterComponents();
     
     ObjectReadyDelegate OnObjectReady;
+
+//    bool ShouldCollide;
     
 private:
     UPROPERTY()

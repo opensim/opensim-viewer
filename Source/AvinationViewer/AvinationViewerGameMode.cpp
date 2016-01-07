@@ -211,11 +211,11 @@ bool ObjectCreator::Init()
 uint32_t ObjectCreator::Run()
 {
     struct stat st;
-    if (stat("/Users/melanie/UnrealViewerData/primsback.xml", &st))
-//    if (stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
+//    if (stat("/Users/melanie/UnrealViewerData/primsback.xml", &st))
+    if (stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
         return 0;
-    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
-//    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
+//    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
+    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
     
     if (fd < 0 || st.st_size == 0)
         return 0;
@@ -295,10 +295,7 @@ void ObjectCreator::TickPool()
         act->RegisterComponents();
         act->SetActorHiddenInGame(false);
     }
-    else
-    {
-        readyLock.Unlock();
-    }
+    readyLock.Unlock();
 }
 
 void ObjectCreator::GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act)

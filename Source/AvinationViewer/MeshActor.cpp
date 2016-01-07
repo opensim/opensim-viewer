@@ -46,6 +46,8 @@ void AMeshActor::BeginPlay()
 void AMeshActor::DoBeginPlay()
 {
     Super::BeginPlay();
+//    if(ShouldCollide)
+//        SetActorEnableCollision(true);
 }
 
 // Called every frame
@@ -84,6 +86,8 @@ void AMeshActor::ObjectReady()
     rootComponent = NewObject<USceneComponent>(this, *rootName);
     SetRootComponent(rootComponent);
 
+    bool ShouldCollide = !sop->isPhantom;
+
     // sog absolute position and rotation from root part
     FVector p = sop->position * 100;
     RootComponent->SetWorldLocationAndRotation(p, sop->rotation);
@@ -97,7 +101,11 @@ void AMeshActor::ObjectReady()
     // unless explicitly changed (as in edit parts on root prim)
     mesh->SetRelativeLocation(FVector(0.0f));
     mesh->SetWorldScale3D(sog->GetRootPart()->scale);
-    
+//    if (ShouldCollide)
+//    {
+//        mesh->SetCollisionProfileName(TEXT("WorldStatic"));
+//        mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+//    }
     int index = 0;
     
     TArray<SceneObjectBase *> parts = sog->GetParts();
@@ -117,6 +125,11 @@ void AMeshActor::ObjectReady()
             subMesh->SetWorldScale3D(sop->scale);
             p = sop->position * 100;
             subMesh->SetRelativeLocationAndRotation(p, sop->rotation);
+//            if (ShouldCollide && sop->ShouldColide)
+//            {
+//                mesh->SetCollisionProfileName(TEXT("WorldStatic"));
+//                mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+//            }
         }
         
         ++index;
@@ -186,13 +199,13 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
                 LLSDItem *min = positionDomain->mapData[TEXT("Min")];
                 LLSDItem *max = positionDomain->mapData[TEXT("Max")];
                 
-                minX = (float)(min->arrayData[0]->data.doubleData) * 100;
-                minY = (float)(min->arrayData[1]->data.doubleData) * 100;
-                minZ = (float)(min->arrayData[2]->data.doubleData) * 100;
+                minX = (float)(min->arrayData[0]->data.doubleData);
+                minY = (float)(min->arrayData[1]->data.doubleData);
+                minZ = (float)(min->arrayData[2]->data.doubleData);
                 
-                maxX = (float)(max->arrayData[0]->data.doubleData) * 100;
-                maxY = (float)(max->arrayData[1]->data.doubleData) * 100;
-                maxZ = (float)(max->arrayData[2]->data.doubleData) * 100;
+                maxX = (float)(max->arrayData[0]->data.doubleData);
+                maxY = (float)(max->arrayData[1]->data.doubleData);
+                maxZ = (float)(max->arrayData[2]->data.doubleData);
             }
             
             if ((*face)->mapData.Contains(TEXT("TexCoord0Domain")))
@@ -212,12 +225,10 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
             //UE_LOG(LogTemp, Warning, TEXT("Face %d PositionDomain %f, %f, %f - %f, %f, %f"), textureIndex, minX, minY, minZ, maxX, maxY, maxZ);
             
             int binaryLength = (*face)->mapData[TEXT("Position")]->binaryLength;
-            int normalsLength = (*face)->mapData[TEXT("Normal")]->binaryLength;
-            int numVertices = binaryLength / 6; // 3 x uint16_t
-            int numNormals = binaryLength / 6; // 3 x uint16_t
             
+            int numVertices = binaryLength / 6; // 3 x uint16_t
             uint16_t *vertexData = (uint16_t *)((*face)->mapData[TEXT("Position")]->data.binaryData);
-            uint16_t *normalsData = (uint16_t *)((*face)->mapData[TEXT("Normal")]->data.binaryData);
+            
             
             //UE_LOG(LogTemp, Warning, TEXT("Vertex count %d Normals count %d"), numVertices, numNormals);
             
@@ -227,10 +238,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
                 uint16_t posY = *vertexData++;
                 uint16_t posZ = *vertexData++;
                 
-                uint16_t norX = *normalsData++;
-                uint16_t norY = *normalsData++;
-                uint16_t norZ = *normalsData++;
-                
                 FVector pos(AvinationUtils::uint16tofloat(posX, minX, maxX),
                             -AvinationUtils::uint16tofloat(posY, minY, maxY),
                             AvinationUtils::uint16tofloat(posZ, minZ, maxZ));
@@ -238,16 +245,26 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
                 
                 //UE_LOG(LogTemp, Warning, TEXT("Vertex %s"), *pos.ToString());
                 
-                if (idx < numNormals)
-                {
-                    FVector nor(AvinationUtils::uint16tofloat(norX, minX, maxX),
-                                -AvinationUtils::uint16tofloat(norY, minY, maxY),
-                                AvinationUtils::uint16tofloat(norZ, minZ, maxZ));
-                    normals.Add(nor);
-                }
-                
                 tangents.Add(FProcMeshTangent(1, 1, 1));
                 vertexColors.Add(FColor(255, 255, 255, 255));
+            }
+            if ((*face)->mapData.Contains(TEXT("Normal")))
+            {
+                int normalsLength = (*face)->mapData[TEXT("Normal")]->binaryLength;
+                int numNormals = binaryLength / 6; // 3 x uint16_t
+                if (numNormals > numVertices)
+                    numNormals = numVertices;
+                uint16_t *normalsData = (uint16_t *)((*face)->mapData[TEXT("Normal")]->data.binaryData);
+                for (int idx = 0; idx < numNormals; ++idx)
+                {
+                    uint16_t norX = *normalsData++;
+                    uint16_t norY = *normalsData++;
+                    uint16_t norZ = *normalsData++;
+                    FVector nor(AvinationUtils::uint16tofloat(norX, -1.0f, 1.0f),
+                        -AvinationUtils::uint16tofloat(norY, -1.0f, 1.0f),
+                        AvinationUtils::uint16tofloat(norZ, -1.0f, 1.0f));
+                    normals.Add(nor);
+                }
             }
             
             uint16_t numTriangles = (*face)->mapData[TEXT("TriangleList")]->binaryLength / 6; // 3 * uint16_t
@@ -260,8 +277,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromMesh(SceneObjectPart *so
                 uint16_t t2 = *trianglesData++;
                 uint16_t t3 = *trianglesData++;
                 triangles.Add(t1);
-                triangles.Add(t3);
                 triangles.Add(t2);
+                triangles.Add(t3);
             }
             
             uint16_t numUvs = (*face)->mapData[TEXT("TexCoord0")]->binaryLength / 4; // 3 * uint16_t
@@ -315,9 +332,9 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
         
         while (face < prim->viewerFaces.Num() && prim->viewerFaces[face].primFaceNumber == primFace)
         {
-            FVector v1(prim->viewerFaces[face].v1.X * 100.0f,
-                       -prim->viewerFaces[face].v1.Y * 100.0f,
-                       prim->viewerFaces[face].v1.Z * 100.0f);
+            FVector v1(prim->viewerFaces[face].v1.X,
+                       -prim->viewerFaces[face].v1.Y,
+                       prim->viewerFaces[face].v1.Z);
             
             int i1 = vertices.Num();
             vertices.Add(v1);
@@ -331,9 +348,9 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             tangents.Add(FProcMeshTangent(1, 1, 1));
             vertexColors.Add(FColor(255, 255, 255, 255));
             
-            FVector v2(prim->viewerFaces[face].v2.X * 100.0f,
-                       -prim->viewerFaces[face].v2.Y * 100.0f,
-                       prim->viewerFaces[face].v2.Z * 100.0f);
+            FVector v2(prim->viewerFaces[face].v2.X,
+                       -prim->viewerFaces[face].v2.Y,
+                       prim->viewerFaces[face].v2.Z);
             
             int i2 = vertices.Num();
             vertices.Add(v2);
@@ -347,9 +364,9 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
             tangents.Add(FProcMeshTangent(1, 1, 1));
             vertexColors.Add(FColor(255, 255, 255, 255));
             
-            FVector v3(prim->viewerFaces[face].v3.X * 100.0f,
-                       -prim->viewerFaces[face].v3.Y * 100.0f,
-                       prim->viewerFaces[face].v3.Z * 100.0f);
+            FVector v3(prim->viewerFaces[face].v3.X,
+                       -prim->viewerFaces[face].v3.Y,
+                       prim->viewerFaces[face].v3.Z);
             
             int i3 = vertices.Num();
             vertices.Add(v3);
@@ -382,7 +399,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrim(SceneObjectPart *so
         }
         
         mesh->CreateMeshSection(primFace, vertices, triangles, normals, uv0, vertexColors, tangents, false);
-//        mesh->CreateMeshSection(primFace, vertices, triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FColor>(), TArray<FProcMeshTangent>(), false);
     }
     
     delete sop->primData;
@@ -424,9 +440,9 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
     {
         ViewerFace vf = prim->viewerFaces[face];
         
-        FVector v1(vf.v1.X * 100.0f,
-                   -vf.v1.Y * 100.0f,
-                   vf.v1.Z * 100.0f);
+        FVector v1(vf.v1.X,
+                   -vf.v1.Y,
+                   vf.v1.Z);
         
         int i1 = vertices.Num();
         vertices.Add(v1);
@@ -439,9 +455,9 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
         tangents.Add(FProcMeshTangent(1, 1, 1));
         vertexColors.Add(FColor(255, 255, 255, 255));
         
-        FVector v2(vf.v2.X * 100.0f,
-                   -vf.v2.Y * 100.0f,
-                   vf.v2.Z * 100.0f);
+        FVector v2(vf.v2.X,
+                   -vf.v2.Y,
+                   vf.v2.Z);
         
         int i2 = vertices.Num();
         vertices.Add(v2);
@@ -454,9 +470,9 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromSculpt(SceneObjectPart *
         tangents.Add(FProcMeshTangent(1, 1, 1));
         vertexColors.Add(FColor(255, 255, 255, 255));
         
-        FVector v3(vf.v3.X * 100.0f,
-                   -vf.v3.Y * 100.0f,
-                   vf.v3.Z * 100.0f);
+        FVector v3(vf.v3.X,
+                   -vf.v3.Y,
+                   vf.v3.Z);
         
         int i3 = vertices.Num();
         vertices.Add(v3);
