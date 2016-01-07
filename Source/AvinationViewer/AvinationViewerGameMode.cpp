@@ -295,7 +295,10 @@ void ObjectCreator::TickPool()
         act->RegisterComponents();
         act->SetActorHiddenInGame(false);
     }
-    readyLock.Unlock();
+    else
+    {
+        readyLock.Unlock();
+    }
 }
 
 void ObjectCreator::GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act)
