@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "ProceduralMeshComponent.h"
 #pragma once
 #define _USE_MATH_DEFINES
 #include "Coord.h"
@@ -288,4 +288,14 @@ public:
 #endif
     void Scale(float x, float y, float z);
     void DumpRaw(FString path, FString name, FString title);
+};
+
+struct PrimFaceMeshData
+{
+    TArray<FVector> vertices;
+    TArray<int32> triangles;
+    TArray<FVector> normals;
+    TArray<FVector2D> uv0;
+    TArray<FColor> vertexColors;
+    TArray<FProcMeshTangent> tangents;
 };

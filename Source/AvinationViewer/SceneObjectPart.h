@@ -95,11 +95,12 @@ public:
     bool Load(rapidxml::xml_node<> *xml);
     void FetchAssets() override;
     bool MeshPrim();
-    bool MeshSculpt(TArray<uint8_t> data);
+    bool MeshSculpt(TArray<uint8_t>& data);
+    bool MeshMesh(TArray<uint8_t>& data);
     void DeleteMeshData();
     virtual void GatherTextures() override;
 
-    LLSDItem * GetMeshData(int lod);
+    LLSDItem * GetMeshData(TArray<uint8_t>& assetdata,int lod);
     
     virtual SceneObject inline Type() override { return ObjectGroup; }
 
@@ -150,16 +151,19 @@ public:
     int32_t primFlags;
 
     int numFaces;
+    int lodWanted;
     
     PrimMesh *primData;
     SculptMesh *sculptData;
+    TArray<PrimFaceMeshData> primMeshData;
+
 private:
     void AssetReceived(FGuid id, TArray<uint8_t> data) override;
     float ReadFloatValue(rapidxml::xml_node<> *parent, const char *name, float def);
     int ReadIntValue(rapidxml::xml_node<> *parent, const char *name, int def);
     FString ReadStringValue(rapidxml::xml_node<> *parent, const char *name, FString def);
     void GeneratePrimMesh(int lod);
-    void GenerateSculptMesh(TArray<uint8_t> data, int lod);
+    void GenerateSculptMesh(TArray<uint8_t> &data, int lod);
     
     bool meshed = false;
     TArray<uint8_t> meshAssetData;

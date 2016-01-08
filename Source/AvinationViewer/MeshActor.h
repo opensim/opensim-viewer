@@ -48,7 +48,7 @@ private:
 
     UProceduralMeshComponent *BuildComponent(SceneObjectPart *sop);
     UProceduralMeshComponent *BuildComponentFromMesh(SceneObjectPart *sop);
-    UProceduralMeshComponent *BuildComponentFromPrim(SceneObjectPart *sop);
+    UProceduralMeshComponent *BuildComponentFromPrimData(SceneObjectPart *sop);
     UProceduralMeshComponent *BuildComponentFromSculpt(SceneObjectPart *sop);
     
     void ObjectReady();

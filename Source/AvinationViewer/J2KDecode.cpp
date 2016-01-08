@@ -132,11 +132,11 @@ UTexture2D *J2KDecode::CreateTexture(UObject *outer, FGuid id)
 
 UTexture2D* J2KDecode::CreateTexture2D(int32_t SrcWidth, int32_t SrcHeight, const int32_t *r, const int32_t *g, const int32_t *b, const int32_t *a, UObject* Outer, const FString& Name, const EObjectFlags &Flags)
 {
-    UTexture2D* Tex2D;
+//    UTexture2D* Tex2D;
     
-    Tex2D = NewObject<UTexture2D>(Outer, FName(*Name), Flags);
-    Tex2D->Source.Init(SrcWidth, SrcHeight, /*NumSlices=*/ 1, /*NumMips=*/ 1, TSF_BGRA8);
-    
+//    Tex2D = NewObject<UTexture2D>(Outer, FName(*Name), Flags);
+//    Tex2D->Source.Init(SrcWidth, SrcHeight, /*NumSlices=*/ 1, /*NumMips=*/ 1, TSF_BGRA8);
+/*    
     bool hasAlpha = false;
     
     // Create base mip for the texture we created.
@@ -188,6 +188,6 @@ UTexture2D* J2KDecode::CreateTexture2D(int32_t SrcWidth, int32_t SrcHeight, cons
     Tex2D->DeferCompression	= true;
     
     return Tex2D;
-
-//    return nullptr;
+*/
+    return nullptr;
 }

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AvinationViewer.h"
+#include "AvinationUtils.h"
 #include "SceneObjectPart.h"
 #include "SceneObjectGroup.h"
 #include "AssetCache.h"
@@ -218,21 +219,19 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     groupPosition.Z = atof(z->value());
     
     sculptType = atoi(sculptTypeNode->value());
-                      
-    if ((sculptType & 0x3f) == 5) // Mesh
-    {
-        isMesh = true;
-        
-        meshAssetId = FString(innerUuidNode->value());
-    }
-    else if ((sculptType & 0x3f) == 0) // Prim
+    
+    if(sculptType == 0)
     {
         isPrim = true;
+    }
+    else if ((sculptType & 0x37) == 5) // Mesh
+    {
+        isMesh = true;
+        meshAssetId = FString(innerUuidNode->value());
     }
     else
     {
         isSculpt = true;
-        
         meshAssetId = FString(innerUuidNode->value());
     }
     
@@ -261,6 +260,8 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     if (profileHollow > 0.95f)
         profileHollow = 0.95f;
 
+    lodWanted = 3;
+
     return true;
 }
 
@@ -272,15 +273,15 @@ void SceneObjectPart::AssetReceived(FGuid id, TArray<uint8_t> data)
     --group->activeFetches;
     group->fetchLock.Unlock();
 
-    if ((sculptType & 0x3f) != 5) // Sculpt
+    if (isSculpt) // Sculpt
     {
         MeshSculpt(data);
     }
-    else
+    else if (isMesh)
     {
-        meshAssetData = data;
+        MeshMesh(data);
     }
-    
+
     group->CheckAssetsDone();
 }
 
@@ -288,12 +289,14 @@ void SceneObjectPart::FetchAssets()
 {
     FGuid id;
     
-    if ((sculptType & 0x3f) == 0) // Prim
+    if (isPrim) // Prim
     {
+        MeshPrim();
         // Prims need no shape assets
         group->CheckAssetsDone();
     }
-    else if ((sculptType & 0x3f) == 5) // Mesh
+
+    else if (isMesh) // Mesh
     {
         FGuid::Parse(meshAssetId, id);
         OnAssetFetched d;
@@ -318,14 +321,14 @@ void SceneObjectPart::FetchAssets()
     }
 }
 
-LLSDItem *SceneObjectPart::GetMeshData(int lod)
+LLSDItem *SceneObjectPart::GetMeshData(TArray<uint8_t>& assetdata,int lod)
 {
-    if ((sculptType & 0x3f) == 5) // Mesh
+    if (isMesh) // Mesh
     {
         AssetDecode *dec;
         try
         {
-            dec = new AssetDecode(meshAssetData);
+            dec = new AssetDecode(assetdata);
         }
         catch (asset_decode_exception ex)
         {
@@ -338,7 +341,7 @@ LLSDItem *SceneObjectPart::GetMeshData(int lod)
             lod = maxLod;
 
         FString lodLevel;
-        switch ((LevelDetail)lod)
+        switch ((LevelDetail)lodWanted)
         {
             case Highest:
                 lodLevel = TEXT("high_lod");
@@ -367,14 +370,140 @@ LLSDItem *SceneObjectPart::GetMeshData(int lod)
     return 0;
 }
 
-inline static bool SortByFace(const ViewerFace& f1, const ViewerFace& f2)
+bool SceneObjectPart::MeshMesh(TArray<uint8_t>& assetdata)
 {
-    return f1.primFaceNumber < f2.primFaceNumber;
+    LLSDItem * data = GetMeshData(assetdata, 0);
+    if (!data)
+        return false;
+
+    int textureIndex = 0;
+    numFaces = 0;
+
+    primMeshData.Empty();
+
+    for (auto face = data->arrayData.CreateConstIterator(); face; ++face)
+    {
+        PrimFaceMeshData pm;
+
+        float minX = -0.5f, minY = -0.5f, minZ = -0.5f, maxX = 0.5f, maxY = 0.5f, maxZ = 0.5f;
+        float minU = 0.0f, minV = 0.0f, maxU = 0.0f, maxV = 0.0f;
+
+
+        if (!(*face)->mapData.Contains(TEXT("NoGeometry")) || !(*face)->mapData[TEXT("NoGeometry")]->data.booleanData)
+        {
+            if ((*face)->mapData.Contains(TEXT("PositionDomain")))
+            {
+                //LLSDDecode::DumpItem((*face)->mapData[TEXT("PositionDomain")]);
+                LLSDItem *positionDomain = (*face)->mapData[TEXT("PositionDomain")];
+
+                LLSDItem *min = positionDomain->mapData[TEXT("Min")];
+                LLSDItem *max = positionDomain->mapData[TEXT("Max")];
+
+                minX = (float)(min->arrayData[0]->data.doubleData);
+                minY = (float)(min->arrayData[1]->data.doubleData);
+                minZ = (float)(min->arrayData[2]->data.doubleData);
+
+                maxX = (float)(max->arrayData[0]->data.doubleData);
+                maxY = (float)(max->arrayData[1]->data.doubleData);
+                maxZ = (float)(max->arrayData[2]->data.doubleData);
+            }
+
+            if ((*face)->mapData.Contains(TEXT("TexCoord0Domain")))
+            {
+                LLSDItem *texDomain = (*face)->mapData[TEXT("TexCoord0Domain")];
+
+                LLSDItem *min = texDomain->mapData[TEXT("Min")];
+                LLSDItem *max = texDomain->mapData[TEXT("Max")];
+
+                minU = (float)(min->arrayData[0]->data.doubleData);
+                minV = (float)(min->arrayData[1]->data.doubleData);
+
+                maxU = (float)(max->arrayData[0]->data.doubleData);
+                maxV = (float)(max->arrayData[1]->data.doubleData);
+            }
+
+            //UE_LOG(LogTemp, Warning, TEXT("Face %d PositionDomain %f, %f, %f - %f, %f, %f"), textureIndex, minX, minY, minZ, maxX, maxY, maxZ);
+
+            int binaryLength = (*face)->mapData[TEXT("Position")]->binaryLength;
+
+            int numVertices = binaryLength / 6; // 3 x uint16_t
+            uint16_t *vertexData = (uint16_t *)((*face)->mapData[TEXT("Position")]->data.binaryData);
+
+
+            //UE_LOG(LogTemp, Warning, TEXT("Vertex count %d Normals count %d"), numVertices, numNormals);
+
+            for (int idx = 0; idx < numVertices; ++idx)
+            {
+                uint16_t posX = *vertexData++;
+                uint16_t posY = *vertexData++;
+                uint16_t posZ = *vertexData++;
+
+                FVector pos(AvinationUtils::uint16tofloat(posX, minX, maxX),
+                    -AvinationUtils::uint16tofloat(posY, minY, maxY),
+                    AvinationUtils::uint16tofloat(posZ, minZ, maxZ));
+                pm.vertices.Add(pos);
+
+                //UE_LOG(LogTemp, Warning, TEXT("Vertex %s"), *pos.ToString());
+
+                pm.tangents.Add(FProcMeshTangent(1, 1, 1));
+                pm.vertexColors.Add(FColor(255, 255, 255, 255));
+            }
+            if ((*face)->mapData.Contains(TEXT("Normal")))
+            {
+                int normalsLength = (*face)->mapData[TEXT("Normal")]->binaryLength;
+                int numNormals = binaryLength / 6; // 3 x uint16_t
+                if (numNormals > numVertices)
+                    numNormals = numVertices;
+                uint16_t *normalsData = (uint16_t *)((*face)->mapData[TEXT("Normal")]->data.binaryData);
+                for (int idx = 0; idx < numNormals; ++idx)
+                {
+                    uint16_t norX = *normalsData++;
+                    uint16_t norY = *normalsData++;
+                    uint16_t norZ = *normalsData++;
+                    FVector nor(AvinationUtils::uint16tofloat(norX, -1.0f, 1.0f),
+                        -AvinationUtils::uint16tofloat(norY, -1.0f, 1.0f),
+                        AvinationUtils::uint16tofloat(norZ, -1.0f, 1.0f));
+                    pm.normals.Add(nor);
+                }
+            }
+
+            uint16_t numTriangles = (*face)->mapData[TEXT("TriangleList")]->binaryLength / 6; // 3 * uint16_t
+            uint16_t *trianglesData = (uint16_t *)((*face)->mapData[TEXT("TriangleList")]->data.binaryData);
+
+            //UE_LOG(LogTemp, Warning, TEXT("Triangles count %d"), numTriangles);
+            for (int idx = 0; idx < numTriangles; ++idx)
+            {
+                uint16_t t1 = *trianglesData++;
+                uint16_t t2 = *trianglesData++;
+                uint16_t t3 = *trianglesData++;
+                pm.triangles.Add(t1);
+                pm.triangles.Add(t2);
+                pm.triangles.Add(t3);
+            }
+
+            uint16_t numUvs = (*face)->mapData[TEXT("TexCoord0")]->binaryLength / 4; // 3 * uint16_t
+            uint16_t *uvData = (uint16_t *)((*face)->mapData[TEXT("TexCoord0")]->data.binaryData);
+
+            //UE_LOG(LogTemp, Warning, TEXT("UV count %d"), numUvs);
+
+            for (int idx = 0; idx < numUvs; ++idx)
+            {
+                uint16_t u = *uvData++;
+                uint16_t v = *uvData++;
+
+                pm.uv0.Add(FVector2D(AvinationUtils::uint16tofloat(u, minU, maxU),
+                    1.0 - AvinationUtils::uint16tofloat(v, minV, maxV)));
+            }
+        }
+        primMeshData.Add(pm);
+        numFaces++;
+    }
+    
+    return true;
 }
 
 bool SceneObjectPart::MeshPrim()
 {
-    int lodWanted = 3;
     if (lodWanted > maxLod)
         lodWanted = maxLod;
     
@@ -390,36 +519,88 @@ bool SceneObjectPart::MeshPrim()
     {
         return false;
     }
-  
-    primData->viewerFaces.Sort(SortByFace);
-    
-    TArray<ViewerFace> faces;
 
-    int face = -1;
-    int prevFace = -1;
-    for (int viewerFace = 0 ; viewerFace < primData->viewerFaces.Num() ; viewerFace++ )
+    primMeshData.Empty();
+    for (int i = 0; i < 16; i++)
     {
-        if (primData->viewerFaces[viewerFace].v1 == primData->viewerFaces[viewerFace].v2 ||
-            primData->viewerFaces[viewerFace].v1 == primData->viewerFaces[viewerFace].v3 ||
-            primData->viewerFaces[viewerFace].v2 == primData->viewerFaces[viewerFace].v3)
+        PrimFaceMeshData pm;
+        primMeshData.Add(pm);
+    }
+
+    int primFace;
+    numFaces = 0;
+    for (int face = 0; face < primData->viewerFaces.Num(); face++)
+    {
+        primFace = primData->viewerFaces[face].primFaceNumber;
+        if (primFace >= 16 || primData < 0)
+            continue;
+        
+        PrimFaceMeshData *pm = &primMeshData[primFace];
+
+        // vertices
+        FVector v1(primData->viewerFaces[face].v1.X,
+                -primData->viewerFaces[face].v1.Y,
+                primData->viewerFaces[face].v1.Z);
+        FVector v2(primData->viewerFaces[face].v2.X,
+                -primData->viewerFaces[face].v2.Y,
+                primData->viewerFaces[face].v2.Z);
+        FVector v3(primData->viewerFaces[face].v3.X,
+                -primData->viewerFaces[face].v3.Y,
+                primData->viewerFaces[face].v3.Z);
+
+        if (v1 == v2 || v1 == v3 || v2 == v3)
         {
             // This is not a rational triangle
             continue;
         }
-        
-        if (primData->viewerFaces[viewerFace].primFaceNumber != prevFace)
-        {
-            face++;
-            prevFace = primData->viewerFaces[viewerFace].primFaceNumber;
-        }
-        primData->viewerFaces[viewerFace].primFaceNumber = face;
-        faces.Add(primData->viewerFaces[viewerFace]);
+
+        int indx = pm->vertices.Num();
+        pm->vertices.Add(v1);
+        pm->vertices.Add(v2);
+        pm->vertices.Add(v3);
+    
+        // triangles
+        pm->triangles.Add(indx);
+        pm->triangles.Add(indx + 1);
+        pm->triangles.Add(indx + 2);
+
+        //normals
+        FVector n1(primData->viewerFaces[face].n1.X,
+                -primData->viewerFaces[face].n1.Y,
+                primData->viewerFaces[face].n1.Z);
+        FVector n2(primData->viewerFaces[face].n2.X,
+                -primData->viewerFaces[face].n2.Y,
+                primData->viewerFaces[face].n2.Z);
+        FVector n3(primData->viewerFaces[face].n3.X,
+                -primData->viewerFaces[face].n3.Y,
+                primData->viewerFaces[face].n3.Z);
+
+        pm->normals.Add(n1);
+        pm->normals.Add(n2);
+        pm->normals.Add(n3);
+
+        //uv map
+        pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.U,
+                1.0f - primData->viewerFaces[face].uv1.V));
+        pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.U,
+                1.0f - primData->viewerFaces[face].uv2.V));
+        pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.U,
+                1.0f - primData->viewerFaces[face].uv3.V));
+
+        // colors
+        pm->vertexColors.Add(FColor(255, 255, 255, 255));
+        pm->vertexColors.Add(FColor(255, 255, 255, 255));
+        pm->vertexColors.Add(FColor(255, 255, 255, 255));
+
+        // tangents
+        pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+        pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+        pm->tangents.Add(FProcMeshTangent(1, 1, 1));
     }
 
-    primData->viewerFaces = faces;
-    primData->numPrimFaces = face + 1;
-    
-    numFaces = face + 1;
+    delete primData;
+    primData = 0;
+
     meshed = true;
     return true;
 }
@@ -569,9 +750,8 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
     */
 }
 
-bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
+bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
 {
-    int lodWanted = 3;
     if (lodWanted > maxLod)
         lodWanted = maxLod;
     
@@ -597,13 +777,63 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t> data)
         return false;
     }
 
+    if (!sculptData)
+        return false;
+
+    SculptMesh *prim = sculptData;
+
+    PrimFaceMeshData pm;
+    primMeshData.Empty();
+
+    for (int face = 0; face < prim->viewerFaces.Num(); ++face)
+    {
+        ViewerFace* vf = &prim->viewerFaces[face];
+
+        FVector v1(vf->v1.X, -vf->v1.Y, vf->v1.Z);
+        FVector v2(vf->v2.X, -vf->v2.Y, vf->v2.Z);
+        FVector v3(vf->v3.X, -vf->v3.Y, vf->v3.Z);
+
+        if (v1 == v2 || v1 == v3 || v2 == v3)
+            continue;
+
+        int index = pm.vertices.Num();
+        pm.vertices.Add(v1);
+        pm.vertices.Add(v2);
+        pm.vertices.Add(v3);
+
+        pm.triangles.Add(index);
+        pm.triangles.Add(index + 2);
+        pm.triangles.Add(index + 1);
+
+        FVector n1(vf->n1.X, -vf->n1.Y,  vf->n1.Z);
+        FVector n2(vf->n2.X, -vf->n2.Y,  vf->n2.Z);
+        FVector n3(vf->n3.X, -vf->n3.Y,  vf->n3.Z);
+
+        pm.normals.Add(n1);
+        pm.normals.Add(n2);
+        pm.normals.Add(n3);
+
+        pm.uv0.Add(FVector2D(vf->uv1.U, 1.0 - vf->uv1.V));
+        pm.uv0.Add(FVector2D(vf->uv2.U, 1.0 - vf->uv2.V));
+        pm.uv0.Add(FVector2D(vf->uv3.U, 1.0 - vf->uv3.V));
+
+        pm.tangents.Add(FProcMeshTangent(1, 1, 1));
+        pm.tangents.Add(FProcMeshTangent(1, 1, 1));
+        pm.tangents.Add(FProcMeshTangent(1, 1, 1));
+
+        pm.vertexColors.Add(FColor(255, 255, 255, 255));
+        pm.vertexColors.Add(FColor(255, 255, 255, 255));
+        pm.vertexColors.Add(FColor(255, 255, 255, 255));
+    }
+    primMeshData.Add(pm);
+
     numFaces = 1;
     
     meshed = true;
     return true;
 }
 
-void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t> indata, int lod)
+void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t>& indata, int lod)
 {
     bool mirror = (sculptType & 0x80) ? true : false;
     bool invert = (sculptType & 0x40) ? true : false;
