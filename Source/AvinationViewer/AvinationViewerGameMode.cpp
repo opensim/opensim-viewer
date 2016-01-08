@@ -15,9 +15,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include "MeshActor.h"
-#include "AssetCache.h"
-#include "AssetDecode.h"
-#include "TextureCache.h"
+#include "AssetSubsystem/AssetCache.h"
+#include "AssetSubsystem/AssetDecode.h"
+#include "AssetSubsystem/TextureCache.h"
 #include "AvnCharacter.h"
 
 class ObjectCreator : public FRunnable

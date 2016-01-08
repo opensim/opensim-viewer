@@ -3,7 +3,7 @@
 #include "AvinationViewer.h"
 #include "J2KDecode.h"
 #include "ImageUtils.h"
-#include "MemStream.h"
+#include "../Utils/MemStream.h"
 
 void showMsg(const char *msg, void *userData)
 {

@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "AvinationViewer.h"
-#include "AvinationUtils.h"
+#include "../Utils/AvinationUtils.h"
 #include "SceneObjectPart.h"
 #include "SceneObjectGroup.h"
-#include "AssetCache.h"
-#include "AssetDecode.h"
-#include "LLSDMeshDecode.h"
+#include "../AssetSubsystem/AssetCache.h"
+#include "../AssetSubsystem/AssetDecode.h"
+#include "../AssetSubsystem/LLSDMeshDecode.h"
 #include <cstdlib>
 #include "Base64.h"
-#include "PrimMesher.h"
-#include "J2KDecode.h"
+#include "../Meshing/PrimMesher.h"
+#include "../AssetSubsystem/J2KDecode.h"
 #include "openjpeg.h"
 
 SceneObjectPart::SceneObjectPart()

@@ -2,7 +2,7 @@
 
 #include "AvinationViewer.h"
 #include "LLSDMeshDecode.h"
-#include "ZlibDecompress.h"
+#include "../Utils/ZlibDecompress.h"
 #include "LLSDDecode.h"
 
 LLSDMeshDecode::LLSDMeshDecode()

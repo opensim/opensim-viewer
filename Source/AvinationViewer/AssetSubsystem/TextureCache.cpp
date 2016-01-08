@@ -259,7 +259,7 @@ bool TextureCache::ThreadedProcessDoneRequests()
         return true;
     }
     
-    UTexture2D *tex = UTexture2D::CreateTransient(jdec.image->comps[0].w, jdec.image->comps[0].h);
+    //UTexture2D *tex = UTexture2D::CreateTransient(jdec.image->comps[0].w, jdec.image->comps[0].h);
     
     for (auto it2 = req->OnTextureFetched.CreateConstIterator() ; it2 ; ++it2)
     {

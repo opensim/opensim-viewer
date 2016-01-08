@@ -4,8 +4,8 @@
 
 #include "AvinationBaseActor.h"
 #include "Http.h"
-#include "SceneObjectGroup.h"
-#include "SceneObjectPart.h"
+#include "SceneObjects/SceneObjectGroup.h"
+#include "SceneObjects/SceneObjectPart.h"
 #include "ProceduralMeshComponent.h"
 #include "MeshActor.generated.h"
 class LLSDItem;

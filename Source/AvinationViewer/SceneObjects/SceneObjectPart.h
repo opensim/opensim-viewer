@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "RapidXml.h"
-#include "SceneObjectBase.h"
+#include "../Utils/RapidXml.h"
+#include "SceneObjects/SceneObjectBase.h"
 #include "TextureEntry.h"
-#include "PrimMesher.h"
-#include "SculptMesher.h"
+#include "../Meshing/PrimMesher.h"
+#include "../Meshing/SculptMesher.h"
 
 class LLSDItem;
 

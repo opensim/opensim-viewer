@@ -2,14 +2,14 @@
 
 #include "AvinationViewer.h"
 #include "MeshActor.h"
-#include "LLSDItem.h"
-#include "LLSDDecode.h"
-#include "AvinationUtils.h"
-#include "AssetCache.h"
-#include "AssetDecode.h"
-#include "TextureEntry.h"
-#include "TextureCache.h"
-#include "PrimMesher.h"
+#include "AssetSubsystem/LLSDItem.h"
+#include "AssetSubsystem/LLSDDecode.h"
+#include "Utils/AvinationUtils.h"
+#include "AssetSubsystem/AssetCache.h"
+#include "AssetSubsystem/AssetDecode.h"
+#include "SceneObjects/TextureEntry.h"
+#include "AssetSubsystem/TextureCache.h"
+#include "Meshing/PrimMesher.h"
 
 #include <stdlib.h>
 #include <fcntl.h>

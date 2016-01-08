@@ -2,7 +2,7 @@
 
 #include "AvinationViewer.h"
 #include "SceneObjectGroup.h"
-#include "RapidXml.h"
+#include "../Utils/RapidXml.h"
 
 SceneObjectGroup::SceneObjectGroup()
 {
