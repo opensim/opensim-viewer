@@ -4,7 +4,8 @@
 
 #include "SceneObjectBase.h"
 #include "SceneObjectPart.h"
-#include "core.h"
+//DO NOT CHANGE CASING! (LGA) - Linux systems are case sensitive and most UE includes are camel case starting with capital letters.
+#include "Core.h"
 
 /**
  * 
