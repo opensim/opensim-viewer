@@ -7,10 +7,10 @@
 #include "../AssetSubsystem/AssetCache.h"
 #include "../AssetSubsystem/AssetDecode.h"
 #include "../AssetSubsystem/LLSDMeshDecode.h"
+#include "../AssetSubsystem/J2KDecode.h"
 #include <cstdlib>
 #include "Base64.h"
 #include "../Meshing/PrimMesher.h"
-#include "../AssetSubsystem/J2KDecode.h"
 #include "openjpeg.h"
 
 SceneObjectPart::SceneObjectPart()
