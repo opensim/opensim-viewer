@@ -43,16 +43,17 @@ Face::Face(int v1in, int v2in, int v3in, int n1in, int n2in, int n3in)
     uv3 = 0;
 }
 
-Coord Face::SurfaceNormal(TArray<Coord> coordList)
+FVector Face::SurfaceNormal(TArray<FVector> coordList)
 {
-    Coord c1 = coordList[v1];
-    Coord c2 = coordList[v2];
-    Coord c3 = coordList[v3];
+    FVector c1 = coordList[v1];
+    FVector c2 = coordList[v2];
+    FVector c3 = coordList[v3];
 
-    Coord edge1(c2.X - c1.X, c2.Y - c1.Y, c2.Z - c1.Z);
-    Coord edge2(c3.X - c1.X, c3.Y - c1.Y, c3.Z - c1.Z);
-
-    return Coord::Cross(edge1, edge2).Normalize();
+    FVector edge1(c2.X - c1.X, c2.Y - c1.Y, c2.Z - c1.Z);
+    FVector edge2(c3.X - c1.X, c3.Y - c1.Y, c3.Z - c1.Z);
+    FVector cross = FVector::CrossProduct(edge1, edge2);
+    cross.Normalize();
+    return cross;
 }
 
 ViewerFace::ViewerFace(int primFaceNumberIn)
@@ -91,24 +92,25 @@ void ViewerFace::AddPos(float x, float y, float z)
     v3.Z += z;
 }
 
-void ViewerFace::AddRot(PrimQuat q)
+void ViewerFace::AddRot(FQuat q)
 {
-    v1 *= q;
-    v2 *= q;
-    v3 *= q;
+    v1 = q * v1;
+    v2 = q * v2;
+    v3 = q * v3;
     
-    n1 *= q;
-    n2 *= q;
-    n3 *= q;
+    n1 = q * n1;
+    n2 = q * n2;
+    n3 = q * n3;
 }
 
 void ViewerFace::CalcSurfaceNormal()
 {
     
-    Coord edge1(v2.X - v1.X, v2.Y - v1.Y, v2.Z - v1.Z);
-    Coord edge2(v3.X - v1.X, v3.Y - v1.Y, v3.Z - v1.Z);
-    
-    n1 = n2 = n3 = Coord::Cross(edge1, edge2).Normalize();
+    FVector edge1(v2.X - v1.X, v2.Y - v1.Y, v2.Z - v1.Z);
+    FVector edge2(v3.X - v1.X, v3.Y - v1.Y, v3.Z - v1.Z);
+    FVector cross = FVector::CrossProduct(edge1, edge2);
+    cross.Normalize();
+    n1 = n2 = n3 = cross;
 }
 
 Angle::Angle(float angleIn, float xIn, float yIn)
@@ -131,12 +133,13 @@ const Angle AngleList::angles3[] =
     Angle(1.0f, 1.0f, 0.0f)
 };
 
-const Coord AngleList::normals3[] =
+const FVector AngleList::normals3[] =
 {
-    Coord(0.25f, 0.4330127019f, 0.0f).Normalize(),
-    Coord(-0.5f, 0.0f, 0.0f).Normalize(),
-    Coord(0.25f, -0.4330127019f, 0.0f).Normalize(),
-    Coord(0.25f, 0.4330127019f, 0.0f).Normalize()
+    FVector(0.25f, 0.4330127019f, 0.0f).GetSafeNormal(),
+    FVector(0.25f, 0.4330127019f, 0.0f).GetSafeNormal(),
+    FVector(-0.5f, 0.0f, 0.0f).GetSafeNormal(),
+    FVector(0.25f, -0.4330127019f, 0.0f).GetSafeNormal(),
+    FVector(0.25f, 0.4330127019f, 0.0f).GetSafeNormal()
 };
     
 const Angle AngleList::angles4[] =
@@ -148,13 +151,13 @@ const Angle AngleList::angles4[] =
     Angle(1.0f, 1.0f, 0.0f)
 };
 
-const Coord AngleList::normals4[] =
+const FVector AngleList::normals4[] =
 {
-    Coord(0.5f, 0.5f, 0.0f).Normalize(),
-    Coord(-0.5f, 0.5f, 0.0f).Normalize(),
-    Coord(-0.5f, -0.5f, 0.0f).Normalize(),
-    Coord(0.5f, -0.5f, 0.0f).Normalize(),
-    Coord(0.5f, 0.5f, 0.0f).Normalize()
+    FVector(0.5f, 0.5f, 0.0f).GetSafeNormal(),
+    FVector(-0.5f, 0.5f, 0.0f).GetSafeNormal(),
+    FVector(-0.5f, -0.5f, 0.0f).GetSafeNormal(),
+    FVector(0.5f, -0.5f, 0.0f).GetSafeNormal(),
+    FVector(0.5f, 0.5f, 0.0f).GetSafeNormal()
 };
     
 const Angle AngleList::angles24[] =
@@ -317,7 +320,7 @@ void AngleList::makeAngles(int sides, float startAngle, float stopAngle)
 
 Profile::Profile()
 {
-    faceNormal = Coord(0.0f, 0.0f, 1.0f);
+    faceNormal = FVector(0.0f, 0.0f, 1.0f);
     numOuterVerts = 0;
     numHollowVerts = 0;
     outerFaceNumber = -1;
@@ -336,7 +339,7 @@ Profile::Profile()
     
 Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, int hollowSides, bool createFaces, bool calcVertexNormalsIn)
 {
-    faceNormal = Coord(0.0f, 0.0f, 1.0f);
+    faceNormal = FVector(0.0f, 0.0f, 1.0f);
     numOuterVerts = 0;
     numHollowVerts = 0;
     outerFaceNumber = -1;
@@ -353,10 +356,10 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
     faceUVs.Empty();
     faceNumbers.Empty();
     
-    Coord center(0.0f, 0.0f, 0.0f);
+    FVector center(0.0f, 0.0f, 0.0f);
     
-    TArray<Coord> hollowCoords;
-    TArray<Coord> hollowNormals;
+    TArray<FVector> hollowCoords;
+    TArray<FVector> hollowNormals;
     TArray<float> hollowUs;
     
     if (calcVertexNormals)
@@ -412,7 +415,7 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
     float z = 0.0f;
     
     Angle angle;
-    Coord newVert;
+    FVector newVert;
     if (hasHollow && hollowSides != sides)
     {
         int numHollowAngles = hollowAngles.angles.Num();
@@ -427,9 +430,9 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
             if (calcVertexNormals)
             {
                 if (hollowSides < 5)
-                    hollowNormals.Add(hollowAngles.normals[i].Invert());
+                    hollowNormals.Add(FVector(-hollowAngles.normals[i].X, -hollowAngles.normals[i].Y, -hollowAngles.normals[i].Z));
                 else
-                    hollowNormals.Add(Coord(-angle.X, -angle.Y, 0.0f));
+                    hollowNormals.Add(FVector(-angle.X, -angle.Y, 0.0f));
                 
                 if (hollowSides == 4)
                     hollowUs.Add(angle.angle * hollow * 0.707107f);
@@ -461,7 +464,7 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
             }
             else
             {
-                vertexNormals.Add(Coord(angle.X, angle.Y, 0.0f));
+                vertexNormals.Add(FVector(angle.X, angle.Y, 0.0f));
                 us.Add(angle.angle);
             }
         }
@@ -478,11 +481,11 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
                 {
                     if (sides < 5)
                     {
-                        hollowNormals.Add(angles.normals[i].Invert());
+                        hollowNormals.Add(FVector(-angles.normals[i].X, -angles.normals[i].Y, -angles.normals[i].Z));
                     }
                     
                     else
-                        hollowNormals.Add(Coord(-angle.X, -angle.Y, 0.0f));
+                        hollowNormals.Add(FVector(-angle.X, -angle.Y, 0.0f));
                     
                     hollowUs.Add(angle.angle * hollow);
                 }
@@ -502,7 +505,7 @@ Profile::Profile(int sides, float profileStart, float profileEnd, float hollow, 
     
     if (hasHollow)
     {
-        TArray<Coord> r;
+        TArray<FVector> r;
         for (int i = 0 ; i < hollowCoords.Num() ; ++i)
             r.Add(hollowCoords.Last(i));
         hollowCoords = r;
@@ -754,7 +757,7 @@ Profile Profile::Copy(bool needFaces)
     return copy;
 }
     
-void Profile::AddPos(Coord v)
+void Profile::AddPos(FVector v)
 {
     AddPos(v.X, v.Y, v.Z);
 }
@@ -763,7 +766,7 @@ void Profile::AddPos(float x, float y, float z)
 {
     int i;
     int numVerts = coords.Num();
-    Coord vert;
+    FVector vert;
     
     for (i = 0; i < numVerts; i++)
     {
@@ -775,24 +778,23 @@ void Profile::AddPos(float x, float y, float z)
     }
 }
 
-void Profile::AddRot(PrimQuat q)
+void Profile::AddRot(FQuat q)
 {
     int i;
     int numVerts = coords.Num();
-    
+
     for (i = 0; i < numVerts; i++)
-        coords[i] *= q;
-    
+        coords[i] = q * coords[i]; // this is as q.RotateVector(vector) == direct rotation, oposite of opensim
+
     if (calcVertexNormals)
     {
         int numNormals = vertexNormals.Num();
         for (i = 0; i < numNormals; i++)
-            vertexNormals[i] *= q;
+            vertexNormals[i] = q * vertexNormals[i];
         
-        faceNormal *= q;
-        cutNormal1 *= q;
-        cutNormal2 *= q;
-        
+        faceNormal = q * faceNormal;
+        cutNormal1 = q * cutNormal1;
+        cutNormal2 = q * cutNormal2;       
     }
 }
 
@@ -800,7 +802,7 @@ void Profile::Scale(float x, float y)
 {
     int i;
     int numVerts = coords.Num();
-    Coord vert;
+    FVector vert;
     
     for (i = 0; i < numVerts; i++)
     {
@@ -835,7 +837,7 @@ void Profile::FlipNormals()
         int normalCount = vertexNormals.Num();
         if (normalCount > 0)
         {
-            Coord n = vertexNormals[normalCount - 1];
+            FVector n = vertexNormals[normalCount - 1];
             n.Z = -n.Z;
             vertexNormals[normalCount - 1] = n;
         }
@@ -966,8 +968,8 @@ void Path::Create(PathType pathType, int steps)
             
             float twist = twistBegin + twistTotal * percentOfPath;
             
-            newNode.rotation = PrimQuat(Coord(0.0f, 0.0f, 1.0f), twist);
-            newNode.position = Coord(xOffset, yOffset, zOffset);
+            newNode.rotation = FQuat(FVector(0.0f, 0.0f, 1.0f), twist);
+            newNode.position = FVector(xOffset, yOffset, zOffset);
             newNode.percentOfPath = percentOfPath;
             
             pathNodes.Add(newNode);
@@ -1063,16 +1065,16 @@ void Path::Create(PathType pathType, int steps)
             
             float zOffset = (float)sin(angle + topShearY) * (0.5f - yPathScale) * radiusScale;
             
-            newNode.position = Coord(xOffset, yOffset, zOffset);
+            newNode.position = FVector(xOffset, yOffset, zOffset);
             
             // now orient the rotation of the profile layer relative to it's position on the path
             // adding taperY to the angle used to generate the quat appears to approximate the viewer
             
-            newNode.rotation = PrimQuat(Coord(1.0f, 0.0f, 0.0f), angle + topShearY);
+            newNode.rotation = FQuat(FVector(1.0f, 0.0f, 0.0f), angle + topShearY);
             
             // next apply twist rotation to the profile layer
             if (twistTotal != 0.0f || twistBegin != 0.0f)
-                newNode.rotation = newNode.rotation * PrimQuat(Coord(0.0f, 0.0f, 1.0f), twist);
+                newNode.rotation = newNode.rotation * FQuat(FVector(0.0f, 0.0f, 1.0f), twist);
             
             newNode.percentOfPath = percentOfPath;
             
@@ -1321,13 +1323,13 @@ void PrimMesh::Extrude(PathType pathType)
     
     if (initialProfileRot != 0.0f)
     {
-        profile.AddRot(PrimQuat(Coord(0.0f, 0.0f, 1.0f), initialProfileRot));
+        profile.AddRot(FQuat(FVector(0.0f, 0.0f, 1.0f), initialProfileRot));
         if (viewerMode)
             profile.MakeFaceUVs();
     }
     
-    Coord lastCutNormal1 = Coord();
-    Coord lastCutNormal2 = Coord();
+    FVector lastCutNormal1(0);
+    FVector lastCutNormal2(0);
     float thisV = 0.0f;
     float lastV = 0.0f;
     
@@ -1367,7 +1369,7 @@ void PrimMesh::Extrude(PathType pathType)
             // add the bottom faces to the viewerFaces list
             if (viewerMode)
             {
-                Coord faceNormal = newLayer.faceNormal;
+                FVector faceNormal = newLayer.faceNormal;
                 ViewerFace newViewerFace = ViewerFace(profile.bottomFaceNumber);
                 int numFaces = newLayer.faces.Num();
                 TArray<Face> localfaces = newLayer.faces;
@@ -1607,7 +1609,7 @@ void PrimMesh::Extrude(PathType pathType)
         if (needEndFaces && nodeIndex == path.pathNodes.Num() - 1 && viewerMode)
         {
             // add the top faces to the viewerFaces list here
-            Coord faceNormal = newLayer.faceNormal;
+            FVector faceNormal = newLayer.faceNormal;
             ViewerFace newViewerFace = ViewerFace(0);
             int numFaces = newLayer.faces.Num();
             TArray<Face> localfaces = newLayer.faces;
@@ -1647,19 +1649,19 @@ void PrimMesh::Extrude(PathType pathType)
     
 }
 
-Coord PrimMesh::SurfaceNormal(Coord c1, Coord c2, Coord c3)
+FVector PrimMesh::SurfaceNormal(FVector c1, FVector c2, FVector c3)
 {
-    Coord edge1(c2.X - c1.X, c2.Y - c1.Y, c2.Z - c1.Z);
-    Coord edge2(c3.X - c1.X, c3.Y - c1.Y, c3.Z - c1.Z);
+    FVector edge1(c2.X - c1.X, c2.Y - c1.Y, c2.Z - c1.Z);
+    FVector edge2(c3.X - c1.X, c3.Y - c1.Y, c3.Z - c1.Z);
     
-    Coord normal = Coord::Cross(edge1, edge2);
+    FVector normal = FVector::CrossProduct(edge1, edge2);
     
     normal.Normalize();
     
     return normal;
 }
 
-Coord PrimMesh::SurfaceNormal(Face face)
+FVector PrimMesh::SurfaceNormal(Face face)
 {
     return SurfaceNormal(coords[face.v1], coords[face.v2], coords[face.v3]);
 }
@@ -1669,7 +1671,7 @@ Coord PrimMesh::SurfaceNormal(Face face)
 /// </summary>
 /// <param name="faceIndex"></param>
 /// <returns></returns>
-Coord PrimMesh::SurfaceNormal(int faceIndex)
+FVector PrimMesh::SurfaceNormal(int faceIndex)
 {
     int numFaces = faces.Num();
     if (faceIndex < 0 || faceIndex >= numFaces)
@@ -1734,7 +1736,7 @@ void PrimMesh::CalcNormals()
     {
         Face face = faces[i];
         
-        normals.Add(SurfaceNormal(i).Normalize());
+        normals.Add(SurfaceNormal(i).GetSafeNormal());
         
         int normIndex = normals.Num() - 1;
         face.n1 = normIndex;
@@ -1755,7 +1757,7 @@ void PrimMesh::AddPos(float x, float y, float z)
 {
     int i;
     int numVerts = coords.Num();
-    Coord vert;
+    FVector vert;
     
     for (i = 0; i < numVerts; i++)
     {
@@ -1780,30 +1782,30 @@ void PrimMesh::AddPos(float x, float y, float z)
 /// Rotates the mesh
 /// </summary>
 /// <param name="q"></param>
-void PrimMesh::AddRot(PrimQuat q)
+void PrimMesh::AddRot(FQuat q)
 {
     int i;
     int numVerts = coords.Num();
     
     for (i = 0; i < numVerts; i++)
-        coords[i] *= q;
+        coords[i] = q * coords[i];
     
     int numNormals = normals.Num();
     for (i = 0; i < numNormals; i++)
-        normals[i] *= q;
+        normals[i] = q * normals[i];
     
     int numViewerFaces = viewerFaces.Num();
     
     for (i = 0; i < numViewerFaces; i++)
     {
         ViewerFace v = viewerFaces[i];
-        v.v1 *= q;
-        v.v2 *= q;
-        v.v3 *= q;
+        v.v1 = q * v.v1;
+        v.v2 = q * v.v2;
+        v.v3 = q * v.v3;
         
-        v.n1 *= q;
-        v.n2 *= q;
-        v.n3 *= q;
+        v.n1 = q * v.n1;
+        v.n2 = q * v.n2;
+        v.n3 = q * v.n3;
         viewerFaces[i] = v;
     }
 }
@@ -1827,9 +1829,9 @@ void PrimMesh::Scale(float x, float y, float z)
 {
     int i;
     int numVerts = coords.Num();
-    //Coord vert;
+    //FVector vert;
     
-    Coord m(x, y, z);
+    FVector m(x, y, z);
     for (i = 0; i < numVerts; i++)
         coords[i] *= m;
     

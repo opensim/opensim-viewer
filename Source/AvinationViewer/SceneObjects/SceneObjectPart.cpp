@@ -266,18 +266,8 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     lodWanted = 2;
     maxLod = High;
 
-    float a = scale.X;
-    if (a < scale.Y)
-        a = scale.Y;
+    float a = scale.Size();
     float b = a;
-    if (a < scale.Z)
-        a = scale.Z;
-    if (b > scale.Z)
-        b = scale.Z;
-
-    a *= b;
-    a = FMath::Sqrt(a); // 0.5m distance
-    b = a;
     a *= 0.02;
     a = FMath::Atan(a) / 0.785;
 
@@ -847,7 +837,7 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
     PrimFaceMeshData pm;
     primMeshData.Empty();
     
-    Coord* ptr;
+    FVector* ptr;
     UVCoord* uptr;
 
     int ncoord = 0;
@@ -857,7 +847,7 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
         FVector v(ptr->X, -ptr->Y, ptr->Z);
         pm.vertices.Add(v);
 
-        // this odd signals mean current tris normals are inverted for some reason
+        // this odd signals mean current triangle normals are inverted for some reason
         ptr = &prim->normals[ncoord];
         FVector n(-ptr->X, ptr->Y, -ptr->Z);
         pm.normals.Add(n);
@@ -915,7 +905,7 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t>& indata, int lod)
     int w = tex->comps[0].w;
     int h = tex->comps[0].h;
 
-    TArray<TArray<Coord>> rows;
+    TArray<TArray<FVector>> rows;
     OPJ_INT32 *r = tex->comps[0].data, *g = tex->comps[1].data, *b = tex->comps[2].data;
     for (int i = 0; i < h; i++)
         rows.AddDefaulted();
@@ -924,7 +914,7 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t>& indata, int lod)
     {
         for (int j = 0; j < w; j++)
         {
-            Coord c = Coord((float)(*r++ & 0xff) * pixScale - 0.5f,
+            FVector c = FVector((float)(*r++ & 0xff) * pixScale - 0.5f,
                             (float)(*g++ & 0xff) * pixScale - 0.5f,
                             (float)(*b++ & 0xff) * pixScale - 0.5f);
             if (mirror)
