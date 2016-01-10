@@ -278,26 +278,23 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     cullDistance = b;
 
     //adjust visual mesh maxlod
-    if (isPrim)
+    if (isPrim && profileShape != pstCircle && profileShape != pstHalfCircle &&
+        (ExtrusionType)pathCurve == etStraight && pathTwist == pathTwistBegin)
     {
-        if (isPrim && profileShape != pstCircle && profileShape != pstHalfCircle &&
-            (ExtrusionType)pathCurve == etStraight && pathTwist == pathTwistBegin)
-        {
-            // prims without lod
-            lodWanted = 0;
-            maxLod = Lowest;
-        }
+        // prims without lod
+        lodWanted = 0;
+        maxLod = Lowest;
+    }
+    else
+    {
+        if (a > .9)
+            maxLod = Highest;
+        else if (a > 0.4)
+            maxLod = High;
+        else if (a > 0.15)
+            maxLod = Low;
         else
-        {
-            if( a > .9)
-                maxLod = Highest;
-            else if (a > 0.4)
-                maxLod = High;
-            else if (a > 0.15)
-                maxLod = Low;
-            else
-                maxLod = Lowest;
-        }
+            maxLod = Lowest;
     }
 
 //    maxLod = Highest;

@@ -12,10 +12,10 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
         vertsWanted = 1024;
         break;
     case High:
-        vertsWanted = 512;
+        vertsWanted = 1024;
         break;
     case Low:
-        vertsWanted = 128;
+        vertsWanted = 256;
         break;
     default:
         vertsWanted = 32;
@@ -39,23 +39,21 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
 
     // Sculpties are limited to 1024 vertices. If the count is exceeded, the texture
     // sample rate will be reduced until the vertex count fits.
-    uint16_t horizontalStepWidth = 1;
-    uint16_t verticalStepHeight = 1;
+    uint16_t step = 1;
 
     uint32_t verts = width * height;
 
     while (verts > vertsWanted)
     {
-        horizontalStepWidth *= 2;
-        verticalStepHeight *= 2;
+        step <<= 1;
 
         // In the below cases, this LOD has no geometry (doesn't show)
-        if (horizontalStepWidth >= width)
+        if (step > width)
             return;
-        if (verticalStepHeight >= height)
+        if (step >= height)
             return;
 
-        verts = (width / horizontalStepWidth) * (height / verticalStepHeight);
+        verts >>= 2;
     }
     
     sculptType = (SculptType)(((int)sculptType) & 0x07);
@@ -63,8 +61,8 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
     if (mirror)
         invert = !invert;
     
-    uint16_t horizontalDivisions = width / horizontalStepWidth;
-    uint16_t verticalDivisions = height / verticalStepHeight;
+    uint16_t horizontalDivisions = width / step;
+    uint16_t verticalDivisions =  height / step;
     uint16_t matrixWidth = horizontalDivisions + 1;
     uint16_t matrixHeight = verticalDivisions + 1;
     
@@ -80,18 +78,21 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
 
     matrix.AddDefaulted(matrixHeight);
     
-    for (v = 0, vv = 0 ; v < (int)height ; ++vv, v += verticalStepHeight)
+    int oneMinushalfStep = -step / 2;
+    oneMinushalfStep += step;
+
+    for (v = 0, vv = 0 ; v < (int)height ; ++vv, v += step)
     {
         matrix[vv].AddDefaulted(matrixWidth);
         
-        for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += horizontalStepWidth)
+        for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += step)
         {
             matrix[vv][hh] = rows[v][h];
         }
-        if (horizontalStepWidth > 1)
+        if (step > 1)
         {
-            if (horizontalStepWidth > 2)
-                matrix[vv][hh] = rows[v][h - horizontalStepWidth + horizontalStepWidth / 2];
+            if (step > 2)
+                matrix[vv][hh] = rows[v][h - oneMinushalfStep];
             else
                 matrix[vv][hh] = rows[v][h - 1];
         }
@@ -105,12 +106,12 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
     
     matrix[vv].AddDefaulted(matrixWidth);
     
-    for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += horizontalStepWidth)
+    for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += step)
     {
-        if (verticalStepHeight > 1)
+        if (step > 1)
         {
-            if (verticalStepHeight > 2)
-                matrix[vv][hh] = rows[v - verticalStepHeight + verticalStepHeight / 2][h];
+            if (step > 2)
+                matrix[vv][hh] = rows[v - oneMinushalfStep][h];
             else
                 matrix[vv][hh] = rows[v - 1][h];
         }
