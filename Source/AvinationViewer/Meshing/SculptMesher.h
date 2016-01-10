@@ -19,6 +19,7 @@ public:
     TArray<Coord> normals;
     TArray<UVCoord> uvs;
     TArray<Coord> tangents;
+    TArray<bool> tangentFlips;
     
     SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
     

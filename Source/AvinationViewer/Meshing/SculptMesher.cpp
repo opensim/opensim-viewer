@@ -224,14 +224,17 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
 
 void SculptMesh::calcVertexNormals(SculptType sculptType, int xSize, int ySize)
 {
+    normals.Empty();
+    normals.AddZeroed(coords.Num());
+
     int numFaces = faces.Num();
     for (int i = 0; i < numFaces; i++)
     {
         Face face = faces[i];
         Coord surfaceNormal = face.SurfaceNormal(coords);
-        normals[face.n1] += surfaceNormal;
-        normals[face.n2] += surfaceNormal;
-        normals[face.n3] += surfaceNormal;
+        normals[face.v1] += surfaceNormal;
+        normals[face.v2] += surfaceNormal;
+        normals[face.v3] += surfaceNormal;
     }
 
     if (sculptType == sphere)
@@ -299,6 +302,10 @@ void SculptMesh::CalcTangents()
     TArray<Coord> tan2;
     tan1.AddZeroed(numVerts);
     tan2.AddZeroed(numVerts);
+    tangents.Empty();
+    tangents.AddZeroed(numVerts);
+    tangentFlips.Empty();
+    tangentFlips.AddZeroed(numVerts);
 
     int numFaces = faces.Num();
 
@@ -365,7 +372,7 @@ void SculptMesh::CalcTangents()
 
         float dotCrossT2 = crossnt.X * tan2[a].X + crossnt.Y * tan2[a].Y + crossnt.Z * tan2[a].Z;
         // Calculate handedness
-        float w = (dotCrossT2 < 0.0F) ? -1.0F : 1.0F;
+        tangentFlips[a] = (dotCrossT2 < 0.0F);
     }
 }
 

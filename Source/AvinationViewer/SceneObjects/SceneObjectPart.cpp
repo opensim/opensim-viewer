@@ -857,15 +857,18 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
         FVector v(ptr->X, -ptr->Y, ptr->Z);
         pm.vertices.Add(v);
 
+        // this odd signals mean current tris normals are inverted for some reason
         ptr = &prim->normals[ncoord];
-        FVector n(ptr->X, -ptr->Y, ptr->Z);
+        FVector n(-ptr->X, ptr->Y, -ptr->Z);
         pm.normals.Add(n);
+
+        //uvs and tangents need more testing with textures and materials
 
         uptr = &prim->uvs[ncoord];
         pm.uv0.Add(FVector2D(uptr->U, 1.0 - uptr->V));
 
-        ptr = &prim->tangents[ncoord];
-        pm.tangents.Add(FProcMeshTangent(ptr->X, ptr->Y, ptr->Z));
+        ptr = &prim->tangents[ncoord];       
+        pm.tangents.Add(FProcMeshTangent(FVector(-ptr->X, ptr->Y, -ptr->Z), prim->tangentFlips[ncoord]));
         pm.vertexColors.Add(FColor(255, 255, 255, 255));
     }
 
@@ -878,9 +881,9 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
         if (i1 >= ncoord || i2 >= ncoord || i3 >= ncoord)
                 continue;
 
-        pm.triangles.Add(i1);
         pm.triangles.Add(i3);
         pm.triangles.Add(i2);
+        pm.triangles.Add(i1);
     }
 
     primMeshData.Add(pm);
