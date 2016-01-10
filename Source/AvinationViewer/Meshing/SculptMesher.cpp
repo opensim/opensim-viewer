@@ -3,12 +3,7 @@
 #include "AvinationViewer.h"
 #include "SculptMesher.h"
 
-SculptMesh::SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod)
-{
-    _SculptMesh(rows, sculptType, viewerMode, mirror, invert, lod);
-}
-
-void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod)
+SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod)
 {
     uint32_t vertsWanted = 1024;
     switch ((LevelDetail)lod)
@@ -17,10 +12,10 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
         vertsWanted = 1024;
         break;
     case High:
-        vertsWanted = 512;
+        vertsWanted = 1024;
         break;
     case Low:
-        vertsWanted = 128;
+        vertsWanted = 256;
         break;
     default:
         vertsWanted = 32;
@@ -44,23 +39,21 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
 
     // Sculpties are limited to 1024 vertices. If the count is exceeded, the texture
     // sample rate will be reduced until the vertex count fits.
-    uint16_t horizontalStepWidth = 1;
-    uint16_t verticalStepHeight = 1;
+    uint16_t step = 1;
 
     uint32_t verts = width * height;
 
     while (verts > vertsWanted)
     {
-        horizontalStepWidth *= 2;
-        verticalStepHeight *= 2;
+        step <<= 1;
 
         // In the below cases, this LOD has no geometry (doesn't show)
-        if (horizontalStepWidth >= width)
+        if (step > width)
             return;
-        if (verticalStepHeight >= height)
+        if (step >= height)
             return;
 
-        verts = (width / horizontalStepWidth) * (height / verticalStepHeight);
+        verts >>= 2;
     }
     
     sculptType = (SculptType)(((int)sculptType) & 0x07);
@@ -68,8 +61,8 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
     if (mirror)
         invert = !invert;
     
-    uint16_t horizontalDivisions = width / horizontalStepWidth;
-    uint16_t verticalDivisions = height / verticalStepHeight;
+    uint16_t horizontalDivisions = width / step;
+    uint16_t verticalDivisions =  height / step;
     uint16_t matrixWidth = horizontalDivisions + 1;
     uint16_t matrixHeight = verticalDivisions + 1;
     
@@ -78,25 +71,28 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
 
     // Reduce the input texture to our coordinate matrix. This greatly simplifies
     // what is to come.
-    TArray<TArray<Coord>> matrix;
+    TArray<TArray<FVector>> matrix;
     
     int v, vv;
     int h, hh;
 
     matrix.AddDefaulted(matrixHeight);
     
-    for (v = 0, vv = 0 ; v < (int)height ; ++vv, v += verticalStepHeight)
+    int oneMinushalfStep = -step / 2;
+    oneMinushalfStep += step;
+
+    for (v = 0, vv = 0 ; v < (int)height ; ++vv, v += step)
     {
         matrix[vv].AddDefaulted(matrixWidth);
         
-        for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += horizontalStepWidth)
+        for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += step)
         {
             matrix[vv][hh] = rows[v][h];
         }
-        if (horizontalStepWidth > 1)
+        if (step > 1)
         {
-            if (horizontalStepWidth > 2)
-                matrix[vv][hh] = rows[v][h - horizontalStepWidth + horizontalStepWidth / 2];
+            if (step > 2)
+                matrix[vv][hh] = rows[v][h - oneMinushalfStep];
             else
                 matrix[vv][hh] = rows[v][h - 1];
         }
@@ -110,12 +106,12 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
     
     matrix[vv].AddDefaulted(matrixWidth);
     
-    for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += horizontalStepWidth)
+    for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += step)
     {
-        if (verticalStepHeight > 1)
+        if (step > 1)
         {
-            if (verticalStepHeight > 2)
-                matrix[vv][hh] = rows[v - verticalStepHeight + verticalStepHeight / 2][h];
+            if (step > 2)
+                matrix[vv][hh] = rows[v - oneMinushalfStep][h];
             else
                 matrix[vv][hh] = rows[v - 1][h];
         }
@@ -125,22 +121,24 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
         }
     }
     
-    // Find the poles for spherical sitching
-    Coord northPole = matrix[0][matrixWidth / 2];
-    
-    // The south pole is taken from the "extra" row (33) data
-    // unless the source texture is 32 pixels tall. In that case
-    // it is taken from the center of the last valid row. The
-    // results may be undefined.
-    Coord southPole = matrix[matrixHeight - 1][matrixWidth / 2];
-    
     if (sculptType == sphere)
     {
+        // Find the poles for spherical sitching
+
+        // The south pole is taken from the "extra" row (33) data
+        // unless the source texture is 32 pixels tall. In that case
+        // it is taken from the center of the last valid row. The
+        // results may be undefined.
+
+        FVector northPole = matrix[0][matrixWidth / 2];
+        FVector southPole = matrix[matrixHeight - 1][matrixWidth / 2];
+
         // Spherical sculpts get all vertices in the 1st and 33rd
         // row stitched to a common "pole" taken from the center
         // of the top and the last valid input row.
         // The coordinates in the top row get overwritten by this
         // operation.
+
         for (int h1 = 0 ; h1 < matrixWidth ; ++h1)
         {
             matrix[0][h1] = northPole;
@@ -188,55 +186,24 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
             coords.Add(matrix[imageY][imageX]);
             if (viewerMode)
             {
-                normals.Add(Coord());
+                normals.Add(FVector());
+                tangents.Add(FVector());
                 uvs.Add(UVCoord(divisionU * imageX, divisionV * imageY));
             }
             
             if (imageY > 0 && imageX > 0)
             {
                 Face f1, f2;
-                
-                if (viewerMode)
+                if (invert)
                 {
-                    if (invert)
-                    {
-                        f1 = Face(p1, p4, p3, p1, p4, p3);
-                        f1.uv1 = p1;
-                        f1.uv2 = p4;
-                        f1.uv3 = p3;
-                        
-                        f2 = Face(p1, p2, p4, p1, p2, p4);
-                        f2.uv1 = p1;
-                        f2.uv2 = p2;
-                        f2.uv3 = p4;
-                    }
-                    else
-                    {
-                        f1 = Face(p1, p3, p4, p1, p3, p4);
-                        f1.uv1 = p1;
-                        f1.uv2 = p3;
-                        f1.uv3 = p4;
-                        
-                        f2 = Face(p1, p4, p2, p1, p4, p2);
-                        f2.uv1 = p1;
-                        f2.uv2 = p4;
-                        f2.uv3 = p2;
-                    }
+                    f1 = Face(p1, p4, p3);
+                    f2 = Face(p1, p2, p4);
                 }
                 else
                 {
-                    if (invert)
-                    {
-                        f1 = Face(p1, p4, p3);
-                        f2 = Face(p1, p2, p4);
-                    }
-                    else
-                    {
-                        f1 = Face(p1, p3, p4);
-                        f2 = Face(p1, p4, p2);
-                    }
+                    f1 = Face(p1, p3, p4);
+                    f2 = Face(p1, p4, p2);
                 }
-                
                 faces.Add(f1);
                 faces.Add(f2);
             }
@@ -244,130 +211,146 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
     }
     
     if (viewerMode)
+    {
         calcVertexNormals(sculptType, matrixWidth, matrixHeight);
+        CalcTangents();
+    }
 }
 
 void SculptMesh::calcVertexNormals(SculptType sculptType, int xSize, int ySize)
 {
+    normals.Empty();
+    normals.AddZeroed(coords.Num());
+
     int numFaces = faces.Num();
     for (int i = 0; i < numFaces; i++)
     {
         Face face = faces[i];
-        Coord surfaceNormal = face.SurfaceNormal(coords);
-        normals[face.n1] += surfaceNormal;
-        normals[face.n2] += surfaceNormal;
-        normals[face.n3] += surfaceNormal;
+        FVector surfaceNormal = face.SurfaceNormal(coords);
+        normals[face.v1] += surfaceNormal;
+        normals[face.v2] += surfaceNormal;
+        normals[face.v3] += surfaceNormal;
     }
-    
-    int numNormals = normals.Num();
-    for (int i = 0; i < numNormals; i++)
-        normals[i] = normals[i].Normalize();
-    
-    if (sculptType != plane)
-    { // blend the vertex normals at the cylinder seam
-        for (int y = 0; y < ySize; y++)
+
+    if (sculptType == sphere)
+    {
+        FVector avg(0,0,0);
+        for (int i = 0; i < xSize; i++)
         {
-            int rowOffset = y * xSize;
-            
-            normals[rowOffset] = normals[rowOffset + xSize - 1] = (normals[rowOffset] + normals[rowOffset + xSize - 1]).Normalize();
+            avg += normals[i];
+        }
+        for (int i = 0; i < xSize; i++)
+        {
+            normals[i] = avg;
+        }
+        avg.X = 0;
+        avg.Y = 0;
+        avg.Z = 0;
+        int lastrow = xSize * (ySize - 1);
+        for (int i = lastrow; i < lastrow + xSize; i++)
+        {
+            avg += normals[i];
+        }
+        for (int i = lastrow; i < lastrow + xSize; i++)
+        {
+            normals[i] = avg;
         }
     }
     
-    for (auto it = faces.CreateConstIterator() ; it ; ++it)
-    {
-        Face face = (*it);
-        
-        ViewerFace vf(0);
-        vf.v1 = coords[face.v1];
-        vf.v2 = coords[face.v2];
-        vf.v3 = coords[face.v3];
-        
-        vf.coordIndex1 = face.v1;
-        vf.coordIndex2 = face.v2;
-        vf.coordIndex3 = face.v3;
-        
-        vf.n1 = normals[face.n1];
-        vf.n2 = normals[face.n2];
-        vf.n3 = normals[face.n3];
-        
-        vf.uv1 = uvs[face.uv1];
-        vf.uv2 = uvs[face.uv2];
-        vf.uv3 = uvs[face.uv3];
-        
-        viewerFaces.Add(vf);
+    if (sculptType == sphere || sculptType == cylinder || sculptType == torus)
+    { // blend the vertex normals at the cylinder seam
+        int xminusOne = xSize - 1;
+        for (int y = 0; y < ySize; y++)
+        {
+            int rowOffset = y * xSize;
+            normals[rowOffset] = normals[rowOffset + xminusOne] = (normals[rowOffset] + normals[rowOffset + xminusOne]);
+        }
     }
-}
 
-void SculptMesh::AddPos(float x, float y, float z)
-{
-    int i;
-    int numVerts = coords.Num();
-    Coord vert;
-    
-    for (i = 0; i < numVerts; i++)
+    if (sculptType == torus)
     {
-        vert = coords[i];
-        vert.X += x;
-        vert.Y += y;
-        vert.Z += z;
-        coords[i] = vert;
+        int lastrow = xSize * (ySize - 1);
+        for (int x = 0; x < xSize; x++)
+        {
+            normals[x] = normals[lastrow + x] = (normals[x] + normals[lastrow + x]);
+        }
     }
-    
-    int numViewerFaces = viewerFaces.Num();
-    
-    for (i = 0; i < numViewerFaces; i++)
-    {
-        ViewerFace v = viewerFaces[i];
-        v.AddPos(x, y, z);
-        viewerFaces[i] = v;
-    }
-}
 
-void SculptMesh::AddRot(PrimQuat q)
-{
-    int i;
-    int numVerts = coords.Num();
-    
-    for (i = 0; i < numVerts; i++)
-        coords[i] *= q;
-    
     int numNormals = normals.Num();
-    for (i = 0; i < numNormals; i++)
-        normals[i] *= q;
-    
-    int numViewerFaces = viewerFaces.Num();
-    
-    for (i = 0; i < numViewerFaces; i++)
-    {
-        ViewerFace v = viewerFaces[i];
-        v.v1 *= q;
-        v.v2 *= q;
-        v.v3 *= q;
-        
-        v.n1 *= q;
-        v.n2 *= q;
-        v.n3 *= q;
-        
-        viewerFaces[i] = v;
-    }
+    for (int i = 0; i < numNormals; i++)
+        normals[i].Normalize();
 }
 
-void SculptMesh::Scale(float x, float y, float z)
+void SculptMesh::CalcTangents()
 {
-    int i;
     int numVerts = coords.Num();
-    
-    Coord m(x, y, z);
-    for (i = 0; i < numVerts; i++)
-        coords[i] *= m;
-    
-    int numViewerFaces = viewerFaces.Num();
-    for (i = 0; i < numViewerFaces; i++)
+    TArray<FVector> tan1;
+    TArray<FVector> tan2;
+    tan1.AddZeroed(numVerts);
+    tan2.AddZeroed(numVerts);
+    tangents.Empty();
+    tangents.AddZeroed(numVerts);
+    tangentFlips.Empty();
+    tangentFlips.AddZeroed(numVerts);
+
+    int numFaces = faces.Num();
+
+    for (int a = 0; a < numFaces; a++)
     {
-        ViewerFace v = viewerFaces[i];
-        v.v1 *= m;
-        v.v2 *= m;
-        v.v3 *= m;
-        viewerFaces[i] = v;
+        int i1 = faces[a].v1;
+        int i2 = faces[a].v2;
+        int i3 = faces[a].v3;
+
+        const FVector v1 = coords[i1];
+        const FVector v2 = coords[i2];
+        const FVector v3 = coords[i3];
+
+        const UVCoord w1 = uvs[i1];
+        const UVCoord w2 = uvs[i2];
+        const UVCoord w3 = uvs[i3];
+
+        float x1 = v2.X - v1.X;
+        float x2 = v3.X - v1.X;
+        float y1 = v2.Y - v1.Y;
+        float y2 = v3.Y - v1.Y;
+        float z1 = v2.Y - v1.Z;
+        float z2 = v3.Z - v1.Z;
+
+        float s1 = w2.U - w1.U;
+        float s2 = w3.U - w1.U;
+        float t1 = w2.V - w1.V;
+        float t2 = w3.V - w1.V;
+
+        float r = 1.0F / (s1 * t2 - s2 * t1);
+        FVector sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+            (t2 * z1 - t1 * z2) * r);
+        FVector tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+            (s1 * z2 - s2 * z1) * r);
+
+        tan1[i1] += sdir;
+        tan1[i2] += sdir;
+        tan1[i3] += sdir;
+
+        tan2[i1] += tdir;
+        tan2[i2] += tdir;
+        tan2[i3] += tdir;
+    }
+
+    for (int a = 0; a < numVerts; a++)
+    {
+        FVector n = normals[a];
+        FVector t = tan1[a];
+
+        float dotnt = FVector::DotProduct(n,t);
+        FVector crossnt = FVector::CrossProduct(n, t);
+
+        FVector tsubn = t - n * crossnt;
+
+        // Gram-Schmidt orthogonalize
+        tangents[a] = tsubn.GetSafeNormal();
+
+        float dotCrossT2 = FVector::DotProduct(crossnt, tan2[a]);
+        // Calculate handedness
+        tangentFlips[a] = (dotCrossT2 < 0.0F);
     }
 }

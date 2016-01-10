@@ -2,9 +2,8 @@
 #include "ProceduralMeshComponent.h"
 #pragma once
 #define _USE_MATH_DEFINES
-#include "Coord.h"
-#include "PrimQuat.h"
 #include <math.h>
+#include "Coord.h"
 
 enum PathType { Linear = 0, Circular = 1, Flexible = 2 };
 
@@ -53,8 +52,8 @@ public:
     Face(int v1, int v2, int v3);
     Face(int v1, int v2, int v3, int n1, int n2, int n3);
     
-    Coord SurfaceNormal(TArray<Coord> coordList);
-    
+    FVector SurfaceNormal(TArray<FVector> coordList);
+
     int primFace;
     
     // vertices
@@ -80,21 +79,21 @@ public:
     
     void Scale(float x, float y, float z);
     void AddPos(float x, float y, float z);
-    void AddRot(PrimQuat q);
+    void AddRot(FQuat q);
     void CalcSurfaceNormal();
     int primFaceNumber;
     
-    Coord v1;
-    Coord v2;
-    Coord v3;
+    FVector v1;
+    FVector v2;
+    FVector v3;
     
     int coordIndex1;
     int coordIndex2;
     int coordIndex3;
     
-    Coord n1;
-    Coord n2;
-    Coord n3;
+    FVector n1;
+    FVector n2;
+    FVector n3;
     
     UVCoord uv1;
     UVCoord uv2;
@@ -118,15 +117,15 @@ public:
     float iX, iY; // intersection point
     
     static const Angle angles3[];
-    static const Coord normals3[];
+    static const FVector normals3[];
     
     static const Angle angles4[];
-    static const Coord normals4[];
+    static const FVector normals4[];
     static const Angle angles24[];
     
     
     TArray<Angle> angles;
-    TArray<Coord> normals;
+    TArray<FVector> normals;
     
     void makeAngles(int sides, float startAngle, float stopAngle);
     
@@ -137,8 +136,8 @@ private:
 
 struct PathNode
 {
-    Coord position;
-    PrimQuat rotation;
+    FVector position;
+    FQuat rotation;
     float xScale;
     float yScale;
     float percentOfPath;
@@ -151,9 +150,9 @@ public:
     
     FString errorMessage;
     
-    TArray<Coord> coords;
+    TArray<FVector> coords;
     TArray<Face> faces;
-    TArray<Coord> vertexNormals;
+    TArray<FVector> vertexNormals;
     TArray<float> us;
     TArray<UVCoord> faceUVs;
     TArray<int> faceNumbers;
@@ -164,9 +163,9 @@ public:
     TArray<int> cut1CoordIndices;
     TArray<int> cut2CoordIndices;
     
-    Coord faceNormal;
-    Coord cutNormal1;
-    Coord cutNormal2;
+    FVector faceNormal;
+    FVector cutNormal1;
+    FVector cutNormal2;
     
     int numOuterVerts;
     int numHollowVerts;
@@ -184,9 +183,9 @@ public:
     void MakeFaceUVs();
     Profile Copy();
     Profile Copy(bool needFaces);
-    void AddPos(Coord v);
+    void AddPos(FVector v);
     void AddPos(float x, float y, float z);
-    void AddRot(PrimQuat q);
+    void AddRot(FQuat q);
     void Scale(float x, float y);
     void FlipNormals();
     void AddValue2FaceVertexIndices(int num);
@@ -227,8 +226,8 @@ public:
     FString errorMessage = "";
     const float twoPi = 2.0f * (float)M_PI;
     
-    TArray<Coord> coords;
-    TArray<Coord> normals;
+    TArray<FVector> coords;
+    TArray<FVector> normals;
     TArray<Face> faces;
     
     TArray<ViewerFace> viewerFaces;
@@ -275,13 +274,13 @@ public:
     inline void ExtrudeCircular() { Extrude(Circular); }
     
     
-    Coord SurfaceNormal(Coord c1, Coord c2, Coord c3);
-    Coord SurfaceNormal(Face face);
-    Coord SurfaceNormal(int faceIndex);
+    FVector SurfaceNormal(FVector c1, FVector c2, FVector c3);
+    FVector SurfaceNormal(Face face);
+    FVector SurfaceNormal(int faceIndex);
     PrimMesh Copy();
     void CalcNormals();
     void AddPos(float x, float y, float z);
-    void AddRot(PrimQuat q);
+    void AddRot(FQuat q);
     
 #if 0
     VertexIndexer GetVertexIndexer();

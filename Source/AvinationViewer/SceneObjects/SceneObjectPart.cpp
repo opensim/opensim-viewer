@@ -13,6 +13,8 @@
 #include "../Meshing/PrimMesher.h"
 #include "openjpeg.h"
 
+#define CULLDIST 12800.0
+
 SceneObjectPart::SceneObjectPart()
 {
     isPrim = isMesh = isSculpt = false;
@@ -64,31 +66,31 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
 {
     rapidxml::xml_node<> *uuidNode = xml->first_node("UUID");
     rapidxml::xml_node<> *innerUuidNode = uuidNode->first_node();
-    
+
     FGuid::Parse(FString(innerUuidNode->value()), uuid);
-    
+
     rapidxml::xml_node<> *shapeNode = xml->first_node("Shape");
     if (!shapeNode)
         return false;
     rapidxml::xml_node<> *sculptTypeNode = shapeNode->first_node("SculptType");
     rapidxml::xml_node<> *sculptTextureNode = shapeNode->first_node("SculptTexture");
-    
+
     if (!sculptTypeNode || !sculptTextureNode)
         return false;
-    
+
     innerUuidNode = sculptTextureNode->first_node();
     if (!innerUuidNode)
         return false;
-    
+
     rapidxml::xml_node<> *textureEntryNode = shapeNode->first_node("TextureEntry");
     if (!textureEntryNode)
         return false;
     FString txe(textureEntryNode->value());
-    
+
     FBase64::Decode(txe, textureEntry);
-    
+
     TextureEntry::Parse(textureEntry, defaultTexture, textures);
-    
+
     pathBegin = ReadFloatValue(shapeNode, "PathBegin", 0);
     pathEnd = ReadFloatValue(shapeNode, "PathEnd", 0);
     pathRadiusOffset = ReadFloatValue(shapeNode, "PathRadiusOffset", 0);
@@ -142,23 +144,23 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
         hollowShape = hstSquare;
     else if (txt == "Triangle")
         hollowShape = hstTriangle;
-    
+
     rapidxml::xml_node<> *scaleNode = xml->first_node("Scale");
     if (!scaleNode)
         return false;
-    
+
     rapidxml::xml_node<> *x, *y, *z, *w;
     x = scaleNode->first_node("X");
     y = scaleNode->first_node("Y");
     z = scaleNode->first_node("Z");
-    
+
     if (!x || !y || !z)
         return false;
-    
+
     scale.X = atof(x->value());
     scale.Y = atof(y->value());
     scale.Z = atof(z->value());
-    
+
     if (scale.X == 0)
         scale.X = 0.001;
     if (scale.Y == 0)
@@ -169,58 +171,58 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     scale *= 100.0f;
 
     rapidxml::xml_node<> *rotationNode = xml->first_node("RotationOffset");
-    
+
     if (!rotationNode)
         return false;
-    
+
     x = rotationNode->first_node("X");
     y = rotationNode->first_node("Y");
     z = rotationNode->first_node("Z");
     w = rotationNode->first_node("W");
-    
+
     if (!x || !y || !z || !w)
         return false;
-    
+
     rotation.X = atof(x->value());
     rotation.Y = -atof(y->value());
     rotation.Z = atof(z->value());
     rotation.W = -atof(w->value());
-    
+
     rotation.Normalize();
-    
+
     rapidxml::xml_node<> *positionNode = xml->first_node("OffsetPosition");
     if (!positionNode)
         return false;
-    
+
     x = positionNode->first_node("X");
     y = positionNode->first_node("Y");
     z = positionNode->first_node("Z");
-    
+
     if (!x || !y || !z)
         return false;
-    
+
     position.X = atof(x->value());
     position.Y = -atof(y->value());
     position.Z = atof(z->value());
-    
+
     rapidxml::xml_node<> *groupPositionNode = xml->first_node("GroupPosition");
     if (!groupPositionNode)
         return false;
-    
+
     x = groupPositionNode->first_node("X");
     y = groupPositionNode->first_node("Y");
     z = groupPositionNode->first_node("Z");
-    
+
     if (!x || !y || !z)
         return false;
-    
+
     groupPosition.X = atof(x->value());
     groupPosition.Y = -atof(y->value());
     groupPosition.Z = atof(z->value());
-    
+
     sculptType = atoi(sculptTypeNode->value());
-    
-    if(sculptType == 0)
+
+    if (sculptType == 0)
     {
         isPrim = true;
     }
@@ -234,7 +236,7 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
         isSculpt = true;
         meshAssetId = FString(innerUuidNode->value());
     }
-    
+
     pathShearX = pathShearX < 128 ? (float)pathShearX * 0.01f : (float)(pathShearX - 256) * 0.01f;
     pathShearY = pathShearY < 128 ? (float)pathShearY * 0.01f : (float)(pathShearY - 256) * 0.01f;
     pathBegin = (float)pathBegin * 2.0e-5f;
@@ -260,8 +262,43 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     if (profileHollow > 0.95f)
         profileHollow = 0.95f;
 
-    lodWanted = 3;
 
+    lodWanted = 2;
+    maxLod = High;
+
+    float a = scale.Size();
+    float b = a;
+    a *= 0.02;
+    a = FMath::Atan(a) / 0.785;
+
+    b *= 250.0;
+    if (b > CULLDIST)
+        b = CULLDIST;
+
+    cullDistance = b;
+
+    //adjust visual mesh maxlod
+    if (isPrim && profileShape != pstCircle && profileShape != pstHalfCircle &&
+        (ExtrusionType)pathCurve == etStraight && pathTwist == pathTwistBegin)
+    {
+        // prims without lod
+        lodWanted = 0;
+        maxLod = Lowest;
+    }
+    else
+    {
+        if (a > .9)
+            maxLod = Highest;
+        else if (a > 0.4)
+            maxLod = High;
+        else if (a > 0.15)
+            maxLod = Low;
+        else
+            maxLod = Lowest;
+    }
+
+//    maxLod = Highest;
+    lodWanted = maxLod;
     return true;
 }
 
@@ -529,6 +566,9 @@ bool SceneObjectPart::MeshPrim()
 
     int primFace;
     numFaces = 0;
+    int i1;
+    int i2;
+    int i3;
     for (int face = 0; face < primData->viewerFaces.Num(); face++)
     {
         primFace = primData->viewerFaces[face].primFaceNumber;
@@ -554,48 +594,67 @@ bool SceneObjectPart::MeshPrim()
             continue;
         }
 
-        int indx = pm->vertices.Num();
-        pm->vertices.Add(v1);
-        pm->vertices.Add(v2);
-        pm->vertices.Add(v3);
-    
-        // triangles
-        pm->triangles.Add(indx);
-        pm->triangles.Add(indx + 1);
-        pm->triangles.Add(indx + 2);
+        if (!(pm->vertices).Find(v1, i1))
+        {
+            i1 = pm->vertices.Num();
+            pm->vertices.Add(v1);
 
-        //normals
-        FVector n1(primData->viewerFaces[face].n1.X,
+            FVector n1(primData->viewerFaces[face].n1.X,
                 -primData->viewerFaces[face].n1.Y,
                 primData->viewerFaces[face].n1.Z);
-        FVector n2(primData->viewerFaces[face].n2.X,
+            pm->normals.Add(n1);
+
+            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.U,
+                1.0f - primData->viewerFaces[face].uv1.V));
+
+            pm->vertexColors.Add(FColor(255, 255, 255, 255));
+
+        }
+
+        if (!(pm->vertices).Find(v2, i2))
+        {
+            i2 = pm->vertices.Num();
+
+            pm->vertices.Add(v2);
+
+            FVector n2(primData->viewerFaces[face].n2.X,
                 -primData->viewerFaces[face].n2.Y,
                 primData->viewerFaces[face].n2.Z);
-        FVector n3(primData->viewerFaces[face].n3.X,
+
+            pm->normals.Add(n2);
+
+            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.U,
+                1.0f - primData->viewerFaces[face].uv2.V));
+
+            pm->vertexColors.Add(FColor(255, 255, 255, 255));
+
+            pm->vertexColors.Add(FColor(255, 255, 255, 255));
+
+        }
+
+        if (!(pm->vertices).Find(v3, i3))
+        {
+            i3 = pm->vertices.Num();
+
+            pm->vertices.Add(v3);
+
+            FVector n3(primData->viewerFaces[face].n3.X,
                 -primData->viewerFaces[face].n3.Y,
                 primData->viewerFaces[face].n3.Z);
+            pm->normals.Add(n3);
 
-        pm->normals.Add(n1);
-        pm->normals.Add(n2);
-        pm->normals.Add(n3);
-
-        //uv map
-        pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.U,
-                1.0f - primData->viewerFaces[face].uv1.V));
-        pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.U,
-                1.0f - primData->viewerFaces[face].uv2.V));
-        pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.U,
+            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.U,
                 1.0f - primData->viewerFaces[face].uv3.V));
 
-        // colors
-        pm->vertexColors.Add(FColor(255, 255, 255, 255));
-        pm->vertexColors.Add(FColor(255, 255, 255, 255));
-        pm->vertexColors.Add(FColor(255, 255, 255, 255));
+            pm->vertexColors.Add(FColor(255, 255, 255, 255));
 
-        // tangents
-        pm->tangents.Add(FProcMeshTangent(1, 1, 1));
-        pm->tangents.Add(FProcMeshTangent(1, 1, 1));
-        pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+            pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+
+        }
+        // triangles
+        pm->triangles.Add(i1);
+        pm->triangles.Add(i2);
+        pm->triangles.Add(i3);
     }
 
     delete primData;
@@ -762,16 +821,6 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
     {
         GenerateSculptMesh(data, lodWanted);
     }
-/*
-    catch (asset_decode_exception& ex)
-    {
-        return false;
-    }
-    catch (std::exception& ex)
-    {
-    return false;
-    }
-*/
     catch (...)
     {
         return false;
@@ -784,47 +833,46 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
 
     PrimFaceMeshData pm;
     primMeshData.Empty();
+    
+    FVector* ptr;
+    UVCoord* uptr;
 
-    for (int face = 0; face < prim->viewerFaces.Num(); ++face)
+    int ncoord = 0;
+    for (; ncoord < prim->coords.Num(); ncoord++)
     {
-        ViewerFace* vf = &prim->viewerFaces[face];
+        ptr = &prim->coords[ncoord];
+        FVector v(ptr->X, -ptr->Y, ptr->Z);
+        pm.vertices.Add(v);
 
-        FVector v1(vf->v1.X, -vf->v1.Y, vf->v1.Z);
-        FVector v2(vf->v2.X, -vf->v2.Y, vf->v2.Z);
-        FVector v3(vf->v3.X, -vf->v3.Y, vf->v3.Z);
+        // this odd signals mean current triangle normals are inverted for some reason
+        ptr = &prim->normals[ncoord];
+        FVector n(-ptr->X, ptr->Y, -ptr->Z);
+        pm.normals.Add(n);
 
-        if (v1 == v2 || v1 == v3 || v2 == v3)
-            continue;
+        //uvs and tangents need more testing with textures and materials
 
-        int index = pm.vertices.Num();
-        pm.vertices.Add(v1);
-        pm.vertices.Add(v2);
-        pm.vertices.Add(v3);
+        uptr = &prim->uvs[ncoord];
+        pm.uv0.Add(FVector2D(uptr->U, 1.0 - uptr->V));
 
-        pm.triangles.Add(index);
-        pm.triangles.Add(index + 2);
-        pm.triangles.Add(index + 1);
-
-        FVector n1(vf->n1.X, -vf->n1.Y,  vf->n1.Z);
-        FVector n2(vf->n2.X, -vf->n2.Y,  vf->n2.Z);
-        FVector n3(vf->n3.X, -vf->n3.Y,  vf->n3.Z);
-
-        pm.normals.Add(n1);
-        pm.normals.Add(n2);
-        pm.normals.Add(n3);
-
-        pm.uv0.Add(FVector2D(vf->uv1.U, 1.0 - vf->uv1.V));
-        pm.uv0.Add(FVector2D(vf->uv2.U, 1.0 - vf->uv2.V));
-        pm.uv0.Add(FVector2D(vf->uv3.U, 1.0 - vf->uv3.V));
-
-        pm.tangents.Add(FProcMeshTangent(1, 1, 1));
-        pm.tangents.Add(FProcMeshTangent(1, 1, 1));
-        pm.tangents.Add(FProcMeshTangent(1, 1, 1));
-
-        pm.vertexColors.Add(FColor(255, 255, 255, 255));
-        pm.vertexColors.Add(FColor(255, 255, 255, 255));
+        ptr = &prim->tangents[ncoord];       
+        pm.tangents.Add(FProcMeshTangent(FVector(-ptr->X, ptr->Y, -ptr->Z), prim->tangentFlips[ncoord]));
         pm.vertexColors.Add(FColor(255, 255, 255, 255));
     }
+
+    for (int i = 0; i < prim->faces.Num(); i++)
+    {
+        int i1 = prim->faces[i].v1;
+        int i2 = prim->faces[i].v2;
+        int i3 = prim->faces[i].v3;
+
+        if (i1 >= ncoord || i2 >= ncoord || i3 >= ncoord)
+                continue;
+
+        pm.triangles.Add(i3);
+        pm.triangles.Add(i2);
+        pm.triangles.Add(i1);
+    }
+
     primMeshData.Add(pm);
 
     numFaces = 1;
@@ -854,7 +902,7 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t>& indata, int lod)
     int w = tex->comps[0].w;
     int h = tex->comps[0].h;
 
-    TArray<TArray<Coord>> rows;
+    TArray<TArray<FVector>> rows;
     OPJ_INT32 *r = tex->comps[0].data, *g = tex->comps[1].data, *b = tex->comps[2].data;
     for (int i = 0; i < h; i++)
         rows.AddDefaulted();
@@ -863,7 +911,7 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t>& indata, int lod)
     {
         for (int j = 0; j < w; j++)
         {
-            Coord c = Coord((float)(*r++ & 0xff) * pixScale - 0.5f,
+            FVector c = FVector((float)(*r++ & 0xff) * pixScale - 0.5f,
                             (float)(*g++ & 0xff) * pixScale - 0.5f,
                             (float)(*b++ & 0xff) * pixScale - 0.5f);
             if (mirror)

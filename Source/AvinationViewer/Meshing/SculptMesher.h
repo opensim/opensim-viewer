@@ -12,20 +12,16 @@ enum SculptType { sphere = 1, torus = 2, plane = 3, cylinder = 4 };
 class AVINATIONVIEWER_API SculptMesh
 {
 public:
-    TArray<Coord> coords;
+    TArray<FVector> coords;
     TArray<Face> faces;
-    
-    TArray<ViewerFace> viewerFaces;
-    TArray<Coord> normals;
+    TArray<FVector> normals;
     TArray<UVCoord> uvs;
+    TArray<FVector> tangents;
+    TArray<bool> tangentFlips;
     
-    SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
-    
-    void _SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
-    
-    void AddPos(float x, float y, float z);
-    void AddRot(PrimQuat q);
-    void Scale(float x, float y, float z);
+    SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
+
 private:
     void calcVertexNormals(SculptType sculptType, int xSize, int ySize);
+    void CalcTangents();
 };
