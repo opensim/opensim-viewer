@@ -8,6 +8,8 @@
 #include "../Meshing/PrimMesher.h"
 #include "../Meshing/SculptMesher.h"
 
+
+
 class LLSDItem;
 
 enum PrimFlags : uint32_t
@@ -153,6 +155,8 @@ public:
     int numFaces;
     int lodWanted;
     
+    float cullDistance;
+
     PrimMesh *primData;
     SculptMesh *sculptData;
     TArray<PrimFaceMeshData> primMeshData;

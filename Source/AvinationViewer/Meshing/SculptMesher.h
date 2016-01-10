@@ -18,6 +18,7 @@ public:
     TArray<ViewerFace> viewerFaces;
     TArray<Coord> normals;
     TArray<UVCoord> uvs;
+    TArray<Coord> tangents;
     
     SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
     
@@ -28,4 +29,5 @@ public:
     void Scale(float x, float y, float z);
 private:
     void calcVertexNormals(SculptType sculptType, int xSize, int ySize);
+    void CalcTangents();
 };

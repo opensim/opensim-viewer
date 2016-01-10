@@ -48,10 +48,10 @@ Coord Face::SurfaceNormal(TArray<Coord> coordList)
     Coord c1 = coordList[v1];
     Coord c2 = coordList[v2];
     Coord c3 = coordList[v3];
-    
+
     Coord edge1(c2.X - c1.X, c2.Y - c1.Y, c2.Z - c1.Z);
     Coord edge2(c3.X - c1.X, c3.Y - c1.Y, c3.Z - c1.Z);
-    
+
     return Coord::Cross(edge1, edge2).Normalize();
 }
 

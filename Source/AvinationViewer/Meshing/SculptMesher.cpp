@@ -126,13 +126,12 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
     }
     
     // Find the poles for spherical sitching
-    Coord northPole = matrix[0][matrixWidth / 2];
     
     // The south pole is taken from the "extra" row (33) data
     // unless the source texture is 32 pixels tall. In that case
     // it is taken from the center of the last valid row. The
     // results may be undefined.
-    Coord southPole = matrix[matrixHeight - 1][matrixWidth / 2];
+    
     
     if (sculptType == sphere)
     {
@@ -141,6 +140,10 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
         // of the top and the last valid input row.
         // The coordinates in the top row get overwritten by this
         // operation.
+
+        Coord northPole = matrix[0][matrixWidth / 2];
+        Coord southPole = matrix[matrixHeight - 1][matrixWidth / 2];
+
         for (int h1 = 0 ; h1 < matrixWidth ; ++h1)
         {
             matrix[0][h1] = northPole;
@@ -189,54 +192,23 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
             if (viewerMode)
             {
                 normals.Add(Coord());
+                tangents.Add(Coord());
                 uvs.Add(UVCoord(divisionU * imageX, divisionV * imageY));
             }
             
             if (imageY > 0 && imageX > 0)
             {
                 Face f1, f2;
-                
-                if (viewerMode)
+                if (invert)
                 {
-                    if (invert)
-                    {
-                        f1 = Face(p1, p4, p3, p1, p4, p3);
-                        f1.uv1 = p1;
-                        f1.uv2 = p4;
-                        f1.uv3 = p3;
-                        
-                        f2 = Face(p1, p2, p4, p1, p2, p4);
-                        f2.uv1 = p1;
-                        f2.uv2 = p2;
-                        f2.uv3 = p4;
-                    }
-                    else
-                    {
-                        f1 = Face(p1, p3, p4, p1, p3, p4);
-                        f1.uv1 = p1;
-                        f1.uv2 = p3;
-                        f1.uv3 = p4;
-                        
-                        f2 = Face(p1, p4, p2, p1, p4, p2);
-                        f2.uv1 = p1;
-                        f2.uv2 = p4;
-                        f2.uv3 = p2;
-                    }
+                    f1 = Face(p1, p4, p3);
+                    f2 = Face(p1, p2, p4);
                 }
                 else
                 {
-                    if (invert)
-                    {
-                        f1 = Face(p1, p4, p3);
-                        f2 = Face(p1, p2, p4);
-                    }
-                    else
-                    {
-                        f1 = Face(p1, p3, p4);
-                        f2 = Face(p1, p4, p2);
-                    }
+                    f1 = Face(p1, p3, p4);
+                    f2 = Face(p1, p4, p2);
                 }
-                
                 faces.Add(f1);
                 faces.Add(f2);
             }
@@ -244,7 +216,10 @@ void SculptMesh::_SculptMesh(TArray<TArray<Coord>> rows, SculptType sculptType, 
     }
     
     if (viewerMode)
+    {
         calcVertexNormals(sculptType, matrixWidth, matrixHeight);
+        CalcTangents();
+    }
 }
 
 void SculptMesh::calcVertexNormals(SculptType sculptType, int xSize, int ySize)
@@ -258,43 +233,139 @@ void SculptMesh::calcVertexNormals(SculptType sculptType, int xSize, int ySize)
         normals[face.n2] += surfaceNormal;
         normals[face.n3] += surfaceNormal;
     }
-    
-    int numNormals = normals.Num();
-    for (int i = 0; i < numNormals; i++)
-        normals[i] = normals[i].Normalize();
-    
-    if (sculptType != plane)
-    { // blend the vertex normals at the cylinder seam
-        for (int y = 0; y < ySize; y++)
+
+    if (sculptType == sphere)
+    {
+        Coord avg(0,0,0);
+        for (int i = 0; i < xSize; i++)
         {
-            int rowOffset = y * xSize;
-            
-            normals[rowOffset] = normals[rowOffset + xSize - 1] = (normals[rowOffset] + normals[rowOffset + xSize - 1]).Normalize();
+            avg.X += normals[i].X;
+            avg.Y += normals[i].Y;
+            avg.Z += normals[i].Z;
+        }
+        for (int i = 0; i < xSize; i++)
+        {
+            normals[i].X = avg.X;
+            normals[i].Y = avg.Y;
+            normals[i].Z = avg.Z;
+        }
+        avg.X = 0;
+        avg.Y = 0;
+        avg.Z = 0;
+        int lastrow = xSize * (ySize - 1);
+        for (int i = lastrow; i < lastrow + xSize; i++)
+        {
+            avg.X += normals[i].X;
+            avg.Y += normals[i].Y;
+            avg.Z += normals[i].Z;
+        }
+        for (int i = lastrow; i < lastrow + xSize; i++)
+        {
+            normals[i].X = avg.X;
+            normals[i].Y = avg.Y;
+            normals[i].Z = avg.Z;
         }
     }
     
-    for (auto it = faces.CreateConstIterator() ; it ; ++it)
+    if (sculptType == sphere || sculptType == cylinder || sculptType == torus)
+    { // blend the vertex normals at the cylinder seam
+        int xminusOne = xSize - 1;
+        for (int y = 0; y < ySize; y++)
+        {
+            int rowOffset = y * xSize;
+
+            normals[rowOffset] = normals[rowOffset + xminusOne] = (normals[rowOffset] + normals[rowOffset + xminusOne]);
+        }
+    }
+
+    if (sculptType == torus)
     {
-        Face face = (*it);
-        
-        ViewerFace vf(0);
-        vf.v1 = coords[face.v1];
-        vf.v2 = coords[face.v2];
-        vf.v3 = coords[face.v3];
-        
-        vf.coordIndex1 = face.v1;
-        vf.coordIndex2 = face.v2;
-        vf.coordIndex3 = face.v3;
-        
-        vf.n1 = normals[face.n1];
-        vf.n2 = normals[face.n2];
-        vf.n3 = normals[face.n3];
-        
-        vf.uv1 = uvs[face.uv1];
-        vf.uv2 = uvs[face.uv2];
-        vf.uv3 = uvs[face.uv3];
-        
-        viewerFaces.Add(vf);
+        int lastrow = xSize * (ySize - 1);
+        for (int x = 0; x < xSize; x++)
+        {
+            normals[x] = normals[lastrow + x] = (normals[x] + normals[lastrow + x]);
+        }
+    }
+
+    int numNormals = normals.Num();
+    for (int i = 0; i < numNormals; i++)
+        normals[i] = normals[i].Normalize();
+}
+
+void SculptMesh::CalcTangents()
+{
+    int numVerts = coords.Num();
+    TArray<Coord> tan1;
+    TArray<Coord> tan2;
+    tan1.AddZeroed(numVerts);
+    tan2.AddZeroed(numVerts);
+
+    int numFaces = faces.Num();
+
+    for (int a = 0; a < numFaces; a++)
+    {
+        int i1 = faces[a].v1;
+        int i2 = faces[a].v2;
+        int i3 = faces[a].v3;
+
+        const Coord v1 = coords[i1];
+        const Coord v2 = coords[i2];
+        const Coord v3 = coords[i3];
+
+        const UVCoord w1 = uvs[i1];
+        const UVCoord w2 = uvs[i2];
+        const UVCoord w3 = uvs[i3];
+
+        float x1 = v2.X - v1.X;
+        float x2 = v3.X - v1.X;
+        float y1 = v2.Y - v1.Y;
+        float y2 = v3.Y - v1.Y;
+        float z1 = v2.Y - v1.Z;
+        float z2 = v3.Z - v1.Z;
+
+        float s1 = w2.U - w1.U;
+        float s2 = w3.U - w1.U;
+        float t1 = w2.V - w1.V;
+        float t2 = w3.V - w1.V;
+
+        float r = 1.0F / (s1 * t2 - s2 * t1);
+        Coord sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+            (t2 * z1 - t1 * z2) * r);
+        Coord tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+            (s1 * z2 - s2 * z1) * r);
+
+        tan1[i1] += sdir;
+        tan1[i2] += sdir;
+        tan1[i3] += sdir;
+
+        tan2[i1] += tdir;
+        tan2[i2] += tdir;
+        tan2[i3] += tdir;
+    }
+
+    for (int a = 0; a < numVerts; a++)
+    {
+        Coord n = normals[a];
+        Coord t = tan1[a];
+
+        float dotnt = n.X * t.X + n.Y * t.Y + n.Z * t.Z;
+        Coord crossnt = Coord::Cross(n, t);
+
+        n.X *= dotnt;
+        n.Y *= dotnt;
+        n.Z *= dotnt;
+
+        Coord tsubn;
+        tsubn.X = t.X - n.X;
+        tsubn.Y = t.Y - n.Y;
+        tsubn.Z = t.Z - n.Z;
+
+        // Gram-Schmidt orthogonalize
+        tangents[a] = tsubn.Normalize();
+
+        float dotCrossT2 = crossnt.X * tan2[a].X + crossnt.Y * tan2[a].Y + crossnt.Z * tan2[a].Z;
+        // Calculate handedness
+        float w = (dotCrossT2 < 0.0F) ? -1.0F : 1.0F;
     }
 }
 

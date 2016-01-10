@@ -54,7 +54,7 @@ public:
     Face(int v1, int v2, int v3, int n1, int n2, int n3);
     
     Coord SurfaceNormal(TArray<Coord> coordList);
-    
+
     int primFace;
     
     // vertices

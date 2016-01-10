@@ -177,8 +177,8 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrimData(SceneObjectPart
     //mesh->RegisterComponent();
     mesh->bAutoRegister = false;
     mesh->CastShadow = true;
-    mesh->SetCullDistance(12800);
-    mesh->SetCachedMaxDrawDistance(12800);
+    mesh->SetCullDistance(sop->cullDistance);
+    mesh->SetCachedMaxDrawDistance(sop->cullDistance);
 
     int nfaces = sop->primMeshData.Num();
     if (nfaces == 0)
