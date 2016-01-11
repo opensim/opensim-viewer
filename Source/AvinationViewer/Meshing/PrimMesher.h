@@ -50,7 +50,6 @@ class Face
 public:
     Face();
     Face(int v1, int v2, int v3);
-    Face(int v1, int v2, int v3, int n1, int n2, int n3);
     
     FVector SurfaceNormal(TArray<FVector> coordList);
 
@@ -60,11 +59,6 @@ public:
     int v1;
     int v2;
     int v3;
-    
-    //normals
-    int n1;
-    int n2;
-    int n3;
     
     // uvs
     int uv1;
@@ -80,7 +74,6 @@ public:
     void Scale(float x, float y, float z);
     void AddPos(float x, float y, float z);
     void AddRot(FQuat q);
-    void CalcSurfaceNormal();
     int primFaceNumber;
     
     FVector v1;
@@ -90,10 +83,6 @@ public:
     int coordIndex1;
     int coordIndex2;
     int coordIndex3;
-    
-    FVector n1;
-    FVector n2;
-    FVector n3;
     
     UVCoord uv1;
     UVCoord uv2;
@@ -117,15 +106,10 @@ public:
     float iX, iY; // intersection point
     
     static const Angle angles3[];
-    static const FVector normals3[];
-    
     static const Angle angles4[];
-    static const FVector normals4[];
     static const Angle angles24[];
     
-    
     TArray<Angle> angles;
-    TArray<FVector> normals;
     
     void makeAngles(int sides, float startAngle, float stopAngle);
     
@@ -152,7 +136,6 @@ public:
     
     TArray<FVector> coords;
     TArray<Face> faces;
-    TArray<FVector> vertexNormals;
     TArray<float> us;
     TArray<UVCoord> faceUVs;
     TArray<int> faceNumbers;
@@ -162,10 +145,6 @@ public:
     TArray<int> hollowCoordIndices;
     TArray<int> cut1CoordIndices;
     TArray<int> cut2CoordIndices;
-    
-    FVector faceNormal;
-    FVector cutNormal1;
-    FVector cutNormal2;
     
     int numOuterVerts;
     int numHollowVerts;
@@ -189,7 +168,6 @@ public:
     void Scale(float x, float y);
     void FlipNormals();
     void AddValue2FaceVertexIndices(int num);
-    void AddValue2FaceNormalIndices(int num);
     void DumpRaw(FString path, FString name, FString title);
 };
 
@@ -278,7 +256,6 @@ public:
     FVector SurfaceNormal(Face face);
     FVector SurfaceNormal(int faceIndex);
     PrimMesh Copy();
-    void CalcNormals();
     void AddPos(float x, float y, float z);
     void AddRot(FQuat q);
     
