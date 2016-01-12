@@ -16,12 +16,9 @@ public:
     TArray<Face> faces;
     TArray<FVector> normals;
     TArray<UVCoord> uvs;
-    TArray<FVector> tangents;
-    TArray<bool> tangentFlips;
     
     SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
 
 private:
     void calcVertexNormals(SculptType sculptType, int xSize, int ySize);
-    void CalcTangents();
 };

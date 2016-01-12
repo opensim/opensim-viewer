@@ -187,7 +187,6 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
             if (viewerMode)
             {
                 normals.Add(FVector());
-                tangents.Add(FVector());
                 uvs.Add(UVCoord(divisionU * imageX, divisionV * imageY));
             }
             
@@ -213,7 +212,6 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
     if (viewerMode)
     {
         calcVertexNormals(sculptType, matrixWidth, matrixHeight);
-        CalcTangents();
     }
 }
 
@@ -281,76 +279,3 @@ void SculptMesh::calcVertexNormals(SculptType sculptType, int xSize, int ySize)
         normals[i].Normalize();
 }
 
-void SculptMesh::CalcTangents()
-{
-    int numVerts = coords.Num();
-    TArray<FVector> tan1;
-    TArray<FVector> tan2;
-    tan1.AddZeroed(numVerts);
-    tan2.AddZeroed(numVerts);
-    tangents.Empty();
-    tangents.AddZeroed(numVerts);
-    tangentFlips.Empty();
-    tangentFlips.AddZeroed(numVerts);
-
-    int numFaces = faces.Num();
-
-    for (int a = 0; a < numFaces; a++)
-    {
-        int i1 = faces[a].v1;
-        int i2 = faces[a].v2;
-        int i3 = faces[a].v3;
-
-        const FVector v1 = coords[i1];
-        const FVector v2 = coords[i2];
-        const FVector v3 = coords[i3];
-
-        const UVCoord w1 = uvs[i1];
-        const UVCoord w2 = uvs[i2];
-        const UVCoord w3 = uvs[i3];
-
-        float x1 = v2.X - v1.X;
-        float x2 = v3.X - v1.X;
-        float y1 = v2.Y - v1.Y;
-        float y2 = v3.Y - v1.Y;
-        float z1 = v2.Y - v1.Z;
-        float z2 = v3.Z - v1.Z;
-
-        float s1 = w2.U - w1.U;
-        float s2 = w3.U - w1.U;
-        float t1 = w2.V - w1.V;
-        float t2 = w3.V - w1.V;
-
-        float r = 1.0F / (s1 * t2 - s2 * t1);
-        FVector sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
-            (t2 * z1 - t1 * z2) * r);
-        FVector tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
-            (s1 * z2 - s2 * z1) * r);
-
-        tan1[i1] += sdir;
-        tan1[i2] += sdir;
-        tan1[i3] += sdir;
-
-        tan2[i1] += tdir;
-        tan2[i2] += tdir;
-        tan2[i3] += tdir;
-    }
-
-    for (int a = 0; a < numVerts; a++)
-    {
-        FVector n = normals[a];
-        FVector t = tan1[a];
-
-        float dotnt = FVector::DotProduct(n,t);
-        FVector crossnt = FVector::CrossProduct(n, t);
-
-        FVector tsubn = t - n * crossnt;
-
-        // Gram-Schmidt orthogonalize
-        tangents[a] = tsubn.GetSafeNormal();
-
-        float dotCrossT2 = FVector::DotProduct(crossnt, tan2[a]);
-        // Calculate handedness
-        tangentFlips[a] = (dotCrossT2 < 0.0F);
-    }
-}
