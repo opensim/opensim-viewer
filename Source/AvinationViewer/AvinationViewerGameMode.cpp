@@ -17,7 +17,7 @@
 #include "MeshActor.h"
 #include "AssetSubsystem/AssetCache.h"
 #include "AssetSubsystem/AssetDecode.h"
-#include "AssetSubsystem/TextureCache.h"
+#include "AssetSubsystem/PrimAsset.h"
 #include "AvnCharacter.h"
 
 class ObjectCreator : public FRunnable
@@ -59,6 +59,7 @@ AAvinationViewerGameMode::AAvinationViewerGameMode(const class FObjectInitialize
 void AAvinationViewerGameMode::HandleMatchHasStarted()
 {
     Super::HandleMatchHasStarted();
+    //delete &AssetCache::Get();
     //delete &TextureCache::Get();
     //TextureCache::outer = this;
 
@@ -67,14 +68,14 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
         delete creator;
     creator = new ObjectCreator(this);
     
-    /*
     FGuid id;
     //FGuid::Parse(TEXT("77540e8e-5064-4cf9-aa77-ad6617d73508"), id);
     FGuid::Parse(TEXT("8e3377b1-ccc7-4f7b-981d-f30ccae8121d"), id);
     
-    OnAssetFetched d;
+    /*
+    AssetFetchedDelegate d;
     d.BindUObject(this, &AAvinationViewerGameMode::CreateNewActor);
-    AssetCache::Get().Fetch(id, d);
+    AssetCache::Get().Fetch<PrimAsset>(id, d);
     */
 }
 
@@ -88,14 +89,15 @@ AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data)
 
 void AAvinationViewerGameMode::HandleObjectReady(AMeshActor *act)
 {
-    FVector pos(200.0f, 0.0f, 270.0f);
+    FVector pos(200.0f, 0.0f, 170.0f);
     
-    act->SetActorLocationAndRotation(pos /* act->sog->GetRootPart()->groupPosition * 100 */, act->sog->GetRootPart()->rotation);
-    
-    act->RegisterComponents();
-    act->SetActorHiddenInGame(false);
     act->sog->GatherTextures();
     
+    act->DoBeginPlay(); // hack needs review
+    act->SetActorLocationAndRotation(pos /* act->sog->GetRootPart()->groupPosition * 100 */, act->sog->GetRootPart()->rotation);
+    act->RegisterComponents();
+    act->SetActorHiddenInGame(false);
+
     UE_LOG(LogTemp, Warning, TEXT("%d textures on object"), act->sog->groupTextures.Num());
 }
 
@@ -124,20 +126,22 @@ AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data,
     return act;
 }
 
-void AAvinationViewerGameMode::CreateNewActor(FGuid id, TArray<uint8_t> data)
+void AAvinationViewerGameMode::CreateNewActor(FGuid id, TSharedAssetRef data)
 {
-    AssetDecode adec(data);
-    TArray<uint8_t> xml;
-    xml = adec.AsBase64DecodeArray();
-    xml.Add(0);
+    TSharedRef<PrimAsset, ESPMode::ThreadSafe> prim = StaticCastSharedRef<PrimAsset>(data);
     
     rapidxml::xml_document<> doc;
     
+    // MUST make a copy here because rapidxml::parse modifies the data
+    // in place. That would destroy the data cached in the asset and
+    // subsequent requests for this asset would get garbage.
+    // Learned this the hard way!
+    TArray<uint8_t> d(prim->xmlData);
+    
     try
     {
-        doc.parse<0>((char *)xml.GetData());
+        doc.parse<0>((char *)d.GetData());
     }
-//    catch (std::exception& e)
     catch (...)
     {
         return;
@@ -157,6 +161,8 @@ void AAvinationViewerGameMode::Tick(float deltaSeconds)
     
     //TextureCache::Get().DispatchDecodedRequest();
     creator->TickPool();
+    
+    AssetCache::Get().Tick();
     
     /*
     if (!(--gap))
@@ -267,9 +273,10 @@ void ObjectCreator::ObjectReady(AMeshActor *act)
     
     for (auto it = act->sog->groupTextures.CreateConstIterator() ; it ; ++it)
     {
-        TextureFetchedDelegate d;
-        d.BindRaw(this, &ObjectCreator::GotTexture, act);
-        TextureCache::Get().Fetch((*it), d);
+        // TODO: Reenable texture fetch
+//        TextureFetchedDelegate d;
+//        d.BindRaw(this, &ObjectCreator::GotTexture, act);
+//        TextureCache::Get().Fetch((*it), d);
     }
     readyLock.Lock();
     ready.Add(act);

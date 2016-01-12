@@ -4,6 +4,8 @@
 #include "../Utils/AvinationUtils.h"
 #include "SceneObjectPart.h"
 #include "SceneObjectGroup.h"
+#include "../AssetSubsystem/MeshAsset.h"
+#include "../AssetSubsystem/SculptAsset.h"
 #include "../AssetSubsystem/AssetCache.h"
 #include "../AssetSubsystem/AssetDecode.h"
 #include "../AssetSubsystem/LLSDMeshDecode.h"
@@ -302,26 +304,6 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
     return true;
 }
 
-void SceneObjectPart::AssetReceived(FGuid id, TArray<uint8_t> data)
-{
-    haveAllAssets = true;
-    
-    group->fetchLock.Lock();
-    --group->activeFetches;
-    group->fetchLock.Unlock();
-
-    if (isSculpt) // Sculpt
-    {
-        MeshSculpt(data);
-    }
-    else if (isMesh)
-    {
-        MeshMesh(data);
-    }
-
-    group->CheckAssetsDone();
-}
-
 void SceneObjectPart::FetchAssets()
 {
     FGuid id;
@@ -333,47 +315,55 @@ void SceneObjectPart::FetchAssets()
         group->CheckAssetsDone();
     }
 
+    // TODO: Renable assets
     else if (isMesh) // Mesh
     {
         FGuid::Parse(meshAssetId, id);
-        OnAssetFetched d;
-        d.BindRaw(this, &SceneObjectPart::AssetReceived);
+        AssetFetchedDelegate d;
+        d.BindRaw(this, &SceneObjectPart::MeshReceived);
         group->fetchLock.Lock();
         ++group->activeFetches;
         //UE_LOG(LogTemp, Warning, TEXT("Fetches now %d"), group->activeFetches);
         group->fetchLock.Unlock();
-        AssetCache::Get().Fetch(id, d);
+        AssetCache::Get().Fetch<MeshAsset>(id, d);
     }
     else // Sculpt
     {
         // The mesh asset is here the sculpt texture
         FGuid::Parse(meshAssetId, id);
-        OnAssetFetched d;
-        d.BindRaw(this, &SceneObjectPart::AssetReceived);
+        AssetFetchedDelegate d;
+        d.BindRaw(this, &SceneObjectPart::SculptReceived);
         group->fetchLock.Lock();
         ++group->activeFetches;
         //UE_LOG(LogTemp, Warning, TEXT("Fetches now %d"), group->activeFetches);
         group->fetchLock.Unlock();
-        AssetCache::Get().Fetch(id, d);
+        AssetCache::Get().Fetch<SculptAsset>(id, d);
     }
 }
 
-LLSDItem *SceneObjectPart::GetMeshData(TArray<uint8_t>& assetdata,int lod)
+void SceneObjectPart::MeshReceived(FGuid id, TSharedAssetRef asset)
+{
+    TSharedRef<MeshAsset, ESPMode::ThreadSafe> mesh = StaticCastSharedRef<MeshAsset>(asset);
+    
+    if (asset->state == AssetBase::Failed)
+        return;
+
+    MeshMesh(mesh);
+    
+    haveAllAssets = true;
+    
+    group->fetchLock.Lock();
+    --group->activeFetches;
+    group->fetchLock.Unlock();
+    
+    group->CheckAssetsDone();
+}
+
+
+LLSDItem *SceneObjectPart::GetMeshData(TSharedRef<MeshAsset, ESPMode::ThreadSafe> assetdata, int lod)
 {
     if (isMesh) // Mesh
     {
-        AssetDecode *dec;
-        try
-        {
-            dec = new AssetDecode(assetdata);
-        }
-        catch (asset_decode_exception ex)
-        {
-            return 0;
-        }
-        
-        TArray<uint8_t> data = dec->AsBase64DecodeArray();
-        
         if (lod > maxLod)
             lod = maxLod;
 
@@ -396,8 +386,7 @@ LLSDItem *SceneObjectPart::GetMeshData(TArray<uint8_t>& assetdata,int lod)
   
         
 //        LLSDItem *lodData = LLSDMeshDecode::Decode(data.GetData(), lodLevel);
-        LLSDItem *lodData = LLSDMeshDecode::Decode(data.GetData(), TEXT("high_lod"));
-        delete dec;
+        LLSDItem *lodData = LLSDMeshDecode::Decode(assetdata->meshData.GetData(), TEXT("high_lod"));
         
         numFaces = lodData->arrayData.Num();
         
@@ -407,7 +396,7 @@ LLSDItem *SceneObjectPart::GetMeshData(TArray<uint8_t>& assetdata,int lod)
     return 0;
 }
 
-bool SceneObjectPart::MeshMesh(TArray<uint8_t>& assetdata)
+bool SceneObjectPart::MeshMesh(TSharedRef<MeshAsset, ESPMode::ThreadSafe> assetdata)
 {
     LLSDItem * data = GetMeshData(assetdata, 0);
     if (!data)
@@ -827,7 +816,25 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
     */
 }
 
-bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
+void SceneObjectPart::SculptReceived(FGuid id, TSharedAssetRef asset)
+{
+    TSharedRef<SculptAsset, ESPMode::ThreadSafe> sculpt = StaticCastSharedRef<SculptAsset>(asset);
+    
+    if (asset->state == AssetBase::Failed)
+        return;
+    
+    MeshSculpt(sculpt);
+    
+    haveAllAssets = true;
+    
+    group->fetchLock.Lock();
+    --group->activeFetches;
+    group->fetchLock.Unlock();
+    
+    group->CheckAssetsDone();
+}
+
+bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> data)
 {
     if (lodWanted > maxLod)
         lodWanted = maxLod;
@@ -899,17 +906,13 @@ bool SceneObjectPart::MeshSculpt(TArray<uint8_t>& data)
     return true;
 }
 
-void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t>& indata, int lod)
+void SceneObjectPart::GenerateSculptMesh(TSharedRef<SculptAsset, ESPMode::ThreadSafe> indata, int lod)
 {
     bool mirror = (sculptType & 0x80) ? true : false;
     bool invert = (sculptType & 0x40) ? true : false;
     float pixScale = 1.0f / 256.0f;
     
-    AssetDecode dec(indata);
-    TArray<uint8_t> data = dec.AsBase64DecodeArray();
-    J2KDecode *idec = new J2KDecode();
-    idec->Decode(dec.AsBase64DecodeArray());
-    opj_image_t *tex = idec->image;
+    opj_image_t *tex = indata->image;
     
     if (!tex)
         throw std::exception();
@@ -939,8 +942,6 @@ void SceneObjectPart::GenerateSculptMesh(TArray<uint8_t>& indata, int lod)
     }
     
     sculptData = new SculptMesh(rows, (SculptType)sculptType, true, mirror, invert, lod);
-    
-    delete idec;
 }
 
 void SceneObjectPart::DeleteMeshData()

@@ -23,7 +23,7 @@ private:
     TMap<FGuid, AMeshActor *> actors;
     TArray<rapidxml::xml_node<> *> queue;
     
-    void CreateNewActor(FGuid id, TArray<uint8_t> data);
+    void CreateNewActor(FGuid id, TSharedAssetRef data);
     AMeshActor *CreateNewActor(rapidxml::xml_node<> *data, ObjectReadyDelegate d, AMeshActor *act = 0);
     AMeshActor *CreateNewActor(rapidxml::xml_node<> *data);
     void HandleObjectReady(AMeshActor *act);

@@ -21,12 +21,12 @@ J2KDecode::~J2KDecode()
         opj_image_destroy(image);
 }
 
- bool J2KDecode::Decode(TArray<uint8_t> data)
+bool J2KDecode::Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data)
 {
-    if (data.Num() == 0)
+    if (data->Num() == 0)
         return 0;
     
-    MemStream *memstr = new MemStream(data.GetData(), data.Num());
+    MemStream *memstr = new MemStream(data->GetData(), data->Num());
     
     opj_dparameters_t parameters;
     opj_codec_t *codec;
@@ -63,7 +63,7 @@ J2KDecode::~J2KDecode()
     opj_stream_set_seek_function(str, MemStream::seek);
     opj_stream_set_skip_function(str, MemStream::skip);
     opj_stream_set_user_data(str, memstr, MemStream::free);
-    opj_stream_set_user_data_length(str, data.Num());
+    opj_stream_set_user_data_length(str, data->Num());
     //opj_set_info_handler(codec, showMsg, 0);
     //opj_set_warning_handler(codec, showMsg, 0);
     //opj_set_error_handler(codec, showMsg, 0);

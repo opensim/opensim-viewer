@@ -22,10 +22,10 @@ public:
     AssetDecode(const uint8_t *data, uint32_t len);
 	~AssetDecode();
     
-    TArray<uint8_t> AsArray();
+    //TArray<uint8_t> AsArray();
     FString AsString();
     TArray<uint8_t> AsBase64DecodeArray();
-    FString AsBase64DecodeString();
+    //FString AsBase64DecodeString();
 private:
     void CommonDecode(const uint8_t *data);
     TArray<uint8_t>input;

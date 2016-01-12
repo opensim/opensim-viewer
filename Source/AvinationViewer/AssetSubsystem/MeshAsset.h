@@ -11,4 +11,9 @@ class AVINATIONVIEWER_API MeshAsset : public MeshableAsset
 public:
 	MeshAsset();
 	virtual ~MeshAsset();
+    
+    TArray<uint8_t> meshData;
+    
+private:
+    void Process();
 };

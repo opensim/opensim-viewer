@@ -12,7 +12,7 @@ public:
     J2KDecode();
 	~J2KDecode();
     
-    bool Decode(TArray<uint8_t> data);
+    bool Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data);
     UTexture2D *CreateTexture(UObject *outer, FGuid id);
     opj_image *image = 0;
 
