@@ -35,16 +35,7 @@ AMeshActor::AMeshActor()
 
 void AMeshActor::BeginPlay()
 {
-    //    Super::BeginPlay();
-}
-
-void AMeshActor::DoBeginPlay()
-{
-    
     Super::BeginPlay();
-
-    //    if(ShouldCollide)
-    //        SetActorEnableCollision(true);
 }
 
 // Called every frame

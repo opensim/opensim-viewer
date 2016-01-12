@@ -37,17 +37,13 @@ private:
     bool runThis = true;
     AAvinationViewerGameMode *mode;
     
-//    FCriticalSection poolLock;
-//    TArray<AMeshActor *> pool;
+    FCriticalSection poolLock;
+    TArray<AMeshActor *> pool;
     
     FCriticalSection readyLock;
     TArray<AMeshActor *> ready;
     
-    FCriticalSection textureLock;
-    TArray<AMeshActor *> textures;
-    
     void ObjectReady(AMeshActor *act);
-    void GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act);
 };
 
 AAvinationViewerGameMode::AAvinationViewerGameMode(const class FObjectInitializer& ObjectInitializer)
@@ -93,7 +89,6 @@ void AAvinationViewerGameMode::HandleObjectReady(AMeshActor *act)
     
     act->sog->GatherTextures();
     
-    act->DoBeginPlay(); // hack needs review
     act->SetActorLocationAndRotation(pos /* act->sog->GetRootPart()->groupPosition * 100 */, act->sog->GetRootPart()->rotation);
     act->RegisterComponents();
     act->SetActorHiddenInGame(false);
@@ -189,6 +184,7 @@ ObjectCreator::~ObjectCreator()
     runThis = false;
     //thread->Kill();
     thread->WaitForCompletion();
+    delete thread;
 }
 
 /*
@@ -245,24 +241,35 @@ uint32_t ObjectCreator::Run()
 
     while (runThis)
     {
-        usleep(50);
-       
+        poolLock.Lock();
+        if (pool.Num() == 0)
+        {
+            poolLock.Unlock();
+            usleep(100000);
+            continue;
+        }
+        
         if (sog)
         {
-//            AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
+            AMeshActor *act = pool[0];
+            pool.RemoveAt(0);
+            
+            poolLock.Unlock();
         
             ObjectReadyDelegate d;
             d.BindRaw(this,&ObjectCreator::ObjectReady);
             
-//            mode->CreateNewActor(sog, d, act);
-            mode->CreateNewActor(sog, d);
+            mode->CreateNewActor(sog, d, act);
             sog = sog->next_sibling();
         }
         else
         {
+            poolLock.Unlock();
             UE_LOG(LogTemp, Warning, TEXT("All actors created"));
             break;
         }
+        
+        //usleep(50);
     }
     
     delete fileData;
@@ -281,6 +288,7 @@ void ObjectCreator::ObjectReady(AMeshActor *act)
 //        d.BindRaw(this, &ObjectCreator::GotTexture, act);
 //        TextureCache::Get().Fetch((*it), d);
     }
+    
     readyLock.Lock();
     ready.Add(act);
     readyLock.Unlock();
@@ -294,25 +302,25 @@ void ObjectCreator::Stop()
 // MUST BE CALLED ON GAME THREAD
 void ObjectCreator::TickPool()
 {
+    poolLock.Lock();
+    while (pool.Num() < 100)
+    {
+        AMeshActor *act = mode->GetWorld()->SpawnActor<AMeshActor>(AMeshActor::StaticClass());
+        pool.Add(act);
+    }
+    poolLock.Unlock();
+    
     readyLock.Lock();
-    if (ready.Num())
+    while (ready.Num())
     {
         AMeshActor *act = ready[0];
         ready.RemoveAt(0);
         readyLock.Unlock();
-
+        
         act->SetActorHiddenInGame(false);
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
-        act->DoBeginPlay(); // hack needs review
+        readyLock.Lock();
     }
-    else
-    {
-        readyLock.Unlock();
-    }
-}
-
-void ObjectCreator::GotTexture(FGuid id, UTexture2D *tex, AMeshActor *act)
-{
-    
+    readyLock.Unlock();
 }

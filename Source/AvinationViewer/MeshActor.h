@@ -30,8 +30,6 @@ public:
 
     bool Load(rapidxml::xml_node<> *data);
 
-    void DoBeginPlay();
-
     SceneObjectGroup *sog;
     
     void RegisterComponents();
