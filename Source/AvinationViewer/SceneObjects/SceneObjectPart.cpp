@@ -563,7 +563,7 @@ bool SceneObjectPart::MeshPrim()
     for (int face = 0; face < primData->viewerFaces.Num(); face++)
     {
         primFace = primData->viewerFaces[face].primFaceNumber;
-        if (primFace >= 16 || primData < 0)
+        if (primFace >= 10 || primData < 0)
             continue;
         
         PrimFaceMeshData *pm = &primMeshData[primFace];

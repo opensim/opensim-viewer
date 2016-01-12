@@ -171,15 +171,15 @@ UProceduralMeshComponent *AMeshActor::BuildComponentFromPrimData(SceneObjectPart
     int nfaces = sop->primMeshData.Num();
     if (nfaces == 0)
         return mesh;
-  
+    
     int primFace = 0;
     for (int srcFace = 0; srcFace < nfaces; srcFace++)
     {
-        PrimFaceMeshData face = sop->primMeshData[srcFace];
-        if (face.vertices.Num() == 0 || face.triangles.Num() == 0)
+        PrimFaceMeshData *face = &sop->primMeshData[srcFace];
+        if (face->vertices.Num() == 0 || face->triangles.Num() == 0)
             continue;
-        mesh->CreateMeshSection(primFace, face.vertices, face.triangles,
-            face.normals, face.uv0, face.vertexColors, face.tangents, false);
+        mesh->CreateMeshSection(primFace, face->vertices, face->triangles,
+            face->normals, face->uv0, face->vertexColors, face->tangents, false);
         primFace++;
 //        SetUpMaterial(mesh, primFace, baseMaterial, sop->textures[primFace]);
     }
