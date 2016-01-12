@@ -3,7 +3,6 @@
 #pragma once
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "Coord.h"
 
 enum PathType { Linear = 0, Circular = 1, Flexible = 2 };
 

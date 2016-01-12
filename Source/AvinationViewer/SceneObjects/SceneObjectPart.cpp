@@ -707,8 +707,8 @@ void SceneObjectPart::calcVertsTangents(PrimFaceMeshData& pm)
     int numVerts = pm.vertices.Num();
     if (numVerts == 0)
         return;
-    int numFaces = pm.triangles.Num();
-    if (numFaces == 0)
+    int faces = pm.triangles.Num();
+    if (faces == 0)
         return;
 
     TArray<FVector> tan1;
@@ -719,7 +719,7 @@ void SceneObjectPart::calcVertsTangents(PrimFaceMeshData& pm)
     pm.tangents.AddZeroed(numVerts);
 
 
-    for (int a = 0; a < numFaces;)
+    for (int a = 0; a < faces;)
     {
         int i1 = pm.triangles[a++];
         int i2 = pm.triangles[a++];
