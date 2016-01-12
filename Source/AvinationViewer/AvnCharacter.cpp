@@ -180,7 +180,7 @@ void AAvnCharacter::Quit()
 
 void AAvnCharacter::ShowFrameRate()
 {
-//    return;
+    return;
     FVector pos = GetActorLocation();
     GEngine->AddOnScreenDebugMessage(0, 1.f, FColor::Yellow, "FPS: " + FString::FromInt(FPS) +
         " <" + FString::SanitizeFloat(pos.X / 100.0) + "," + FString::SanitizeFloat(-pos.Y / 100.0) +

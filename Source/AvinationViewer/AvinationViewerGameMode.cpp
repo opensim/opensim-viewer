@@ -216,12 +216,16 @@ bool ObjectCreator::Init()
 
 uint32_t ObjectCreator::Run()
 {
+    const char *path = "/Users/melanie/UnrealViewerData/primsback.xml";
+    
     struct stat st;
-//    if (stat("/Users/melanie/UnrealViewerData/primsback.xml", &st))
-    if (stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
-        return 0;
-//    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
-    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
+    if (stat(path, &st) < 0)
+    {
+        path = "/Avination/UnRealViewer/primsback.xml";
+        if (stat(path, &st) < 0)
+            return 0;
+    }
+    int fd = open(path, O_RDONLY);
     
     if (fd < 0 || st.st_size == 0)
         return 0;
