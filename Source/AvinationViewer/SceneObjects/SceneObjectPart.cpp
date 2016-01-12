@@ -591,7 +591,6 @@ bool SceneObjectPart::MeshPrim()
             pm->vertices.Add(v1);
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.X,
                 1.0f - primData->viewerFaces[face].uv1.Y));
-            pm->tangents.Add(FProcMeshTangent(1, 1, 1));
         }
         else
         {
@@ -599,10 +598,8 @@ bool SceneObjectPart::MeshPrim()
             if (uv != pm->uv0[i1])
             {
                 i1 = pm->vertices.Num();
-                v1.X -= 1e-6;
                 pm->vertices.Add(v1);
                 pm->uv0.Add(uv);
-                pm->tangents.Add(FProcMeshTangent(1, 1, 1));
             }
         }
 
@@ -612,8 +609,6 @@ bool SceneObjectPart::MeshPrim()
             pm->vertices.Add(v2);
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.X,
                 1.0f - primData->viewerFaces[face].uv2.Y));
-            pm->tangents.Add(FProcMeshTangent(1, 1, 1));
-
         }
         else
         {
@@ -621,10 +616,8 @@ bool SceneObjectPart::MeshPrim()
             if (uv != pm->uv0[i2])
             {
                 i2 = pm->vertices.Num();
-                v2.X -= 1e-6;
                 pm->vertices.Add(v2);
                 pm->uv0.Add(uv);
-                pm->tangents.Add(FProcMeshTangent(1, 1, 1));
             }
         }
 
@@ -634,8 +627,6 @@ bool SceneObjectPart::MeshPrim()
             pm->vertices.Add(v3);
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.X,
                 1.0f - primData->viewerFaces[face].uv3.Y));
-            pm->tangents.Add(FProcMeshTangent(1, 1, 1));
-
         }
         else
         {
@@ -643,10 +634,8 @@ bool SceneObjectPart::MeshPrim()
             if (uv != pm->uv0[i3])
             {
                 i3 = pm->vertices.Num();
-                v3.X -= 1e-6;
                 pm->vertices.Add(v3);
                 pm->uv0.Add(uv);
-                pm->tangents.Add(FProcMeshTangent(1, 1, 1));
             }
         }
 
@@ -672,19 +661,19 @@ bool SceneObjectPart::MeshPrim()
 
 void SceneObjectPart::calcVertsNormals(PrimFaceMeshData& pm)
 {
-    int numVertices = pm.vertices.Num();
-    if (numVertices == 0)
+    int numvertices = pm.vertices.Num();
+    if (numvertices == 0)
         return;
-    int numTris = pm.triangles.Num();
-    if (numTris == 0)
+    int numtris = pm.triangles.Num();
+    if (numtris == 0)
         return;
     pm.normals.Empty();
-    pm.normals.AddZeroed(numVertices);
+    pm.normals.AddZeroed(numvertices);
 
     int i1, i2, i3;
     FVector v1, e1, e2;
 
-    for (int i = 0; i < numTris;)
+    for (int i = 0; i < numtris;)
     {
         i1 = pm.triangles[i++];
         i2 = pm.triangles[i++];
@@ -698,28 +687,28 @@ void SceneObjectPart::calcVertsNormals(PrimFaceMeshData& pm)
         pm.normals[i2] -= surfaceNormal;
         pm.normals[i3] -= surfaceNormal;
     }
-    for (int i = 0; i < numVertices;i++)
+    for (int i = 0; i < pm.normals.Num(); i++)
         pm.normals[i].Normalize();
 }
 
 void SceneObjectPart::calcVertsTangents(PrimFaceMeshData& pm)
 {
-    int numVerts = pm.vertices.Num();
-    if (numVerts == 0)
+    int numverts = pm.vertices.Num();
+    if (numverts == 0)
         return;
-    int faces = pm.triangles.Num();
-    if (faces == 0)
+    int numtris = pm.triangles.Num();
+    if (numtris == 0)
         return;
+
+    pm.tangents.Empty();
+    pm.tangents.AddZeroed(numverts);
 
     TArray<FVector> tan1;
     TArray<FVector> tan2;
-    tan1.AddZeroed(numVerts);
-    tan2.AddZeroed(numVerts);
-    pm.tangents.Empty();
-    pm.tangents.AddZeroed(numVerts);
+    tan1.AddZeroed(numverts);
+    tan2.AddZeroed(numverts);
 
-
-    for (int a = 0; a < faces;)
+    for (int a = 0; a < numtris;)
     {
         int i1 = pm.triangles[a++];
         int i2 = pm.triangles[a++];
@@ -737,7 +726,7 @@ void SceneObjectPart::calcVertsTangents(PrimFaceMeshData& pm)
         float x2 = v3.X - v1.X;
         float y1 = v2.Y - v1.Y;
         float y2 = v3.Y - v1.Y;
-        float z1 = v2.Y - v1.Z;
+        float z1 = v2.Z - v1.Z;
         float z2 = v3.Z - v1.Z;
 
         float s1 = w2.X - w1.X;
@@ -745,7 +734,9 @@ void SceneObjectPart::calcVertsTangents(PrimFaceMeshData& pm)
         float t1 = w2.Y - w1.Y;
         float t2 = w3.Y - w1.Y;
 
-        float r = 1.0F / (s1 * t2 - s2 * t1);
+        float r = s1 * t2 - s2 * t1;
+        r = (fabs(r) > 1e-5) ? 1.0f / r : (r > 0.0 ? 1.0e3 : 1.0e3);
+
         FVector sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
             (t2 * z1 - t1 * z2) * r);
         FVector tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
@@ -760,7 +751,7 @@ void SceneObjectPart::calcVertsTangents(PrimFaceMeshData& pm)
         tan2[i3] += tdir;
     }
 
-    for (int a = 0; a < numVerts; a++)
+    for (int a = 0; a < numverts; a++)
     {
         FVector n = pm.normals[a];
         FVector t = tan1[a];
@@ -770,11 +761,15 @@ void SceneObjectPart::calcVertsTangents(PrimFaceMeshData& pm)
 
         FVector tsubn = t - n * crossnt;
 
-        // Gram-Schmidt orthogonalize
-        tsubn.Normalize();
-        float dotCrossT2 = FVector::DotProduct(crossnt, tan2[a]);
+        if (tsubn.SizeSquared() > 1e-5)
+        {
+            tsubn.Normalize();
+            float dotCrossT2 = FVector::DotProduct(crossnt, tan2[a]);
 
-        pm.tangents[a] = FProcMeshTangent(FVector(-tsubn.X, tsubn.Y, -tsubn.Z), (dotCrossT2 < 0.0F));
+            pm.tangents[a] = FProcMeshTangent(FVector(-tsubn.X, tsubn.Y, -tsubn.Z), (dotCrossT2 < 0.0F));
+        }
+        else
+            pm.tangents[a] = FProcMeshTangent(FVector(0.0, 0.0, -1), true);
     }
 }
 
