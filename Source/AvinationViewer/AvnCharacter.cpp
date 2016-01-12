@@ -21,7 +21,7 @@ AAvnCharacter::AAvnCharacter()
     capsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
     capsuleComponent->InitCapsuleSize(50.f, 180.0f);
 
-    SetActorLocation(FVector(0));
+    SetActorLocation(FVector(12800.0,12800,4000.0));
     UCharacterMovementComponent* CMovement =  GetCharacterMovement();
     CMovement->bCheatFlying = true;
 

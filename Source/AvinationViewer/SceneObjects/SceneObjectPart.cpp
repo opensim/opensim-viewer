@@ -588,39 +588,67 @@ bool SceneObjectPart::MeshPrim()
         {
             i1 = pm->vertices.Num();
             pm->vertices.Add(v1);
-
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.U,
                 1.0f - primData->viewerFaces[face].uv1.V));
-            pm->vertexColors.Add(FColor(255, 255, 255, 255));
             pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+        }
+        else
+        {
+            FVector2D uv(primData->viewerFaces[face].uv1.U, 1.0f - primData->viewerFaces[face].uv1.V);
+            if (uv != pm->uv0[i1])
+            {
+                i1 = pm->vertices.Num();
+                v1.X -= 1e-6;
+                pm->vertices.Add(v1);
+                pm->uv0.Add(uv);
+                pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+            }
         }
 
         if (!(pm->vertices).Find(v2, i2))
         {
-            i2 = pm->vertices.Num();
-
+            i2 = pm->vertices.Num();        
             pm->vertices.Add(v2);
-
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.U,
                 1.0f - primData->viewerFaces[face].uv2.V));
-
-            pm->vertexColors.Add(FColor(255, 255, 255, 255));
-
             pm->tangents.Add(FProcMeshTangent(1, 1, 1));
 
+        }
+        else
+        {
+            FVector2D uv(primData->viewerFaces[face].uv2.U, 1.0f - primData->viewerFaces[face].uv2.V);
+            if (uv != pm->uv0[i2])
+            {
+                i2 = pm->vertices.Num();
+                v2.X -= 1e-6;
+                pm->vertices.Add(v2);
+                pm->uv0.Add(uv);
+                pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+            }
         }
 
         if (!(pm->vertices).Find(v3, i3))
         {
             i3 = pm->vertices.Num();
-
             pm->vertices.Add(v3);
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.U,
                 1.0f - primData->viewerFaces[face].uv3.V));
-            pm->vertexColors.Add(FColor(255, 255, 255, 255));
             pm->tangents.Add(FProcMeshTangent(1, 1, 1));
 
         }
+        else
+        {
+            FVector2D uv(primData->viewerFaces[face].uv3.U, 1.0f - primData->viewerFaces[face].uv3.V);
+            if (uv != pm->uv0[i3])
+            {
+                i3 = pm->vertices.Num();
+                v3.X -= 1e-6;
+                pm->vertices.Add(v3);
+                pm->uv0.Add(uv);
+                pm->tangents.Add(FProcMeshTangent(1, 1, 1));
+            }
+        }
+
         // triangles
         pm->triangles.Add(i1);
         pm->triangles.Add(i2);
