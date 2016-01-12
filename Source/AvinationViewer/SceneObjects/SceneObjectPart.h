@@ -7,7 +7,9 @@
 #include "TextureEntry.h"
 #include "../Meshing/PrimMesher.h"
 #include "../Meshing/SculptMesher.h"
-
+#include "../AssetSubsystem/AssetBase.h"
+#include "../AssetSubsystem/SculptAsset.h"
+#include "../AssetSubsystem/MeshAsset.h"
 
 
 class LLSDItem;
@@ -97,12 +99,12 @@ public:
     bool Load(rapidxml::xml_node<> *xml);
     void FetchAssets() override;
     bool MeshPrim();
-    bool MeshSculpt(TArray<uint8_t>& data);
-    bool MeshMesh(TArray<uint8_t>& data);
+    bool MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> data);
+    bool MeshMesh(TSharedRef<MeshAsset, ESPMode::ThreadSafe> data);
     void DeleteMeshData();
     virtual void GatherTextures() override;
 
-    LLSDItem * GetMeshData(TArray<uint8_t>& assetdata,int lod);
+    LLSDItem * GetMeshData(TSharedRef<MeshAsset, ESPMode::ThreadSafe> assetdata,int lod);
     
     virtual SceneObject inline Type() override { return ObjectGroup; }
 
@@ -162,12 +164,13 @@ public:
     TArray<PrimFaceMeshData> primMeshData;
 
 private:
-    void AssetReceived(FGuid id, TArray<uint8_t> data) override;
+    void SculptReceived(FGuid id, TSharedAssetRef asset);
+    void MeshReceived(FGuid id, TSharedAssetRef asset);
     float ReadFloatValue(rapidxml::xml_node<> *parent, const char *name, float def);
     int ReadIntValue(rapidxml::xml_node<> *parent, const char *name, int def);
     FString ReadStringValue(rapidxml::xml_node<> *parent, const char *name, FString def);
     void GeneratePrimMesh(int lod);
-    void GenerateSculptMesh(TArray<uint8_t> &data, int lod);
+    void GenerateSculptMesh(TSharedRef<SculptAsset, ESPMode::ThreadSafe> data, int lod);
     
     bool meshed = false;
     TArray<uint8_t> meshAssetData;

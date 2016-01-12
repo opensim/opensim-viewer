@@ -2,7 +2,6 @@
 
 #pragma once
 DECLARE_DELEGATE(ProcessDelegate)
-DECLARE_DELEGATE_OneParam(DecodeDelegate, TArray<uint8_t>&)
 
 /**
  * 
@@ -10,16 +9,35 @@ DECLARE_DELEGATE_OneParam(DecodeDelegate, TArray<uint8_t>&)
 class AVINATIONVIEWER_API AssetBase
 {
 public:
+    
+    enum AssetState
+    {
+        Waiting = 0,
+        Processing = 1,
+        Failed = 2,
+        Done = 3,
+        Retrying = 4
+    };
+    
 	AssetBase();
 	virtual ~AssetBase();
     
-    TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> rawData;
-
-    DecodeDelegate decode; // On dedicated thread
+    void inline SetFailed() { stageData->Empty(); state = AssetState::Failed; }
+    
+    ProcessDelegate decode; // On dedicated thread
     ProcessDelegate preProcess; // On game thread!
     ProcessDelegate mainProcess; // On dedicated thread
     ProcessDelegate postProcess; // On game thread
+
+    FGuid id;
+    AssetState state;
+protected:
+    TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> stageData;
     
 private:
-    void Decode(TArray<uint8_t>& data);
+    void Decode();
+    
+    friend class AssetCache;
 };
+
+typedef TSharedRef<AssetBase, ESPMode::ThreadSafe> TSharedAssetRef;

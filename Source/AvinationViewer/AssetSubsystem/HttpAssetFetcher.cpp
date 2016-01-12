@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*
 #include "AvinationViewer.h"
 #include "HttpAssetFetcher.h"
 #include "J2KDecode.h"
@@ -64,3 +65,4 @@ void HttpAssetFetcher::requestDone(FHttpRequestPtr request, FHttpResponsePtr res
         return;
     }
 }
+*/

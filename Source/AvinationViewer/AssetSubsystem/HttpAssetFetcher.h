@@ -9,6 +9,7 @@
  * 
  */
 
+/*
 class HttpAssetFetcher;
 class J2KDecode;
 
@@ -37,3 +38,4 @@ public:
 private:
     void requestDone(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
 };
+*/

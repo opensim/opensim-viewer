@@ -2,8 +2,11 @@
 
 #pragma once
 #include "AssetBase.h"
-#include "HttpAssetFetcher.h"
 #include "SharedPointer.h"
+
+DECLARE_DELEGATE_TwoParams(AssetFetchedDelegate, FGuid, TSharedAssetRef)
+
+class AssetCache;
 
 /**
  * 
@@ -11,11 +14,21 @@
 class AVINATIONVIEWER_API AssetFetchContainer
 {
 public:
-	AssetFetchContainer(TSharedRef<AssetBase, ESPMode::ThreadSafe> a, TSharedRef<IHttpRequest> r);
+	AssetFetchContainer(FGuid id, TSharedAssetRef a);
 	~AssetFetchContainer();
     
-    TSharedRef<AssetBase, ESPMode::ThreadSafe> asset;
+    void AddDispatch(AssetFetchedDelegate d);
+    void Dispatch(TArray<AssetFetchedDelegate> d);
     
+    TSharedAssetRef asset;
+    FGuid id;
 private:
-    TSharedRef<IHttpRequest> req;
+    TSharedPtr<IHttpRequest> req;
+    int queue;
+    
+    TArray<AssetFetchedDelegate> dispatches;
+    
+    friend class AssetCache;
 };
+
+typedef TSharedRef<AssetFetchContainer, ESPMode::ThreadSafe> TSharedAssetFetchContainerRef;

@@ -53,12 +53,14 @@ AssetDecode::~AssetDecode()
     doc.clear();
 }
 
+/*
 TArray<uint8_t> AssetDecode::AsArray()
 {
     TArray<uint8_t> ret;
     ret.Append((uint8_t *)dataNode->value(), dataNode->value_size());
     return ret;
 }
+ */
 
 FString AssetDecode::AsString()
 {
@@ -72,6 +74,7 @@ TArray<uint8_t> AssetDecode::AsBase64DecodeArray()
     return ret;
 }
 
+/*
 FString AssetDecode::AsBase64DecodeString()
 {
     FString src = AsString();
@@ -79,3 +82,4 @@ FString AssetDecode::AsBase64DecodeString()
     FBase64::Decode(src, ret);
     return ret;
 }
+*/

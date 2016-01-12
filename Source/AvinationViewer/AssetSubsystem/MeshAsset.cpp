@@ -5,8 +5,14 @@
 
 MeshAsset::MeshAsset()
 {
+    mainProcess.BindRaw(this, &MeshAsset::Process);
 }
 
 MeshAsset::~MeshAsset()
 {
+}
+
+void MeshAsset::Process()
+{
+    meshData = TArray<uint8_t>(*stageData);
 }
