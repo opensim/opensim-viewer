@@ -37,8 +37,8 @@ private:
     bool runThis = true;
     AAvinationViewerGameMode *mode;
     
-    FCriticalSection poolLock;
-    TArray<AMeshActor *> pool;
+//    FCriticalSection poolLock;
+//    TArray<AMeshActor *> pool;
     
     FCriticalSection readyLock;
     TArray<AMeshActor *> ready;
@@ -217,11 +217,11 @@ bool ObjectCreator::Init()
 uint32_t ObjectCreator::Run()
 {
     struct stat st;
-    if (stat("/Users/melanie/UnrealViewerData/primsback.xml", &st))
-//    if (stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
+//    if (stat("/Users/melanie/UnrealViewerData/primsback.xml", &st))
+    if (stat("/Avination/UnRealViewer/primsback.xml", &st) < 0)
         return 0;
-    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
-//    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
+//    int fd = open("/Users/melanie/UnrealViewerData/primsback.xml", O_RDONLY);
+    int fd = open("/Avination/UnRealViewer/primsback.xml", O_RDONLY);
     
     if (fd < 0 || st.st_size == 0)
         return 0;
@@ -257,7 +257,6 @@ uint32_t ObjectCreator::Run()
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("All actors created"));
-            poolLock.Unlock();
             break;
         }
     }
@@ -297,10 +296,11 @@ void ObjectCreator::TickPool()
         AMeshActor *act = ready[0];
         ready.RemoveAt(0);
         readyLock.Unlock();
-        act->DoBeginPlay(); // hack needs review
+
+        act->SetActorHiddenInGame(false);
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
-        act->SetActorHiddenInGame(false);
+        act->DoBeginPlay(); // hack needs review
     }
     else
     {

@@ -33,20 +33,18 @@ AMeshActor::AMeshActor()
     baseMaterialTranslucent = parentMaterialTranslucent.Object;
 }
 
-// Called when the game starts or when spawned
 void AMeshActor::BeginPlay()
 {
-    SetActorHiddenInGame(true);
-    SetActorEnableCollision(false);
-//	Super::BeginPlay(); // this needs to be called from mainthread 
-	
+    //    Super::BeginPlay();
 }
 
 void AMeshActor::DoBeginPlay()
 {
+    
     Super::BeginPlay();
-//    if(ShouldCollide)
-//        SetActorEnableCollision(true);
+
+    //    if(ShouldCollide)
+    //        SetActorEnableCollision(true);
 }
 
 // Called every frame
