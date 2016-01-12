@@ -17,7 +17,6 @@
 #include "MeshActor.h"
 #include "AssetSubsystem/AssetCache.h"
 #include "AssetSubsystem/AssetDecode.h"
-#include "AssetSubsystem/TextureCache.h"
 #include "AssetSubsystem/PrimAsset.h"
 #include "AvnCharacter.h"
 

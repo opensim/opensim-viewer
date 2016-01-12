@@ -8,7 +8,6 @@
 #include "AssetSubsystem/AssetCache.h"
 #include "AssetSubsystem/AssetDecode.h"
 #include "SceneObjects/TextureEntry.h"
-#include "AssetSubsystem/TextureCache.h"
 #include "Meshing/PrimMesher.h"
 
 #include <stdlib.h>
