@@ -589,13 +589,13 @@ bool SceneObjectPart::MeshPrim()
         {
             i1 = pm->vertices.Num();
             pm->vertices.Add(v1);
-            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.U,
-                1.0f - primData->viewerFaces[face].uv1.V));
+            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.X,
+                1.0f - primData->viewerFaces[face].uv1.Y));
             pm->tangents.Add(FProcMeshTangent(1, 1, 1));
         }
         else
         {
-            FVector2D uv(primData->viewerFaces[face].uv1.U, 1.0f - primData->viewerFaces[face].uv1.V);
+            FVector2D uv(primData->viewerFaces[face].uv1.X, 1.0f - primData->viewerFaces[face].uv1.Y);
             if (uv != pm->uv0[i1])
             {
                 i1 = pm->vertices.Num();
@@ -610,14 +610,14 @@ bool SceneObjectPart::MeshPrim()
         {
             i2 = pm->vertices.Num();        
             pm->vertices.Add(v2);
-            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.U,
-                1.0f - primData->viewerFaces[face].uv2.V));
+            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.X,
+                1.0f - primData->viewerFaces[face].uv2.Y));
             pm->tangents.Add(FProcMeshTangent(1, 1, 1));
 
         }
         else
         {
-            FVector2D uv(primData->viewerFaces[face].uv2.U, 1.0f - primData->viewerFaces[face].uv2.V);
+            FVector2D uv(primData->viewerFaces[face].uv2.X, 1.0f - primData->viewerFaces[face].uv2.Y);
             if (uv != pm->uv0[i2])
             {
                 i2 = pm->vertices.Num();
@@ -632,14 +632,14 @@ bool SceneObjectPart::MeshPrim()
         {
             i3 = pm->vertices.Num();
             pm->vertices.Add(v3);
-            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.U,
-                1.0f - primData->viewerFaces[face].uv3.V));
+            pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.X,
+                1.0f - primData->viewerFaces[face].uv3.Y));
             pm->tangents.Add(FProcMeshTangent(1, 1, 1));
 
         }
         else
         {
-            FVector2D uv(primData->viewerFaces[face].uv3.U, 1.0f - primData->viewerFaces[face].uv3.V);
+            FVector2D uv(primData->viewerFaces[face].uv3.X, 1.0f - primData->viewerFaces[face].uv3.Y);
             if (uv != pm->uv0[i3])
             {
                 i3 = pm->vertices.Num();
@@ -967,7 +967,7 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
     primMeshData.Empty();
     
     FVector* ptr;
-    UVCoord* uptr;
+    FVector2D* uptr;
 
     int ncoord = 0;
     for (; ncoord < prim->coords.Num(); ncoord++)
@@ -981,7 +981,7 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
         pm.normals.Add(n);
 
         uptr = &prim->uvs[ncoord];
-        pm.uv0.Add(FVector2D(uptr->U, 1.0 - uptr->V));
+        pm.uv0.Add(FVector2D(uptr->X, 1.0 - uptr->Y));
     }
 
     for (int i = 0; i < prim->faces.Num(); i++)

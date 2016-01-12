@@ -619,7 +619,7 @@ void Profile::MakeFaceUVs()
 {
     faceUVs.Empty();
     for (auto it = coords.CreateConstIterator() ; it ; ++it)
-        faceUVs.Add(UVCoord(1.0f - (0.5f + (*it).X), 1.0f - (0.5f - (*it).Y)));
+        faceUVs.Add(FVector2D(1.0f - (0.5f + (*it).X), 1.0f - (0.5f - (*it).Y)));
 }
 
 Profile Profile::Copy()
@@ -718,8 +718,8 @@ void Profile::FlipNormals()
     int numfaceUVs = faceUVs.Num();
     for (i = 0; i < numfaceUVs; i++)
     {
-        UVCoord uv = faceUVs[i];
-        uv.V = 1.0f - uv.V;
+        FVector2D uv = faceUVs[i];
+        uv.Y = 1.0f - uv.Y;
         faceUVs[i] = uv;
     }
 }
@@ -1240,9 +1240,9 @@ void PrimMesh::Extrude(PathType pathType)
                     
                     if (pathType == Linear)
                     {
-                        newViewerFace.uv1.Flip();
-                        newViewerFace.uv2.Flip();
-                        newViewerFace.uv3.Flip();
+                        FlipUV(newViewerFace.uv1);
+                        FlipUV(newViewerFace.uv2);
+                        FlipUV(newViewerFace.uv3);
                     }
                     
                     viewerFaces.Add(newViewerFace);
@@ -1353,21 +1353,21 @@ void PrimMesh::Extrude(PathType pathType)
                         }
                     }
                     
-                    newViewerFace1.uv1.U = u1;
-                    newViewerFace1.uv2.U = u1;
-                    newViewerFace1.uv3.U = u2;
+                    newViewerFace1.uv1.X = u1;
+                    newViewerFace1.uv2.X = u1;
+                    newViewerFace1.uv3.X = u2;
                     
-                    newViewerFace1.uv1.V = thisV;
-                    newViewerFace1.uv2.V = lastV;
-                    newViewerFace1.uv3.V = thisV;
+                    newViewerFace1.uv1.Y = thisV;
+                    newViewerFace1.uv2.Y = lastV;
+                    newViewerFace1.uv3.Y = thisV;
                     
-                    newViewerFace2.uv1.U = u2;
-                    newViewerFace2.uv2.U = u1;
-                    newViewerFace2.uv3.U = u2;
+                    newViewerFace2.uv1.X = u2;
+                    newViewerFace2.uv2.X = u1;
+                    newViewerFace2.uv3.X = u2;
                     
-                    newViewerFace2.uv1.V = thisV;
-                    newViewerFace2.uv2.V = lastV;
-                    newViewerFace2.uv3.V = lastV;
+                    newViewerFace2.uv1.Y = thisV;
+                    newViewerFace2.uv2.Y = lastV;
+                    newViewerFace2.uv3.Y = lastV;
                     
                     newViewerFace1.v1 = coords[newFace1.v1];
                     newViewerFace1.v2 = coords[newFace1.v2];
@@ -1426,9 +1426,9 @@ void PrimMesh::Extrude(PathType pathType)
                 
                 if (pathType == Linear)
                 {
-                    newViewerFace.uv1.Flip();
-                    newViewerFace.uv2.Flip();
-                    newViewerFace.uv3.Flip();
+                    FlipUV(newViewerFace.uv1);
+                    FlipUV(newViewerFace.uv2);
+                    FlipUV(newViewerFace.uv3);
                 }
 
                 viewerFaces.Add(newViewerFace);
@@ -1570,6 +1570,11 @@ public VertexIndexer PrimMesh::GetVertexIndexer()
 }
 #endif
 
+void PrimMesh::FlipUV(FVector2D& uv)
+{
+    uv.X = 1.0 - uv.X;
+    uv.Y = 1.0 - uv.Y;
+}
 /// <summary>
 /// Scales the mesh
 /// </summary>

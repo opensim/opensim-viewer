@@ -15,7 +15,7 @@ public:
     TArray<FVector> coords;
     TArray<Face> faces;
     TArray<FVector> normals;
-    TArray<UVCoord> uvs;
+    TArray<FVector2D> uvs;
     
     SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
 

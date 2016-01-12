@@ -84,9 +84,9 @@ public:
     int coordIndex2;
     int coordIndex3;
     
-    UVCoord uv1;
-    UVCoord uv2;
-    UVCoord uv3;
+    FVector2D uv1;
+    FVector2D uv2;
+    FVector2D uv3;
 };
 
 class Angle
@@ -137,7 +137,7 @@ public:
     TArray<FVector> coords;
     TArray<Face> faces;
     TArray<float> us;
-    TArray<UVCoord> faceUVs;
+    TArray<FVector2D> faceUVs;
     TArray<int> faceNumbers;
     
     // use these for making individual meshes for each prim face
@@ -169,6 +169,7 @@ public:
     void FlipNormals();
     void AddValue2FaceVertexIndices(int num);
     void DumpRaw(FString path, FString name, FString title);
+    
 };
 
 class Path
@@ -258,6 +259,7 @@ public:
     PrimMesh Copy();
     void AddPos(float x, float y, float z);
     void AddRot(FQuat q);
+    void FlipUV(FVector2D& uv);
     
 #if 0
     VertexIndexer GetVertexIndexer();

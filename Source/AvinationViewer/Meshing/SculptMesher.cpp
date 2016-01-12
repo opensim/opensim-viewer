@@ -187,7 +187,7 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
             if (viewerMode)
             {
                 normals.Add(FVector());
-                uvs.Add(UVCoord(divisionU * imageX, divisionV * imageY));
+                uvs.Add(FVector2D(divisionU * imageX, divisionV * imageY));
             }
             
             if (imageY > 0 && imageX > 0)
