@@ -40,6 +40,8 @@ public:
     virtual void Stop() override { runThis = false; }
     
 private:
+    void DoCacheExpire();
+
     FRunnableThread *thread;
     bool runThis = true;
     AssetCache *cache;
