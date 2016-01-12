@@ -281,7 +281,8 @@ bool SceneObjectPart::Load(rapidxml::xml_node<> *xml)
 
     //adjust visual mesh maxlod
     if (isPrim && profileShape != pstCircle && profileShape != pstHalfCircle &&
-        (ExtrusionType)pathCurve == etStraight && pathTwist == pathTwistBegin)
+        (ExtrusionType)pathCurve == etStraight && pathTwist == pathTwistBegin
+        && (profileHollow == 0 || hollowShape != hstCircle))
     {
         // prims without lod
         lodWanted = 0;
@@ -758,7 +759,7 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
             hollowsides = 3;
     }
     
-    PrimMesh *newPrim = new PrimMesh(sides, gprofileBegin, gprofileEnd, hollowShape, hollowsides);
+    PrimMesh *newPrim = new PrimMesh(sides, gprofileBegin, gprofileEnd, profileHollow, hollowsides);
     newPrim->viewerMode = true;
     newPrim->sphereMode = isSphere;
     newPrim->holeSizeX = pathScaleX;
@@ -770,8 +771,7 @@ void SceneObjectPart::GeneratePrimMesh(int lod)
     newPrim->radius = pathRadiusOffset;
     newPrim->revolutions = pathRevolutions;
     newPrim->skew = pathSkew;
-    newPrim->hollow = profileHollow;
-     
+      
     if (((ExtrusionType)pathCurve == etStraight) || ((ExtrusionType)pathCurve == etFlexible))
     {
         newPrim->twistBegin = pathTwistBegin * 18 / 10;
