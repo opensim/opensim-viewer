@@ -547,7 +547,7 @@ bool SceneObjectPart::MeshPrim()
     }
 
     primMeshData.Empty();
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 10; i++)
     {
         PrimFaceMeshData pm;
         primMeshData.Add(pm);
@@ -588,16 +588,10 @@ bool SceneObjectPart::MeshPrim()
             i1 = pm->vertices.Num();
             pm->vertices.Add(v1);
 
-            FVector n1(primData->viewerFaces[face].n1.X,
-                -primData->viewerFaces[face].n1.Y,
-                primData->viewerFaces[face].n1.Z);
-            pm->normals.Add(n1);
-
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.U,
                 1.0f - primData->viewerFaces[face].uv1.V));
-
             pm->vertexColors.Add(FColor(255, 255, 255, 255));
-
+            pm->tangents.Add(FProcMeshTangent(1, 1, 1));
         }
 
         if (!(pm->vertices).Find(v2, i2))
@@ -606,18 +600,12 @@ bool SceneObjectPart::MeshPrim()
 
             pm->vertices.Add(v2);
 
-            FVector n2(primData->viewerFaces[face].n2.X,
-                -primData->viewerFaces[face].n2.Y,
-                primData->viewerFaces[face].n2.Z);
-
-            pm->normals.Add(n2);
-
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.U,
                 1.0f - primData->viewerFaces[face].uv2.V));
 
             pm->vertexColors.Add(FColor(255, 255, 255, 255));
 
-            pm->vertexColors.Add(FColor(255, 255, 255, 255));
+            pm->tangents.Add(FProcMeshTangent(1, 1, 1));
 
         }
 
@@ -626,17 +614,9 @@ bool SceneObjectPart::MeshPrim()
             i3 = pm->vertices.Num();
 
             pm->vertices.Add(v3);
-
-            FVector n3(primData->viewerFaces[face].n3.X,
-                -primData->viewerFaces[face].n3.Y,
-                primData->viewerFaces[face].n3.Z);
-            pm->normals.Add(n3);
-
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.U,
                 1.0f - primData->viewerFaces[face].uv3.V));
-
             pm->vertexColors.Add(FColor(255, 255, 255, 255));
-
             pm->tangents.Add(FProcMeshTangent(1, 1, 1));
 
         }
@@ -649,8 +629,46 @@ bool SceneObjectPart::MeshPrim()
     delete primData;
     primData = 0;
 
+    for (int i = 0; i < 10; i++)
+    {
+        PrimFaceMeshData* pm = &primMeshData[i];
+        if (pm->vertices.Num() == 0)
+            continue;
+        calcVertsNormals(pm);
+    }
+
     meshed = true;
     return true;
+}
+
+
+void SceneObjectPart::calcVertsNormals(PrimFaceMeshData* pm)
+{
+    int numVertices = pm->vertices.Num();
+
+    pm->normals.Empty();
+    pm->normals.AddZeroed(numVertices);
+
+    int i1, i2, i3;
+    FVector v1, e1, e2;
+
+    int numTris = pm->triangles.Num();
+    for (int i = 0; i < numTris;)
+    {
+        i1 = pm->triangles[i++];
+        i2 = pm->triangles[i++];
+        i3 = pm->triangles[i++];
+        v1 = pm->vertices[i1];
+        e1 = pm->vertices[i2] - v1;
+        e2 = pm->vertices[i3] - v1;
+
+        FVector surfaceNormal = FVector::CrossProduct(e1,e2);
+        pm->normals[i1] -= surfaceNormal;
+        pm->normals[i2] -= surfaceNormal;
+        pm->normals[i3] -= surfaceNormal;
+    }
+    for (int i = 0; i < numVertices;i++)
+        pm->normals[i].Normalize();
 }
 
 void SceneObjectPart::GeneratePrimMesh(int lod)

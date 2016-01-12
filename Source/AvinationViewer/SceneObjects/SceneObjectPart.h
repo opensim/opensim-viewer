@@ -171,6 +171,7 @@ private:
     FString ReadStringValue(rapidxml::xml_node<> *parent, const char *name, FString def);
     void GeneratePrimMesh(int lod);
     void GenerateSculptMesh(TSharedRef<SculptAsset, ESPMode::ThreadSafe> data, int lod);
+    void calcVertsNormals(PrimFaceMeshData* pm);
     
     bool meshed = false;
     TArray<uint8_t> meshAssetData;
