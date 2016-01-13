@@ -3,7 +3,7 @@
 #include "AvinationViewer.h"
 #include "SculptMesher.h"
 
-SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod)
+SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, int lod)
 {
     uint32_t vertsWanted = 1024;
     switch ((LevelDetail)lod)
@@ -57,9 +57,6 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
     }
 
     sculptType = (SculptType)(((int)sculptType) & 0x07);
-
-    if (mirror)
-        invert = !invert;
 
     uint16_t horizontalDivisions = width / step;
     uint16_t verticalDivisions = height / step;
@@ -203,19 +200,11 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
             
             if (imageY > 0 && imageX > 0)
             {
-                Face f1, f2;
-                if (invert)
-                {
-                    f1 = Face(p1, p4, p3);
-                    f2 = Face(p1, p2, p4);
-                }
-                else
-                {
-                    f1 = Face(p1, p3, p4);
-                    f2 = Face(p1, p4, p2);
-                }
-                faces.Add(f1);
-                faces.Add(f2);
+                Face f;
+                f = Face(p1, p3, p4);
+                faces.Add(f);
+                f = Face(p1, p4, p2);
+                faces.Add(f);
             }
         }
     }

@@ -332,6 +332,7 @@ void SceneObjectPart::FetchAssets()
     }
     else // Sculpt
     {
+
         // The mesh asset is here the sculpt texture
         FGuid::Parse(meshAssetId, id);
         AssetFetchedDelegate d;
@@ -958,6 +959,11 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
     if (!sculptData)
         return false;
 
+    bool mirror = (sculptType & 0x80) ? true : false;
+    bool invert = (sculptType & 0x40) ? true : false;
+    if (mirror)
+        invert = !invert;
+
     SculptMesh *prim = sculptData;
 
     PrimFaceMeshData pm;
@@ -971,10 +977,24 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
     {
         ptr = &prim->coords[ncoord];
         FVector v(ptr->X, -ptr->Y, ptr->Z);
-        pm.vertices.Add(v);
-
         ptr = &prim->normals[ncoord];
         FVector n(-ptr->X, ptr->Y, -ptr->Z);
+
+        if (mirror)
+        {
+            v.X = -v.X;
+            if (invert)
+            {
+                n.X = -n.X;
+            }
+            else
+            {
+                n.Y = -n.Y;
+                n.Z = -n.Z;
+            }
+        }
+
+        pm.vertices.Add(v);
         pm.normals.Add(n);
 
         uptr = &prim->uvs[ncoord];
@@ -990,9 +1010,18 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
         if (i1 >= ncoord || i2 >= ncoord || i3 >= ncoord)
                 continue;
 
-        pm.triangles.Add(i3);
-        pm.triangles.Add(i2);
-        pm.triangles.Add(i1);
+        if (invert)
+        {
+            pm.triangles.Add(i1);
+            pm.triangles.Add(i2);
+            pm.triangles.Add(i3);
+        }
+        else
+        {
+            pm.triangles.Add(i3);
+            pm.triangles.Add(i2);
+            pm.triangles.Add(i1);
+        }
     }
     calcVertsTangents(pm);
     primMeshData.Add(pm);
@@ -1005,9 +1034,7 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
 
 void SceneObjectPart::GenerateSculptMesh(TSharedRef<SculptAsset, ESPMode::ThreadSafe> indata, int lod)
 {
-    bool mirror = (sculptType & 0x80) ? true : false;
-    bool invert = (sculptType & 0x40) ? true : false;
-    float pixScale = 1.0f / 256.0f;
+    float pixScale = 1.0f / 255.0f;
     
     opj_image_t *tex = indata->image;
     
@@ -1032,13 +1059,11 @@ void SceneObjectPart::GenerateSculptMesh(TSharedRef<SculptAsset, ESPMode::Thread
             FVector c = FVector((float)(*r++ & 0xff) * pixScale - 0.5f,
                             (float)(*g++ & 0xff) * pixScale - 0.5f,
                             (float)(*b++ & 0xff) * pixScale - 0.5f);
-            if (mirror)
-                c.X = -c.X;
             rows[h - 1 - i].Add(c);
         }
     }
     
-    sculptData = new SculptMesh(rows, (SculptType)sculptType, true, mirror, invert, lod);
+    sculptData = new SculptMesh(rows, (SculptType)sculptType, true, lod);
 }
 
 void SceneObjectPart::DeleteMeshData()
