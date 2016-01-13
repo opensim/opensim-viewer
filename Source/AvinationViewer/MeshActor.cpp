@@ -7,6 +7,7 @@
 #include "Utils/AvinationUtils.h"
 #include "AssetSubsystem/AssetCache.h"
 #include "AssetSubsystem/AssetDecode.h"
+#include "AssetSubsystem/TextureAsset.h"
 #include "SceneObjects/TextureEntry.h"
 #include "Meshing/PrimMesher.h"
 
@@ -48,6 +49,8 @@ void AMeshActor::Tick( float DeltaTime )
 bool AMeshActor::Load(rapidxml::xml_node<> *data)
 {
     sog = new SceneObjectGroup();
+    sog->actor = this;
+    
     if (sog->Load(data))
     {
         sog->OnObjectReady.BindUObject(this, &AMeshActor::ObjectReady);
@@ -147,19 +150,9 @@ void AMeshActor::RegisterComponents()
 
 UProceduralMeshComponent *AMeshActor::BuildComponent(SceneObjectPart *sop)
 {
-    UProceduralMeshComponent *mesh;
-    
-//    if (sop->isPrim || sop->isMesh || sop->isSculpt)
-    {
-        mesh = BuildComponentFromPrimData(sop);
-    }
-    
-    return mesh;
-}
-
-UProceduralMeshComponent *AMeshActor::BuildComponentFromPrimData(SceneObjectPart *sop)
-{
     UProceduralMeshComponent *mesh = NewObject<UProceduralMeshComponent>(this, *sop->uuid.ToString());
+
+    sop->mesh = mesh;
     
     mesh->Mobility = EComponentMobility::Stationary;
     //mesh->RegisterComponent();
@@ -214,40 +207,15 @@ UMaterialInstanceDynamic *AMeshActor::SetUpMaterial(UProceduralMeshComponent *me
     return mat;
 }
 
-/*
-void AMeshActor::GotTexture(FGuid id, int status, UTexture2D *texture, UProceduralMeshComponent *mesh, int textureIndex, SceneObjectPart *sop)
+void AMeshActor::GotTexture(FGuid id, TSharedAssetRef asset, UProceduralMeshComponent *mesh, int index, TextureEntry *te)
 {
-    TextureEntry te = sop->textures[textureIndex];
+    TSharedRef<TextureAsset, ESPMode::ThreadSafe> t = StaticCastSharedRef<TextureAsset>(asset);
+    
     UMaterialInstanceDynamic* mat;
 
-    if (!texture)
-    {
-        mat = SetUpMaterial(mesh, textureIndex, baseMaterial, te);
-        
-        return;
-    }
-    
-    if (objectTextures.Contains(id))
-    {
-        UTexture2D *t = objectTextures[id];
-        if (!t->CompressionNoAlpha)
-            mat = SetUpMaterial(mesh, textureIndex, baseMaterialTranslucent, te);
-        else
-            mat = SetUpMaterial(mesh, textureIndex, baseMaterial, te);
-        
-        mat->SetTextureParameterValue(TEXT("Texture"), t);
-    }
+    if (t->hasAlpha)
+        mat = SetUpMaterial(mesh, index, baseMaterialTranslucent, *te);
     else
-    {
-        UTexture2D *tex = DuplicateObject(texture, this);
-        tex->CompressionNoAlpha = texture->CompressionNoAlpha;
-        
-        objectTextures.Add(id, tex);
-        if (!tex->CompressionNoAlpha)
-            mat = SetUpMaterial(mesh, textureIndex, baseMaterialTranslucent, te);
-        else
-            mat = SetUpMaterial(mesh, textureIndex, baseMaterial, te);
-        mat->SetTextureParameterValue(TEXT("Texture"), tex);
-    }
+        mat = SetUpMaterial(mesh, index, baseMaterial, *te);
+    mat->SetTextureParameterValue(TEXT("Texture"), t->tex);
 }
-*/

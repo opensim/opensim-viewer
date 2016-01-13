@@ -6,6 +6,7 @@
 #include "MeshAsset.h"
 #include "SculptAsset.h"
 #include "PrimAsset.h"
+#include "TextureAsset.h"
 
 #define MAX_CONCURRENT_FETCHES 10
 
@@ -282,6 +283,7 @@ void TemplateInstantiator()
     AssetCache::Get().Fetch<MeshAsset>(FGuid(), d);
     AssetCache::Get().Fetch<SculptAsset>(FGuid(), d);
     AssetCache::Get().Fetch<PrimAsset>(FGuid(), d);
+    AssetCache::Get().Fetch<TextureAsset>(FGuid(), d);
 }
 
 uint32_t AssetDecodeThread::Run()

@@ -6,6 +6,7 @@
 #include "SceneObjectGroup.h"
 #include "../AssetSubsystem/MeshAsset.h"
 #include "../AssetSubsystem/SculptAsset.h"
+#include "../AssetSubsystem/TextureAsset.h"
 #include "../AssetSubsystem/AssetCache.h"
 #include "../AssetSubsystem/AssetDecode.h"
 #include "../AssetSubsystem/LLSDMeshDecode.h"
@@ -14,6 +15,7 @@
 #include "Base64.h"
 #include "../Meshing/PrimMesher.h"
 #include "openjpeg.h"
+#include "MeshActor.h"
 
 #define CULLDIST 12800.0
 
@@ -1050,8 +1052,13 @@ void SceneObjectPart::DeleteMeshData()
     meshAssetData.Empty();
 }
 
-void SceneObjectPart::GatherTextures()
+void SceneObjectPart::RequestTextures()
 {
     for (int i = 0 ; i < numFaces ; ++i)
-        group->AddTexture(textures[i].textureId);
+    {
+        AssetFetchedDelegate d;
+        d.BindUObject(group->actor, &AMeshActor::GotTexture, mesh, i, &textures[i]);
+        AssetCache::GetTexCache().Fetch<TextureAsset>(textures[i].textureId, d);
+    }
 }
+

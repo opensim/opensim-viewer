@@ -102,12 +102,11 @@ public:
     bool MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> data);
     bool MeshMesh(TSharedRef<MeshAsset, ESPMode::ThreadSafe> data);
     void DeleteMeshData();
-    virtual void GatherTextures() override;
+    virtual void RequestTextures() override;
 
     LLSDItem * GetMeshData(TSharedRef<MeshAsset, ESPMode::ThreadSafe> assetdata,int lod);
     
     virtual SceneObject inline Type() override { return ObjectGroup; }
-
     FVector groupPosition;
     FVector position;
     FVector scale;
@@ -159,9 +158,12 @@ public:
     
     float cullDistance;
 
+    int submeshIndex;
+    
     PrimMesh *primData;
     SculptMesh *sculptData;
     TArray<PrimFaceMeshData> primMeshData;
+    UProceduralMeshComponent *mesh;
 
 private:
     void SculptReceived(FGuid id, TSharedAssetRef asset);

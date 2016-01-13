@@ -16,8 +16,8 @@ public:
 	virtual ~SceneObjectBase();
     
     virtual void FetchAssets();
-    virtual void GatherTextures() = 0;
-    
+    virtual void RequestTextures() = 0;
+
     SceneObjectBase *parent;
     SceneObjectGroup *group;
     

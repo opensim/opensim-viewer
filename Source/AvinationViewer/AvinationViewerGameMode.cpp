@@ -18,9 +18,10 @@
 #include "AssetSubsystem/AssetCache.h"
 #include "AssetSubsystem/AssetDecode.h"
 #include "AssetSubsystem/PrimAsset.h"
+#include "AssetSubsystem/TextureAsset.h"
 #include "AvnCharacter.h"
 
-#define ONE_OBJECT_TEST
+//#define ONE_OBJECT_TEST
 
 class ObjectCreator : public FRunnable
 {
@@ -67,7 +68,8 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
 #ifdef ONE_OBJECT_TEST
     FGuid id;
     //FGuid::Parse(TEXT("77540e8e-5064-4cf9-aa77-ad6617d73508"), id);
-    FGuid::Parse(TEXT("8e3377b1-ccc7-4f7b-981d-f30ccae8121d"), id);
+    //FGuid::Parse(TEXT("8e3377b1-ccc7-4f7b-981d-f30ccae8121d"), id);
+    FGuid::Parse(TEXT("664d9466-e74c-477e-bb4f-796845ce894e"), id);
     
     AssetFetchedDelegate d;
     d.BindUObject(this, &AAvinationViewerGameMode::CreateNewActor);
@@ -89,13 +91,11 @@ void AAvinationViewerGameMode::HandleObjectReady(AMeshActor *act)
 
     //FVector pos(200.0f, 0.0f, 170.0f);
     
-    act->sog->GatherTextures();
+    act->sog->RequestTextures();
     
     act->SetActorHiddenInGame(false);
     act->SetActorLocationAndRotation(pos /* act->sog->GetRootPart()->groupPosition * 100 */, act->sog->GetRootPart()->rotation);
     act->RegisterComponents();
-
-    UE_LOG(LogTemp, Warning, TEXT("%d textures on object"), act->sog->groupTextures.Num());
 }
 
 AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data, ObjectReadyDelegate d, AMeshActor *act)
@@ -125,6 +125,12 @@ AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data,
 
 void AAvinationViewerGameMode::CreateNewActor(FGuid id, TSharedAssetRef data)
 {
+    if (data->state == AssetBase::Failed)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Asset fetch failed"));
+        return;
+    }
+    
     TSharedRef<PrimAsset, ESPMode::ThreadSafe> prim = StaticCastSharedRef<PrimAsset>(data);
     
     rapidxml::xml_document<> doc;
@@ -153,26 +159,12 @@ void AAvinationViewerGameMode::CreateNewActor(FGuid id, TSharedAssetRef data)
 
 void AAvinationViewerGameMode::Tick(float deltaSeconds)
 {
-    //static int gap = 2;
     Super::Tick(deltaSeconds);
     
-    //TextureCache::Get().DispatchDecodedRequest();
     creator->TickPool();
     
     AssetCache::Get().Tick();
     AssetCache::GetTexCache().Tick();
-    
-    /*
-    if (!(--gap))
-    {
-        gap = 2;
-        if (queue.Num())
-        {
-            CreateNewActor(queue[0]);
-            queue.RemoveAt(0);
-        }
-    }
-    */
 }
 
 ObjectCreator::ObjectCreator(AAvinationViewerGameMode *m)
@@ -189,24 +181,6 @@ ObjectCreator::~ObjectCreator()
     thread->WaitForCompletion();
     delete thread;
 }
-
-/*
-void ObjectCreator::Enqueue(rapidxml::xml_node<> *sog)
-{
-    queueLock.Lock();
-    queue.Add(sog);
-    queueLock.Unlock();
-}
-*/
-
-/*
-void ObjectCreator::Enqueue(TArray<uint8_t> sog)
-{
-    queueLock.Lock();
-    queue.Add(sog);
-    queueLock.Unlock();
-}
-*/
 
 bool ObjectCreator::Init()
 {
@@ -285,15 +259,7 @@ uint32_t ObjectCreator::Run()
 
 void ObjectCreator::ObjectReady(AMeshActor *act)
 {
-    act->sog->GatherTextures();
-    
-    for (auto it = act->sog->groupTextures.CreateConstIterator() ; it ; ++it)
-    {
-        // TODO: Reenable texture fetch
-//        TextureFetchedDelegate d;
-//        d.BindRaw(this, &ObjectCreator::GotTexture, act);
-//        TextureCache::Get().Fetch((*it), d);
-    }
+    act->sog->RequestTextures();
     
     readyLock.Lock();
     ready.Add(act);

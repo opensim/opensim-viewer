@@ -7,6 +7,8 @@
 //DO NOT CHANGE CASING! (LGA) - Linux systems are case sensitive and most UE includes are camel case starting with capital letters.
 #include "Core.h"
 
+class AMeshActor;
+
 /**
  * 
  */
@@ -29,11 +31,9 @@ public:
     bool startingFetch;
     
     void CheckAssetsDone();
-    virtual void GatherTextures() override;
+    virtual void RequestTextures() override;
     virtual SceneObject inline Type() override { return ObjectGroup; }
-    void AddTexture(FGuid id);
-    
-    TArray<FGuid> groupTextures;
+    AMeshActor *actor;
     
 private:
     FCriticalSection partsLock;
