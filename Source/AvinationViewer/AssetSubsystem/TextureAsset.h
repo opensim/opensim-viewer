@@ -13,6 +13,7 @@ public:
 	TextureAsset();
 	~TextureAsset();
     
+    UPROPERTY()
     UTexture2D *tex = 0;
     bool hasAlpha = false;
     
@@ -24,7 +25,6 @@ private:
     
     int w, h;
     opj_image *image = 0;
-    UPROPERTY()
     uint8_t *texBuffer = 0;
     FUpdateTextureRegion2D *upd = 0;
 };

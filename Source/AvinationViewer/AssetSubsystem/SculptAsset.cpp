@@ -31,6 +31,10 @@ void SculptAsset::DecodeImage()
         throw std::exception();
     
     if (image->numcomps < 3)
+    {
+        delete image;
+        image = 0;
         throw std::exception();
+    }
 }
 

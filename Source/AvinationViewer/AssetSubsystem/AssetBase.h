@@ -22,7 +22,7 @@ public:
 	AssetBase();
 	virtual ~AssetBase();
     
-    void inline SetFailed() { stageData->Empty(); state = AssetState::Failed; }
+    void inline SetFailed() { if (stageData.IsValid()) stageData->Empty(); state = AssetState::Failed; }
     
     ProcessDelegate decode; // On dedicated thread
     ProcessDelegate preProcess; // On game thread!

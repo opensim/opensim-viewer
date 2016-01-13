@@ -35,6 +35,12 @@ void TextureAsset::DecodeImage()
     if (image->numcomps < 1)
         throw std::exception();
     
+    if (w < 0 || h < 0)
+    {
+        opj_image_destroy(image);
+        throw std::exception();
+    }
+    
     w = image->comps[0].w;
     h = image->comps[0].h;
 }
@@ -120,6 +126,9 @@ void TextureAsset::Process()
 
 void TextureAsset::PostProcess()
 {
+    if (state == AssetBase::Failed)
+        return;
+    
     struct FUpdateTextureRegionsData
     {
         FTexture2DResource* Texture2DResource;
