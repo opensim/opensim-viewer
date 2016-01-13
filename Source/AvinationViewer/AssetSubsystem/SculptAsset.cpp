@@ -11,8 +11,9 @@ SculptAsset::SculptAsset()
 
 SculptAsset::~SculptAsset()
 {
-    if (image)
-        delete image;
+   if (image)
+       opj_image_destroy(image);
+   image = nullptr;
 }
 
 void SculptAsset::DecodeImage()
@@ -32,8 +33,8 @@ void SculptAsset::DecodeImage()
     
     if (image->numcomps < 3)
     {
-        delete image;
-        image = 0;
+        opj_image_destroy(image);
+        image = nullptr;
         throw std::exception();
     }
 }
