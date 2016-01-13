@@ -121,7 +121,13 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
         }
     }
 
-    bool rw = true;
+    if(hh == matrixWidth - 1 && h == width && step > 1)
+    {
+        if (step > 2)
+            matrix[vv][hh] = rows[v - oneMinushalfStep][h - 1];
+        else
+            matrix[vv][hh] = rows[v - 1][h - 1];
+    }
 
     if (sculptType == sphere)
     {
@@ -153,7 +159,6 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
     {
         for (int v1 = 0; v1 < matrixHeight; ++v1)
             matrix[v1][matrixWidth - 1] = matrix[v1][0];
-        rw = false;
     }
 
     // For this one, stitch top to bottom as well
@@ -162,8 +167,6 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
         for (int h1 = 0; h1 < matrixWidth; ++h1)
             matrix[matrixHeight - 1][h1] = matrix[0][h1];
     }
-    if (rw)
-        matrixWidth--;
 
     coords.Empty();
     normals.Empty();
