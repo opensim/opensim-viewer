@@ -242,13 +242,16 @@ void AssetCache::Tick()
         
         queueLock.Unlock();
         
-        try
+        if (fetch->asset->state != AssetBase::Failed)
         {
-            fetch->asset->postProcess.ExecuteIfBound();
-        }
-        catch (...)
-        {
-            fetch->asset->SetFailed();
+            try
+            {
+                fetch->asset->postProcess.ExecuteIfBound();
+            }
+            catch (...)
+            {
+                fetch->asset->SetFailed();
+            }
         }
         
         fetch->asset->decode.Unbind();
