@@ -15,13 +15,13 @@ LLSDMeshDecode::~LLSDMeshDecode()
 
 LLSDItem *LLSDMeshDecode::Decode(uint8_t *data, FString lod)
 {
-    LLSDDecode *dec = new LLSDDecode();
+    LLSDDecode dec;
     
     uint8_t *d = data;
     
-    dec->Decode(&d);
+    dec.Decode(&d);
     
-    TMap<FString, LLSDItem *> high_lod = dec->items->mapData[lod]->mapData;
+    TMap<FString, LLSDItem *> high_lod = dec.items->mapData[lod]->mapData;
     
     uint32_t offset = high_lod[TEXT("offset")]->data.integerData;
     uint32_t size = high_lod[TEXT("size")]->data.integerData;
@@ -30,7 +30,6 @@ LLSDItem *LLSDMeshDecode::Decode(uint8_t *data, FString lod)
     
     uint32_t header_length = d - data;
     
-    delete dec;
     
     uint8_t *outbuf = 0;
     
@@ -43,15 +42,13 @@ LLSDItem *LLSDMeshDecode::Decode(uint8_t *data, FString lod)
     
     d = outbuf;
     
-    dec = new LLSDDecode();
+    dec.Reset();
     
-    dec->Decode(&d);
+    dec.Decode(&d);
     
-    LLSDItem *retval = dec->items;
+    LLSDItem *retval = dec.items;
     
-    dec->items = 0;
-    
-    delete dec;
+    dec.items = 0;
     
     return retval;
 }

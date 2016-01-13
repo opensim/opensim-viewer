@@ -13,21 +13,25 @@ TextureAsset::TextureAsset()
 
 TextureAsset::~TextureAsset()
 {
+    if (image)
+        opj_image_destroy(image);
+    image = 0;
 }
 
 void TextureAsset::DecodeImage()
 {
     AssetBase::Decode();
     
-    J2KDecode *idec = new J2KDecode();
-    if (!idec->Decode(stageData))
+    J2KDecode idec;
+    if (!idec.Decode(stageData))
     {
         throw std::exception();
     }
     
     stageData.Reset();
     
-    image = idec->image;
+    image = idec.image;
+    idec.image = 0;
     
     if (!image)
         throw std::exception();
@@ -40,6 +44,7 @@ void TextureAsset::DecodeImage()
     if (w < 0 || h < 0)
     {
         opj_image_destroy(image);
+        image = 0;
         throw std::exception();
     }
 }
@@ -47,7 +52,7 @@ void TextureAsset::DecodeImage()
 void TextureAsset::PreProcess()
 {
     tex = UTexture2D::CreateTransient(w, h);
-    tex->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+    tex->MipGenSettings = TextureMipGenSettings::TMGS_Blur4;
     tex->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
     tex->SRGB = 0;
     tex->UpdateResource();
@@ -118,6 +123,7 @@ void TextureAsset::Process()
     }
     
     opj_image_destroy(image);
+    image = 0;
 }
 
 void TextureAsset::PostProcess()
@@ -167,8 +173,8 @@ void TextureAsset::PostProcess()
                }
            }
            
-           delete RegionData->Regions;
-           delete RegionData->SrcData;
+           FMemory::Free(RegionData->Regions);
+           FMemory::Free(RegionData->SrcData);
            delete RegionData;
        }
     );

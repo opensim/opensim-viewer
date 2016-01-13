@@ -27,6 +27,13 @@ LLSDDecode::~LLSDDecode()
         delete items;
 }
 
+void LLSDDecode::Reset()
+{
+    if (items != 0)
+        delete items;
+    items = 0;
+}
+
 bool LLSDDecode::Decode(uint8_t **data)
 {
     items = DecodeItem(data);

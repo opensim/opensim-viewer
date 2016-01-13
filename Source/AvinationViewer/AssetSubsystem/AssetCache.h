@@ -45,6 +45,7 @@ private:
     FRunnableThread *thread;
     bool runThis = true;
     AssetCache *cache;
+    int cacheDivider;
 };
 
 class AVINATIONVIEWER_API AssetCache

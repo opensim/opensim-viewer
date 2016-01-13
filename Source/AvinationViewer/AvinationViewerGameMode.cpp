@@ -259,8 +259,6 @@ uint32_t ObjectCreator::Run()
 
 void ObjectCreator::ObjectReady(AMeshActor *act)
 {
-    act->sog->RequestTextures();
-    
     readyLock.Lock();
     ready.Add(act);
     readyLock.Unlock();
@@ -292,7 +290,9 @@ void ObjectCreator::TickPool()
         act->SetActorHiddenInGame(false);
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
+        act->sog->RequestTextures();
         readyLock.Lock();
+        
     }
     readyLock.Unlock();
 }

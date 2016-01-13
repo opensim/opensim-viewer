@@ -12,27 +12,29 @@ SculptAsset::SculptAsset()
 SculptAsset::~SculptAsset()
 {
     if (image)
-        delete image;
+        opj_image_destroy(image);
+    image = 0;
 }
 
 void SculptAsset::DecodeImage()
 {
-    J2KDecode *idec = new J2KDecode();
-    if (!idec->Decode(stageData))
+    J2KDecode idec;
+    if (!idec.Decode(stageData))
     {
         throw std::exception();
     }
     
     stageData.Reset();
     
-    image = idec->image;
+    image = idec.image;
+    idec.image = 0;
     
     if (!image)
         throw std::exception();
     
     if (image->numcomps < 3)
     {
-        delete image;
+        opj_image_destroy(image);
         image = 0;
         throw std::exception();
     }

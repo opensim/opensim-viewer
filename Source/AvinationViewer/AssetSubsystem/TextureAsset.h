@@ -13,7 +13,6 @@ public:
 	TextureAsset();
 	~TextureAsset();
     
-    UPROPERTY()
     UTexture2D *tex = 0;
     bool hasAlpha = false;
     

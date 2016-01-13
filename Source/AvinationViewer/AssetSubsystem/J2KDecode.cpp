@@ -26,7 +26,7 @@ bool J2KDecode::Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data)
     if (data->Num() == 0)
         return 0;
     
-    MemStream *memstr = new MemStream(data->GetData(), data->Num());
+    MemStream memstr(data->GetData(), data->Num());
     
     opj_dparameters_t parameters;
     opj_codec_t *codec;
@@ -38,7 +38,6 @@ bool J2KDecode::Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data)
     codec = opj_create_decompress(OPJ_CODEC_J2K);
     if (!codec)
     {
-        delete memstr;
         return false;
     }
     
@@ -46,7 +45,6 @@ bool J2KDecode::Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data)
     if (!success)
     {
         opj_destroy_codec(codec);
-        delete memstr;
         return false;
     }
     
@@ -55,14 +53,13 @@ bool J2KDecode::Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data)
     {
         opj_destroy_codec(codec);
         opj_stream_destroy(str);
-        delete memstr;
         return false;
     }
     
     opj_stream_set_read_function(str, MemStream::read);
     opj_stream_set_seek_function(str, MemStream::seek);
     opj_stream_set_skip_function(str, MemStream::skip);
-    opj_stream_set_user_data(str, memstr, MemStream::free);
+    opj_stream_set_user_data(str, &memstr, 0);
     opj_stream_set_user_data_length(str, data->Num());
     //opj_set_info_handler(codec, showMsg, 0);
     //opj_set_warning_handler(codec, showMsg, 0);
@@ -73,7 +70,6 @@ bool J2KDecode::Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data)
     {
         opj_destroy_codec(codec);
         opj_stream_destroy(str);
-        delete memstr;
         return false;
     }
     
@@ -85,7 +81,6 @@ bool J2KDecode::Decode(TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data)
         image = 0;
         opj_destroy_codec(codec);
         opj_stream_destroy(str);
-        delete memstr;
         return false;
     }
     

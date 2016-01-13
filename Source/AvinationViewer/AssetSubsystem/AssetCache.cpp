@@ -329,7 +329,7 @@ uint32_t AssetDecodeThread::Run()
 
 uint32_t AssetProcessThread::Run()
 {
-    static int cacheDivider = 10;
+    cacheDivider = 10;
     
     while (runThis)
     {

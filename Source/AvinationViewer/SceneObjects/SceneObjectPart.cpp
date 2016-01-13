@@ -346,12 +346,12 @@ void SceneObjectPart::FetchAssets()
 
 void SceneObjectPart::MeshReceived(FGuid id, TSharedAssetRef asset)
 {
-    TSharedRef<MeshAsset, ESPMode::ThreadSafe> mesh = StaticCastSharedRef<MeshAsset>(asset);
-    
     if (asset->state == AssetBase::Failed)
         return;
-
-    MeshMesh(mesh);
+    
+    TSharedRef<MeshAsset, ESPMode::ThreadSafe> meshAsset = StaticCastSharedRef<MeshAsset>(asset);
+    
+    MeshMesh(meshAsset);
     
     haveAllAssets = true;
     
