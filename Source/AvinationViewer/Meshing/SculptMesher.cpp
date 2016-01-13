@@ -192,19 +192,6 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
             
             coords.Add(matrix[imageY][imageX]);
 
-            if (fabs(matrix[imageY][imageX].X)> 0.5)
-            {
-                return ;
-            }
-            if (fabs(matrix[imageY][imageX].Y)> 0.5)
-            {
-                return ;
-            }
-            if (fabs(matrix[imageY][imageX].Z)> 0.5)
-            {
-                return ;
-            }
-
             if (viewerMode)
             {
                 normals.Add(FVector());
