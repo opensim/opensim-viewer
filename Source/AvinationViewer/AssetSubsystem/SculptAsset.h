@@ -14,7 +14,9 @@ public:
 	virtual ~SculptAsset();
     
     opj_image *image = 0;
+    TArray<TArray<FVector>> sculptRows;
     
 private:
     void DecodeImage();
+    void Process();
 };

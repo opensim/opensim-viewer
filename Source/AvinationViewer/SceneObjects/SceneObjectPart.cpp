@@ -949,10 +949,13 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
     
    if (meshed)
         return true;
-    
+
+   if (data->sculptRows.Num() == 0)
+       return false;
+
     try
     {
-        GenerateSculptMesh(data, lodWanted);
+        sculptData = new SculptMesh(data->sculptRows, (SculptType)sculptType, true, lodWanted);
     }
     catch (...)
     {
@@ -1035,39 +1038,7 @@ bool SceneObjectPart::MeshSculpt(TSharedRef<SculptAsset, ESPMode::ThreadSafe> da
     return true;
 }
 
-void SceneObjectPart::GenerateSculptMesh(TSharedRef<SculptAsset, ESPMode::ThreadSafe> indata, int lod)
-{
-    float pixScale = 1.0f / 255.0f;
-    
-    opj_image_t *tex = indata->image;
-    
-    if (!tex)
-        throw std::exception();
-    
-    if (tex->numcomps < 3)
-        throw std::exception();
-    
-    int w = tex->comps[0].w;
-    int h = tex->comps[0].h;
 
-    TArray<TArray<FVector>> rows;
-    OPJ_INT32 *r = tex->comps[0].data, *g = tex->comps[1].data, *b = tex->comps[2].data;
-    for (int i = 0; i < h; i++)
-        rows.AddDefaulted();
-
-    for (int i = 0; i < h; i++)
-    {
-        for (int j = 0; j < w; j++)
-        {
-            FVector c = FVector((float)(*r++ & 0xff) * pixScale - 0.5f,
-                            (float)(*g++ & 0xff) * pixScale - 0.5f,
-                            (float)(*b++ & 0xff) * pixScale - 0.5f);
-            rows[h - 1 - i].Add(c);
-        }
-    }
-    
-    sculptData = new SculptMesh(rows, (SculptType)sculptType, true, lod);
-}
 
 void SceneObjectPart::DeleteMeshData()
 {
