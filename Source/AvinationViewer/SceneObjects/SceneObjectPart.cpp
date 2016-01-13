@@ -596,11 +596,11 @@ bool SceneObjectPart::MeshPrim()
             i1 = pm->vertices.Num();
             pm->vertices.Add(v1);
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv1.X,
-                1.0f - primData->viewerFaces[face].uv1.Y));
+                primData->viewerFaces[face].uv1.Y));
         }
         else
         {
-            FVector2D uv(primData->viewerFaces[face].uv1.X, 1.0f - primData->viewerFaces[face].uv1.Y);
+            FVector2D uv(primData->viewerFaces[face].uv1.X, primData->viewerFaces[face].uv1.Y);
             if (uv != pm->uv0[i1])
             {
                 i1 = pm->vertices.Num();
@@ -614,11 +614,11 @@ bool SceneObjectPart::MeshPrim()
             i2 = pm->vertices.Num();        
             pm->vertices.Add(v2);
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv2.X,
-                1.0f - primData->viewerFaces[face].uv2.Y));
+                primData->viewerFaces[face].uv2.Y));
         }
         else
         {
-            FVector2D uv(primData->viewerFaces[face].uv2.X, 1.0f - primData->viewerFaces[face].uv2.Y);
+            FVector2D uv(primData->viewerFaces[face].uv2.X, primData->viewerFaces[face].uv2.Y);
             if (uv != pm->uv0[i2])
             {
                 i2 = pm->vertices.Num();
@@ -632,11 +632,11 @@ bool SceneObjectPart::MeshPrim()
             i3 = pm->vertices.Num();
             pm->vertices.Add(v3);
             pm->uv0.Add(FVector2D(primData->viewerFaces[face].uv3.X,
-                1.0f - primData->viewerFaces[face].uv3.Y));
+                primData->viewerFaces[face].uv3.Y));
         }
         else
         {
-            FVector2D uv(primData->viewerFaces[face].uv3.X, 1.0f - primData->viewerFaces[face].uv3.Y);
+            FVector2D uv(primData->viewerFaces[face].uv3.X, primData->viewerFaces[face].uv3.Y);
             if (uv != pm->uv0[i3])
             {
                 i3 = pm->vertices.Num();
