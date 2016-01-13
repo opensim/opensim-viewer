@@ -48,44 +48,44 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
         step <<= 1;
 
         // In the below cases, this LOD has no geometry (doesn't show)
-        if (step > width)
+        if (step >= width)
             return;
         if (step >= height)
             return;
 
         verts >>= 2;
     }
-    
+
     sculptType = (SculptType)(((int)sculptType) & 0x07);
 
     if (mirror)
         invert = !invert;
-    
+
     uint16_t horizontalDivisions = width / step;
-    uint16_t verticalDivisions =  height / step;
+    uint16_t verticalDivisions = height / step;
     uint16_t matrixWidth = horizontalDivisions + 1;
     uint16_t matrixHeight = verticalDivisions + 1;
-    
+
     float divisionU = 1.0f / (float)horizontalDivisions;
     float divisionV = 1.0f / (float)verticalDivisions;
 
     // Reduce the input texture to our coordinate matrix. This greatly simplifies
     // what is to come.
     TArray<TArray<FVector>> matrix;
-    
+
     int v, vv;
     int h, hh;
 
     matrix.AddDefaulted(matrixHeight);
-    
+
     int oneMinushalfStep = -step / 2;
     oneMinushalfStep += step;
 
-    for (v = 0, vv = 0 ; v < (int)height ; ++vv, v += step)
+    for (v = 0, vv = 0; v < (int)height; ++vv, v += step)
     {
         matrix[vv].AddDefaulted(matrixWidth);
-        
-        for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += step)
+
+        for (h = 0, hh = 0; h < (int)width; ++hh, h += step)
         {
             matrix[vv][hh] = rows[v][h];
         }
@@ -103,10 +103,10 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
             matrix[vv][hh] = matrix[vv][hh - 1];
         }
     }
-    
+
     matrix[vv].AddDefaulted(matrixWidth);
-    
-    for (h = 0, hh = 0 ; h < (int)width ; ++hh, h += step)
+
+    for (h = 0, hh = 0; h < (int)width; ++hh, h += step)
     {
         if (step > 1)
         {
@@ -120,7 +120,9 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
             matrix[vv][hh] = matrix[vv - 1][hh];
         }
     }
-    
+
+    bool rw = true;
+
     if (sculptType == sphere)
     {
         // Find the poles for spherical sitching
@@ -139,28 +141,33 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
         // The coordinates in the top row get overwritten by this
         // operation.
 
-        for (int h1 = 0 ; h1 < matrixWidth ; ++h1)
+        for (int h1 = 0; h1 < matrixWidth; ++h1)
         {
             matrix[0][h1] = northPole;
             matrix[matrixHeight - 1][h1] = southPole;
         }
     }
-    
-    // Plane mode is handled by the default case.
-    
+
     // For these two, stitch sides left to right
     if (sculptType == sphere || sculptType == cylinder || sculptType == torus)
     {
-        for (int v1 = 0 ; v1 < matrixHeight ; ++v1)
+        for (int v1 = 0; v1 < matrixHeight; ++v1)
             matrix[v1][matrixWidth - 1] = matrix[v1][0];
+        rw = false;
     }
-    
+
     // For this one, stitch top to bottom as well
     if (sculptType == torus)
     {
-        for (int h1 = 0 ; h1 < matrixWidth ; ++h1)
+        for (int h1 = 0; h1 < matrixWidth; ++h1)
             matrix[matrixHeight - 1][h1] = matrix[0][h1];
     }
+    if (rw)
+        matrixWidth--;
+
+    coords.Empty();
+    normals.Empty();
+    faces.Empty();
 
     int p1, p2, p3, p4;
     for (int imageY = 0; imageY < matrixHeight; imageY++)
@@ -184,6 +191,20 @@ SculptMesh::SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, boo
             p1 = p3 - matrixWidth;
             
             coords.Add(matrix[imageY][imageX]);
+
+            if (fabs(matrix[imageY][imageX].X)> 0.5)
+            {
+                return ;
+            }
+            if (fabs(matrix[imageY][imageX].Y)> 0.5)
+            {
+                return ;
+            }
+            if (fabs(matrix[imageY][imageX].Z)> 0.5)
+            {
+                return ;
+            }
+
             if (viewerMode)
             {
                 normals.Add(FVector());
