@@ -34,15 +34,14 @@ void TextureAsset::DecodeImage()
     
     if (image->numcomps < 1)
         throw std::exception();
-    
+
+    w = image->comps[0].w;
+    h = image->comps[0].h;
     if (w < 0 || h < 0)
     {
         opj_image_destroy(image);
         throw std::exception();
     }
-    
-    w = image->comps[0].w;
-    h = image->comps[0].h;
 }
 
 void TextureAsset::PreProcess()
@@ -61,27 +60,24 @@ void TextureAsset::Process()
     texBuffer = new uint8_t[w * h * 4];
     
     int32_t *r, *g, *b, *a;
-    
+    r = 0;
+    g = 0;
+    b = 0;
+    a = 0;
     
     switch(image->numcomps)
     {
         case 1: // Straight greyscale
             r = image->comps[0].data;
-            g = 0;
-            b = 0;
-            a = 0;
             break;
         case 2: // Greyscale w/alpha
             r = image->comps[0].data;
-            g = 0;
-            b = 0;
             a = image->comps[1].data;
             break;
         case 3: // RGB
             r = image->comps[0].data;
             g = image->comps[1].data;
             b = image->comps[2].data;
-            a = 0;
             break;
         case 4: // RGBA
             r = image->comps[0].data;
