@@ -15,4 +15,5 @@ MeshAsset::~MeshAsset()
 void MeshAsset::Process()
 {
     meshData = TArray<uint8_t>(*stageData);
+    stageData.Reset();
 }

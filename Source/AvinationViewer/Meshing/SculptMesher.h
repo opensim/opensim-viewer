@@ -16,7 +16,7 @@ public:
     TArray<FVector> normals;
     TArray<FVector2D> uvs;
     
-    SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, bool mirror, bool invert, int lod);
+    SculptMesh(TArray<TArray<FVector>>& rows, SculptType sculptType, bool viewerMode, int lod);
 
 private:
     void calcVertexNormals(SculptType sculptType, int xSize, int ySize);
