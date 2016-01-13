@@ -20,6 +20,8 @@
 #include "AssetSubsystem/PrimAsset.h"
 #include "AvnCharacter.h"
 
+#define ONE_OBJECT_TEST
+
 class ObjectCreator : public FRunnable
 {
 public:
@@ -57,22 +59,20 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
     Super::HandleMatchHasStarted();
     //delete &AssetCache::Get();
     //delete &TextureCache::Get();
-    //TextureCache::outer = this;
-
     
     if (creator)
         delete creator;
     creator = new ObjectCreator(this);
-    
+
+#ifdef ONE_OBJECT_TEST
     FGuid id;
     //FGuid::Parse(TEXT("77540e8e-5064-4cf9-aa77-ad6617d73508"), id);
     FGuid::Parse(TEXT("8e3377b1-ccc7-4f7b-981d-f30ccae8121d"), id);
     
-    /*
     AssetFetchedDelegate d;
     d.BindUObject(this, &AAvinationViewerGameMode::CreateNewActor);
     AssetCache::Get().Fetch<PrimAsset>(id, d);
-    */
+#endif
 }
 
 AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data)
@@ -85,13 +85,15 @@ AMeshActor *AAvinationViewerGameMode::CreateNewActor(rapidxml::xml_node<> *data)
 
 void AAvinationViewerGameMode::HandleObjectReady(AMeshActor *act)
 {
-    FVector pos(200.0f, 0.0f, 170.0f);
+    FVector pos (13000.0,-12800,4000.0);
+
+    //FVector pos(200.0f, 0.0f, 170.0f);
     
     act->sog->GatherTextures();
     
+    act->SetActorHiddenInGame(false);
     act->SetActorLocationAndRotation(pos /* act->sog->GetRootPart()->groupPosition * 100 */, act->sog->GetRootPart()->rotation);
     act->RegisterComponents();
-    act->SetActorHiddenInGame(false);
 
     UE_LOG(LogTemp, Warning, TEXT("%d textures on object"), act->sog->groupTextures.Num());
 }
@@ -158,6 +160,7 @@ void AAvinationViewerGameMode::Tick(float deltaSeconds)
     creator->TickPool();
     
     AssetCache::Get().Tick();
+    AssetCache::GetTexCache().Tick();
     
     /*
     if (!(--gap))
@@ -212,6 +215,7 @@ bool ObjectCreator::Init()
 
 uint32_t ObjectCreator::Run()
 {
+#ifndef ONE_OBJECT_TEST
     const char *path = "/Users/melanie/UnrealViewerData/primsback.xml";
     
     struct stat st;
@@ -273,6 +277,8 @@ uint32_t ObjectCreator::Run()
     }
     
     delete fileData;
+    
+#endif
     
     return 0;
 }

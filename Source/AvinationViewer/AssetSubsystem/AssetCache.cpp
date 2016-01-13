@@ -21,6 +21,7 @@ enum QueueNumber : int
 };
 
 AssetCache *AssetCache::instance = 0;
+AssetCache *AssetCache::textureInstance = 0;
 
 AssetCache::AssetCache()
 {
@@ -44,6 +45,16 @@ AssetCache& AssetCache::Get()
     instance = new AssetCache();
     
     return *instance;
+}
+
+AssetCache& AssetCache::GetTexCache()
+{
+    if (textureInstance)
+        return *textureInstance;
+    
+    textureInstance = new AssetCache();
+    
+    return *textureInstance;
 }
 
 template<typename T>
@@ -150,6 +161,8 @@ bool inline AssetCache::AddCallbackIfEnqueued(FGuid id, AssetFetchedDelegate d)
     TSharedAssetFetchContainerRef fetch = queueIndex[id];
     
     fetch->AddDispatch(d);
+    
+    fetch->cacheHits++;
     
     return true;
 }
@@ -311,6 +324,8 @@ uint32_t AssetDecodeThread::Run()
 
 uint32_t AssetProcessThread::Run()
 {
+    static int cacheDivider = 10;
+    
     while (runThis)
     {
         cache->queueLock.Lock();
@@ -333,6 +348,34 @@ uint32_t AssetProcessThread::Run()
             cache->queueLock.Unlock();
             usleep(100000);
         }
+        
+        if (!(--cacheDivider))
+        {
+            cacheDivider = 10;
+            DoCacheExpire();
+        }
     }
+    
     return 0;
+}
+
+void AssetProcessThread::DoCacheExpire()
+{
+    FScopeLock l(&cache->queueLock);
+    
+    if (cache->memCache.Num() < 80)
+        return;
+    
+    TArray<TSharedAssetFetchContainerRef> cacheSorter;
+    
+    for (auto it = cache->memCache.CreateConstIterator() ; it ; ++it)
+        cacheSorter.Add((*it).Value);
+    
+    cacheSorter.Sort([](const TSharedAssetFetchContainerRef& a, const TSharedAssetFetchContainerRef& b)
+                     {
+                         return a->cacheHits > b->cacheHits;
+                     });
+    
+    for (int i = 50 ; i < cacheSorter.Num() ; i++)
+        cache->memCache.Remove(cacheSorter[i]->id);
 }

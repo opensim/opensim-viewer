@@ -22,6 +22,9 @@ public:
     
     TSharedAssetRef asset;
     FGuid id;
+    
+    int cacheHits = 0;
+    
 private:
     TSharedPtr<IHttpRequest> req;
     int queue;

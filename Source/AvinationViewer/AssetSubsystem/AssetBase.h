@@ -32,10 +32,9 @@ public:
     FGuid id;
     AssetState state;
 protected:
-    TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> stageData;
-    
-private:
     void Decode();
+    
+    TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> stageData;
     
     friend class AssetCache;
 };
