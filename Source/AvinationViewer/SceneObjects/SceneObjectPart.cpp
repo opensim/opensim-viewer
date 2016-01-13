@@ -569,6 +569,9 @@ bool SceneObjectPart::MeshPrim()
         if (primFace >= 10 || primData < 0)
             continue;
         
+        if (numFaces <= primFace)
+            numFaces = primFace + 1;
+        
         PrimFaceMeshData *pm = &primMeshData[primFace];
 
         // vertices
