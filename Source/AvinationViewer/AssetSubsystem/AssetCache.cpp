@@ -21,6 +21,7 @@ enum QueueNumber : int
 };
 
 AssetCache *AssetCache::instance = 0;
+AssetCache *AssetCache::textureInstance = 0;
 
 AssetCache::AssetCache()
 {
@@ -44,6 +45,16 @@ AssetCache& AssetCache::Get()
     instance = new AssetCache();
     
     return *instance;
+}
+
+AssetCache& AssetCache::GetTexCache()
+{
+    if (textureInstance)
+        return *textureInstance;
+    
+    textureInstance = new AssetCache();
+    
+    return *textureInstance;
 }
 
 template<typename T>

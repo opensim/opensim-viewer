@@ -51,6 +51,7 @@ class AVINATIONVIEWER_API AssetCache
 {
 public:
     static AssetCache& Get();
+    static AssetCache& GetTexCache();
 	virtual ~AssetCache();
     
     template <typename T>
@@ -77,6 +78,7 @@ protected:
     FCriticalSection queueLock;
     
     static AssetCache *instance;
+    static AssetCache *textureInstance;
     
     AssetDecodeThread *decodeThread;
     AssetProcessThread *processThread;
