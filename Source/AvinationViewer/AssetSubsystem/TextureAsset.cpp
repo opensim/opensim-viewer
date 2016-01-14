@@ -52,7 +52,7 @@ void TextureAsset::DecodeImage()
 void TextureAsset::PreProcess()
 {
     tex = UTexture2D::CreateTransient(w, h);
-    tex->MipGenSettings = TextureMipGenSettings::TMGS_Blur4;
+//    tex->MipGenSettings = TextureMipGenSettings::TMGS_Blur4;
     tex->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
     tex->SRGB = 0;
     tex->UpdateResource();

@@ -103,8 +103,6 @@ public:
     bool MeshMesh(TSharedRef<MeshAsset, ESPMode::ThreadSafe> data);
     void DeleteMeshData();
     virtual void RequestTextures() override;
-
-    LLSDItem * GetMeshData(TSharedRef<MeshAsset, ESPMode::ThreadSafe> assetdata,int lod);
     
     virtual SceneObject inline Type() override { return ObjectGroup; }
     FVector groupPosition;
@@ -172,7 +170,6 @@ private:
     int ReadIntValue(rapidxml::xml_node<> *parent, const char *name, int def);
     FString ReadStringValue(rapidxml::xml_node<> *parent, const char *name, FString def);
     void GeneratePrimMesh(int lod);
-    void GenerateSculptMesh(TSharedRef<SculptAsset, ESPMode::ThreadSafe> data, int lod);
     void calcVertsNormals(PrimFaceMeshData& pm);
     void calcVertsTangents(PrimFaceMeshData& pm);
     bool meshed = false;

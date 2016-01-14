@@ -332,7 +332,6 @@ void SceneObjectPart::FetchAssets()
     }
     else // Sculpt
     {
-
         // The mesh asset is here the sculpt texture
         FGuid::Parse(meshAssetId, id);
         AssetFetchedDelegate d;
@@ -363,173 +362,23 @@ void SceneObjectPart::MeshReceived(FGuid id, TSharedAssetRef asset)
     group->CheckAssetsDone();
 }
 
-
-LLSDItem *SceneObjectPart::GetMeshData(TSharedRef<MeshAsset, ESPMode::ThreadSafe> assetdata, int lod)
-{
-    if (isMesh) // Mesh
-    {
-        if (lod > maxLod)
-            lod = maxLod;
-
-        FString lodLevel;
-        switch ((LevelDetail)lodWanted)
-        {
-            case Highest:
-                lodLevel = TEXT("high_lod");
-                break;
-            case High:
-                lodLevel = TEXT("medium_lod");
-                break;
-            case Low:
-                lodLevel = TEXT("low_lod");
-                break;
-            default:
-                lodLevel = TEXT("lowest_lod");
-                break;
-        }
-  
-        
-//        LLSDItem *lodData = LLSDMeshDecode::Decode(data.GetData(), lodLevel);
-        LLSDItem *lodData = LLSDMeshDecode::Decode(assetdata->meshData.GetData(), TEXT("high_lod"));
-        
-        numFaces = lodData->arrayData.Num();
-        
-        return lodData;
-    }
-    
-    return 0;
-}
-
 bool SceneObjectPart::MeshMesh(TSharedRef<MeshAsset, ESPMode::ThreadSafe> assetdata)
 {
-    LLSDItem * data = GetMeshData(assetdata, 0);
-    if (!data)
-        return false;
+    int assetlods = assetdata->lodMeshs.Num();
+    if (assetlods < 1)
+        return false;   
 
-    int textureIndex = 0;
-    numFaces = 0;
+    assetlods--; // max index
+    int lodindex = 3.0 - lodWanted; // lods are in reverse order
 
-    primMeshData.Empty();
+    if (lodindex < 0)
+        lodindex = 0;
+    else if (lodindex > assetlods)
+        lodindex = assetlods;
 
-    for (auto face = data->arrayData.CreateConstIterator(); face; ++face)
-    {
-        PrimFaceMeshData pm;
+    primMeshData = assetdata->lodMeshs[lodindex].meshFaces;
+    numFaces = primMeshData.Num();
 
-        float minX = -0.5f, minY = -0.5f, minZ = -0.5f, maxX = 0.5f, maxY = 0.5f, maxZ = 0.5f;
-        float minU = 0.0f, minV = 0.0f, maxU = 0.0f, maxV = 0.0f;
-
-
-        if (!(*face)->mapData.Contains(TEXT("NoGeometry")) || !(*face)->mapData[TEXT("NoGeometry")]->data.booleanData)
-        {
-            if ((*face)->mapData.Contains(TEXT("PositionDomain")))
-            {
-                //LLSDDecode::DumpItem((*face)->mapData[TEXT("PositionDomain")]);
-                LLSDItem *positionDomain = (*face)->mapData[TEXT("PositionDomain")];
-
-                LLSDItem *min = positionDomain->mapData[TEXT("Min")];
-                LLSDItem *max = positionDomain->mapData[TEXT("Max")];
-
-                minX = (float)(min->arrayData[0]->data.doubleData);
-                minY = (float)(min->arrayData[1]->data.doubleData);
-                minZ = (float)(min->arrayData[2]->data.doubleData);
-
-                maxX = (float)(max->arrayData[0]->data.doubleData);
-                maxY = (float)(max->arrayData[1]->data.doubleData);
-                maxZ = (float)(max->arrayData[2]->data.doubleData);
-            }
-
-            if ((*face)->mapData.Contains(TEXT("TexCoord0Domain")))
-            {
-                LLSDItem *texDomain = (*face)->mapData[TEXT("TexCoord0Domain")];
-
-                LLSDItem *min = texDomain->mapData[TEXT("Min")];
-                LLSDItem *max = texDomain->mapData[TEXT("Max")];
-
-                minU = (float)(min->arrayData[0]->data.doubleData);
-                minV = (float)(min->arrayData[1]->data.doubleData);
-
-                maxU = (float)(max->arrayData[0]->data.doubleData);
-                maxV = (float)(max->arrayData[1]->data.doubleData);
-            }
-
-            //UE_LOG(LogTemp, Warning, TEXT("Face %d PositionDomain %f, %f, %f - %f, %f, %f"), textureIndex, minX, minY, minZ, maxX, maxY, maxZ);
-
-            int binaryLength = (*face)->mapData[TEXT("Position")]->binaryLength;
-
-            int numVertices = binaryLength / 6; // 3 x uint16_t
-            uint16_t *vertexData = (uint16_t *)((*face)->mapData[TEXT("Position")]->data.binaryData);
-
-
-            //UE_LOG(LogTemp, Warning, TEXT("Vertex count %d Normals count %d"), numVertices, numNormals);
-
-            for (int idx = 0; idx < numVertices; ++idx)
-            {
-                uint16_t posX = *vertexData++;
-                uint16_t posY = *vertexData++;
-                uint16_t posZ = *vertexData++;
-
-                FVector pos(AvinationUtils::uint16tofloat(posX, minX, maxX),
-                    -AvinationUtils::uint16tofloat(posY, minY, maxY),
-                    AvinationUtils::uint16tofloat(posZ, minZ, maxZ));
-                pm.vertices.Add(pos);
-
-                //UE_LOG(LogTemp, Warning, TEXT("Vertex %s"), *pos.ToString());
-
-                pm.tangents.Add(FProcMeshTangent(1, 1, 1));
-                pm.vertexColors.Add(FColor(255, 255, 255, 255));
-            }
-            if ((*face)->mapData.Contains(TEXT("Normal")))
-            {
-                int normalsLength = (*face)->mapData[TEXT("Normal")]->binaryLength;
-                int numNormals = binaryLength / 6; // 3 x uint16_t
-                if (numNormals > numVertices)
-                    numNormals = numVertices;
-                uint16_t *normalsData = (uint16_t *)((*face)->mapData[TEXT("Normal")]->data.binaryData);
-                for (int idx = 0; idx < numNormals; ++idx)
-                {
-                    uint16_t norX = *normalsData++;
-                    uint16_t norY = *normalsData++;
-                    uint16_t norZ = *normalsData++;
-                    FVector nor(AvinationUtils::uint16tofloat(norX, -1.0f, 1.0f),
-                        -AvinationUtils::uint16tofloat(norY, -1.0f, 1.0f),
-                        AvinationUtils::uint16tofloat(norZ, -1.0f, 1.0f));
-                    pm.normals.Add(nor);
-                }
-            }
-
-            uint16_t numTriangles = (*face)->mapData[TEXT("TriangleList")]->binaryLength / 6; // 3 * uint16_t
-            uint16_t *trianglesData = (uint16_t *)((*face)->mapData[TEXT("TriangleList")]->data.binaryData);
-
-            //UE_LOG(LogTemp, Warning, TEXT("Triangles count %d"), numTriangles);
-            for (int idx = 0; idx < numTriangles; ++idx)
-            {
-                uint16_t t1 = *trianglesData++;
-                uint16_t t2 = *trianglesData++;
-                uint16_t t3 = *trianglesData++;
-                pm.triangles.Add(t1);
-                pm.triangles.Add(t2);
-                pm.triangles.Add(t3);
-            }
-
-            uint16_t numUvs = (*face)->mapData[TEXT("TexCoord0")]->binaryLength / 4; // 3 * uint16_t
-            uint16_t *uvData = (uint16_t *)((*face)->mapData[TEXT("TexCoord0")]->data.binaryData);
-
-            //UE_LOG(LogTemp, Warning, TEXT("UV count %d"), numUvs);
-
-            for (int idx = 0; idx < numUvs; ++idx)
-            {
-                uint16_t u = *uvData++;
-                uint16_t v = *uvData++;
-
-                pm.uv0.Add(FVector2D(AvinationUtils::uint16tofloat(u, minU, maxU),
-                    1.0 - AvinationUtils::uint16tofloat(v, minV, maxV)));
-            }
-        }
-        calcVertsTangents(pm);
-        primMeshData.Add(pm);
-        numFaces++;
-    }
-    
     return true;
 }
 

@@ -2,6 +2,7 @@
 
 #pragma once
 #include "ProceduralMeshComponent.h"
+#include "../Meshing/PrimMesher.h"
 
 /**
  * 
@@ -12,10 +13,6 @@ public:
 	SubmeshData();
 	~SubmeshData();
     
-    TArray<FVector> vertices;
-    TArray<int32> triangles;
-    TArray<FVector> normals;
-    TArray<FVector2D> uv0;
-    TArray<FColor> vertexColors;
-    TArray<FProcMeshTangent> tangents;
+    TArray<PrimFaceMeshData> meshFaces;
+    int numFaces = 0;
 };
