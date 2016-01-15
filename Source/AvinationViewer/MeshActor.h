@@ -37,12 +37,17 @@ public:
     
 private:
     UPROPERTY()
-    UMaterial *baseMaterial;
+        UMaterial *baseMaterial;
     UPROPERTY()
-    UMaterial *baseMaterialTranslucent;
+        UMaterial *baseMaterialTranslucent;
+    UPROPERTY()
+        UMaterial *baseMaterialUnLit;
+    UPROPERTY()
+        UMaterial *baseMaterialTranslucentUnLit;
 
     UProceduralMeshComponent *BuildComponent(SceneObjectPart *sop);
     
     void ObjectReady();
     UMaterialInstanceDynamic *SetUpMaterial(UProceduralMeshComponent *mesh, int textureIndex, UMaterial *baseMaterial, TextureEntry& te);
+    UMaterialInstanceDynamic *SetUpMaterialUnLit(UProceduralMeshComponent *mesh, int textureIndex, UMaterial *baseMaterial, TextureEntry& te);
 };

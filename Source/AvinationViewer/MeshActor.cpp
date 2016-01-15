@@ -28,10 +28,18 @@ AMeshActor::AMeshActor()
     ConstructorHelpers::FObjectFinder<UMaterial> parentMaterial(TEXT("Material'/Game/Materials/DynamicBase.DynamicBase'"));
 
     baseMaterial = parentMaterial.Object;
-    
+
     ConstructorHelpers::FObjectFinder<UMaterial> parentMaterialTranslucent(TEXT("Material'/Game/Materials/DynamicBaseTranslucent.DynamicBaseTranslucent'"));
-    
+
     baseMaterialTranslucent = parentMaterialTranslucent.Object;
+
+    ConstructorHelpers::FObjectFinder<UMaterial> parentMaterialUnLit(TEXT("Material'/Game/Materials/DynamicBaseUnLit.DynamicBaseUnLit'"));
+
+    baseMaterialUnLit = parentMaterialUnLit.Object;
+
+    ConstructorHelpers::FObjectFinder<UMaterial> parentMaterialTranslucentUnLit(TEXT("Material'/Game/Materials/DynamicBaseTranslucentUnLit.DynamicBaseTranslucentUnLit'"));
+
+    baseMaterialTranslucentUnLit = parentMaterialTranslucentUnLit.Object;
 }
 
 void AMeshActor::BeginPlay()
@@ -174,7 +182,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponent(SceneObjectPart *sop)
         mesh->CreateMeshSection(primFace, face->vertices, face->triangles,
             face->normals, face->uv0, face->vertexColors, face->tangents, false);
         primFace++;
-//        SetUpMaterial(mesh, primFace, baseMaterial, sop->textures[primFace]);
     }
 
     if (sop->primData)
@@ -193,16 +200,44 @@ UMaterialInstanceDynamic *AMeshActor::SetUpMaterial(UProceduralMeshComponent *me
 {
     //if (baseMat == baseMaterialTranslucent)
     //    UE_LOG(LogTemp, Warning, TEXT("Translucent texture"));
-    
+
     mesh->SetMaterial(textureIndex, bMat);
     UMaterialInstanceDynamic *mat = mesh->CreateAndSetMaterialInstanceDynamic(textureIndex);
-    
-    mat->SetScalarParameterValue(TEXT("Emissive"), (te.material & 0x20) ? 1.0f : 0.0f);
+
+    float repeatU = te.repeatU;
+    float repeatV = te.repeatV;
+
+    float offsetU = 0.5 * (1 - repeatU) + te.offsetU;
+    float offsetV = 0.5 * (1 - repeatV) - te.offsetV;
+
     mat->SetVectorParameterValue(TEXT("Color"), te.color);
-    mat->SetVectorParameterValue(TEXT("Offset"), FLinearColor(te.offsetU, -te.offsetV, 0.0f, 0.0f));
-    mat->SetVectorParameterValue(TEXT("Repeats"), FLinearColor(te.repeatU, te.repeatV, 0.0f, 0.0f));
+    mat->SetVectorParameterValue(TEXT("Offset"), FLinearColor(offsetU, offsetV, 0.0f, 0.0f));
+    mat->SetVectorParameterValue(TEXT("Repeats"), FLinearColor(repeatU, repeatV, 0.0f, 0.0f));
     mat->SetScalarParameterValue(TEXT("Rotation"), te.rotation);
-    
+
+    return mat;
+}
+
+UMaterialInstanceDynamic *AMeshActor::SetUpMaterialUnLit(UProceduralMeshComponent *mesh, int textureIndex, UMaterial *bMat, TextureEntry& te)
+{
+    //if (baseMat == baseMaterialTranslucent)
+    //    UE_LOG(LogTemp, Warning, TEXT("Translucent texture"));
+
+    mesh->SetMaterial(textureIndex, bMat);
+    UMaterialInstanceDynamic *mat = mesh->CreateAndSetMaterialInstanceDynamic(textureIndex);
+
+    float repeatU = te.repeatU;
+    float repeatV = te.repeatV;
+
+    float offsetU = 0.5 * (1 - repeatU) + te.offsetU;
+    float offsetV = 0.5 * (1 - repeatV) - te.offsetV;
+
+    float emissive = 3.0f * te.glow + 0.7f; // values to tune
+    mat->SetScalarParameterValue(TEXT("Emissive"), emissive);
+    mat->SetVectorParameterValue(TEXT("Color"), te.color);
+    mat->SetVectorParameterValue(TEXT("Offset"), FLinearColor(offsetU, offsetV, 0.0f, 0.0f));
+    mat->SetVectorParameterValue(TEXT("Repeats"), FLinearColor(repeatU, repeatV, 0.0f, 0.0f));
+    mat->SetScalarParameterValue(TEXT("Rotation"), te.rotation);
 
     return mat;
 }
@@ -213,9 +248,20 @@ void AMeshActor::GotTexture(FGuid id, TSharedAssetRef asset, UProceduralMeshComp
     
     UMaterialInstanceDynamic* mat;
 
-    if (t->hasAlpha)
-        mat = SetUpMaterial(mesh, index, baseMaterialTranslucent, *te);
+    if ((te->material & 0x20) || te->glow > 0.0001)
+    {
+        if (t->hasAlpha)
+            mat = SetUpMaterialUnLit(mesh, index, baseMaterialTranslucentUnLit, *te);
+        else
+            mat = SetUpMaterialUnLit(mesh, index, baseMaterialUnLit, *te);
+    }
     else
-        mat = SetUpMaterial(mesh, index, baseMaterial, *te);
+    {
+        if (t->hasAlpha)
+            mat = SetUpMaterial(mesh, index, baseMaterialTranslucent, *te);
+        else
+            mat = SetUpMaterial(mesh, index, baseMaterial, *te);
+    }
+
     mat->SetTextureParameterValue(TEXT("Texture"), t->tex);
 }
