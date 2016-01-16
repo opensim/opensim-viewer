@@ -47,6 +47,8 @@ void TextureAsset::DecodeImage()
         image = 0;
         throw std::exception();
     }
+
+
 }
 
 void TextureAsset::PreProcess()
@@ -54,7 +56,11 @@ void TextureAsset::PreProcess()
     tex = UTexture2D::CreateTransient(w, h);
 //    tex->MipGenSettings = TextureMipGenSettings::TMGS_Blur4;
     tex->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
-    tex->SRGB = 0;
+
+    // this needs to be set acording to use
+ //   tex->SRGB = 0; // normal map 
+    tex->SRGB = true; // difuse maps
+
     tex->UpdateResource();
     tex->AddToRoot();
     upd = new FUpdateTextureRegion2D(0, 0, 0, 0, w, h);
@@ -63,40 +69,40 @@ void TextureAsset::PreProcess()
 void TextureAsset::Process()
 {
     texBuffer = new uint8_t[w * h * 4];
-    
+
     int32_t *r, *g, *b, *a;
     r = 0;
     g = 0;
     b = 0;
     a = 0;
-    
-    switch(image->numcomps)
+
+    switch (image->numcomps)
     {
-        case 1: // Straight greyscale
-            r = image->comps[0].data;
-            break;
-        case 2: // Greyscale w/alpha
-            r = image->comps[0].data;
-            a = image->comps[1].data;
-            break;
-        case 3: // RGB
-            r = image->comps[0].data;
-            g = image->comps[1].data;
-            b = image->comps[2].data;
-            break;
-        case 4: // RGBA
-            r = image->comps[0].data;
-            g = image->comps[1].data;
-            b = image->comps[2].data;
-            a = image->comps[3].data;
-            break;
+    case 1: // Straight greyscale
+        r = image->comps[0].data;
+        break;
+    case 2: // Greyscale w/alpha
+        r = image->comps[0].data;
+        a = image->comps[1].data;
+        break;
+    case 3: // RGB
+        r = image->comps[0].data;
+        g = image->comps[1].data;
+        b = image->comps[2].data;
+        break;
+    case 4: // RGBA
+        r = image->comps[0].data;
+        g = image->comps[1].data;
+        b = image->comps[2].data;
+        a = image->comps[3].data;
+        break;
     }
-    
+
     hasAlpha = false;
     int pixels = w * h;
-    
+
     uint8_t *dest = texBuffer;
-    for (int i = 0 ; i < pixels ; i++)
+    for (int i = 0; i < pixels; i++)
     {
         if (!g)
         {
@@ -109,7 +115,7 @@ void TextureAsset::Process()
             *dest++ = (uint8_t)*(g++);
         }
         *dest++ = (uint8_t)*(r++);
-        
+
         if (a)
         {
             if (*a < 0xf8)
@@ -121,7 +127,7 @@ void TextureAsset::Process()
             *dest++ = 0xff;
         }
     }
-    
+
     opj_image_destroy(image);
     image = 0;
 }
