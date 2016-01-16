@@ -194,8 +194,6 @@ UProceduralMeshComponent *AMeshActor::BuildComponent(SceneObjectPart *sop)
     return mesh;
 }
 
-
-
 UMaterialInstanceDynamic *AMeshActor::SetUpMaterial(UProceduralMeshComponent *mesh, int textureIndex, UMaterial *bMat, TextureEntry& te)
 {
     //if (baseMat == baseMaterialTranslucent)
@@ -239,25 +237,28 @@ UMaterialInstanceDynamic *AMeshActor::SetUpMaterialUnLit(UProceduralMeshComponen
     mat->SetVectorParameterValue(TEXT("Repeats"), FLinearColor(repeatU, repeatV, 0.0f, 0.0f));
     mat->SetScalarParameterValue(TEXT("Rotation"), te.rotation);
 
+
     return mat;
 }
 
 void AMeshActor::GotTexture(FGuid id, TSharedAssetRef asset, UProceduralMeshComponent *mesh, int index, TextureEntry *te)
 {
     TSharedRef<TextureAsset, ESPMode::ThreadSafe> t = StaticCastSharedRef<TextureAsset>(asset);
-    
-    UMaterialInstanceDynamic* mat;
 
-    if ((te->material & 0x20) || te->glow > 0.0001)
+    UMaterialInstanceDynamic* mat;
+    bool hasAlpha = (t->hasAlpha || te->color.A < 0.99f);
+    bool emissive = (te->material & 0x20) || te->glow > 0.01;
+
+    if (emissive)
     {
-        if (t->hasAlpha)
+        if (hasAlpha)
             mat = SetUpMaterialUnLit(mesh, index, baseMaterialTranslucentUnLit, *te);
         else
             mat = SetUpMaterialUnLit(mesh, index, baseMaterialUnLit, *te);
     }
     else
     {
-        if (t->hasAlpha)
+        if (hasAlpha)
             mat = SetUpMaterial(mesh, index, baseMaterialTranslucent, *te);
         else
             mat = SetUpMaterial(mesh, index, baseMaterial, *te);
