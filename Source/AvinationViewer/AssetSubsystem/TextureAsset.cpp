@@ -6,7 +6,7 @@
 TextureAsset::TextureAsset()
 {
     decode.BindRaw(this, &TextureAsset::DecodeImage);
-    preProcess.BindRaw(this, &TextureAsset::PreProcess);
+//    preProcess.BindRaw(this, &TextureAsset::PreProcess);
     mainProcess.BindRaw(this, &TextureAsset::Process);
     postProcess.BindRaw(this, &TextureAsset::PostProcess);
 }
@@ -16,6 +16,16 @@ TextureAsset::~TextureAsset()
     if (image)
         opj_image_destroy(image);
     image = 0;
+    if (nlevels > 0)
+    {
+        for (int i = 0; i < nlevels; i++)
+        {
+            if (texBuffer[i])
+                FMemory::Free(texBuffer[i]);
+            texBuffer[i] = nullptr;
+        }
+    }
+    texBuffer.Empty();
 }
 
 void TextureAsset::DecodeImage()
@@ -47,28 +57,18 @@ void TextureAsset::DecodeImage()
         image = 0;
         throw std::exception();
     }
-
-
 }
 
 void TextureAsset::PreProcess()
 {
-    tex = UTexture2D::CreateTransient(w, h);
-//    tex->MipGenSettings = TextureMipGenSettings::TMGS_Blur4;
-    tex->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
-
-    // this needs to be set acording to use
- //   tex->SRGB = 0; // normal map 
-    tex->SRGB = true; // difuse maps
-
-    tex->UpdateResource();
-    tex->AddToRoot();
-    upd = new FUpdateTextureRegion2D(0, 0, 0, 0, w, h);
 }
 
 void TextureAsset::Process()
 {
-    texBuffer = new uint8_t[w * h * 4];
+    texBuffer.Empty();
+    texBuffer.AddZeroed(12);
+
+    texBuffer[0] = new uint8_t[w * h * 4];
 
     int32_t *r, *g, *b, *a;
     r = 0;
@@ -101,7 +101,7 @@ void TextureAsset::Process()
     hasAlpha = false;
     int pixels = w * h;
 
-    uint8_t *dest = texBuffer;
+    uint8_t *dest = texBuffer[0];
     for (int i = 0; i < pixels; i++)
     {
         if (!g)
@@ -130,13 +130,113 @@ void TextureAsset::Process()
 
     opj_image_destroy(image);
     image = 0;
+
+    nlevels = 1;
+
+    int mindimension = h;
+    if (mindimension < w)
+        mindimension = w;
+    int sw = w;
+    int sh = h;
+
+    unsigned int *tmpline = new unsigned int[w * 4];
+
+    while (mindimension > 32 && nlevels < 10)
+    {
+        texBuffer[nlevels] = new uint8_t[sw * sh]; // reducion will be by 2x2 so number of components included
+
+        uint8_t *dest = texBuffer[nlevels];
+        uint8_t *src = texBuffer[nlevels - 1];
+
+        unsigned int *destline;
+
+        sh >>= 1; 
+        sw >>= 1;
+        mindimension >>= 1;
+
+        for (int j = 0; j < sh; j++)
+        {
+            destline = tmpline;
+            for (int i = 0; i < sw; i++)
+            {
+                *destline++ = *src++;
+                *destline++ = *src++;
+                *destline++ = *src++;
+                *destline   = *src++;
+
+                destline -= 3;
+                *destline++ += *src++;
+                *destline++ += *src++;
+                *destline++ += *src++;
+                *destline++ += *src++;
+            }
+
+            destline = tmpline;
+            for (int i = 0; i < sw; i++)
+            {
+                *destline++ += *src++;
+                *destline++ += *src++;
+                *destline++ += *src++;
+                *destline   += *src++;
+
+                destline -= 3;
+                *destline++ += *src++;
+                *destline++ += *src++;
+                *destline++ += *src++;
+                *destline   += *src++;
+
+                destline -= 3;
+                *dest++ = (uint8_t)(*destline++ >> 2);
+                *dest++ = (uint8_t)(*destline++ >> 2);
+                *dest++ = (uint8_t)(*destline++ >> 2);
+                *dest++ = (uint8_t)(*destline++ >> 2);
+            }
+        }
+
+        nlevels++;
+    }
+    FMemory::Free(tmpline);
 }
 
 void TextureAsset::PostProcess()
 {
     if (state == AssetBase::Failed)
         return;
-    
+
+    tex = UTexture2D::CreateTransient(w, h);
+    tex->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
+
+    // this needs to be set acording to use
+    //   tex->SRGB = 0; // normal map 
+    tex->SRGB = true; // difuse maps
+
+    // for some reason this original doesn't work
+    FTexture2DMipMap Mip = tex->PlatformData->Mips[0];
+    Mip.BulkData.RemoveBulkData();
+    tex->PlatformData->Mips.Empty();
+
+    // force just one test
+    //nlevels = 1;
+
+    for (int level = 0; level < nlevels; level++)
+    {
+        int lw = w >> level;
+        int lh = h >> level;
+
+        FTexture2DMipMap *Mip = new FTexture2DMipMap();
+        Mip->BulkData.Lock(LOCK_READ_WRITE);
+        Mip->SizeX = lw;
+        Mip->SizeY = lh;
+        int tsize = lw * lh * 4;
+        void* NewMipData = Mip->BulkData.Realloc(tsize);
+        FMemory::Memcpy(NewMipData, (void*)texBuffer[level], tsize);
+        tex->PlatformData->Mips.Add(Mip);
+        Mip->BulkData.Unlock();
+    }
+
+    tex->UpdateResource();
+    tex->AddToRoot();
+/*
     struct FUpdateTextureRegionsData
     {
         FTexture2DResource* Texture2DResource;
@@ -147,41 +247,50 @@ void TextureAsset::PostProcess()
         uint32 SrcBpp;
         uint8* SrcData;
     };
-    
-    FUpdateTextureRegionsData* RegionData = new FUpdateTextureRegionsData;
-    
-    RegionData->Texture2DResource = (FTexture2DResource*)tex->Resource;
-    RegionData->MipIndex = 0;
-    RegionData->NumRegions = 1;
-    RegionData->Regions = upd;
-    RegionData->SrcPitch = w * 4;
-    RegionData->SrcBpp = 4;
-    RegionData->SrcData = texBuffer;
-    
-    ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(
-       UpdateTextureRegionsData,
-       FUpdateTextureRegionsData*, RegionData, RegionData,
-       {
-           for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; ++RegionIndex)
-           {
-               int32 CurrentFirstMip = RegionData->Texture2DResource->GetCurrentFirstMip();
-               if (RegionData->MipIndex >= CurrentFirstMip)
-               {
-                   RHIUpdateTexture2D(
-                                      RegionData->Texture2DResource->GetTexture2DRHI(),
-                                      RegionData->MipIndex - CurrentFirstMip,
-                                      RegionData->Regions[RegionIndex],
-                                      RegionData->SrcPitch,
-                                      RegionData->SrcData
-                                      + RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
-                                      + RegionData->Regions[RegionIndex].SrcX * RegionData->SrcBpp
-                                      );
-               }
-           }
-           
-           FMemory::Free(RegionData->Regions);
-           FMemory::Free(RegionData->SrcData);
-           delete RegionData;
-       }
-    );
+
+    for (int level = 0; level < nlevels; level++)
+    {
+        int lw = w >> level;
+        int lh = h >> level;
+
+        FUpdateTextureRegion2D* upd = new FUpdateTextureRegion2D(0, 0, 0, 0, lw, lh);
+
+        FUpdateTextureRegionsData* RegionData = new FUpdateTextureRegionsData;
+
+        RegionData->Texture2DResource = (FTexture2DResource*)tex->Resource;
+        RegionData->MipIndex = level;
+        RegionData->NumRegions = 1;
+        RegionData->Regions = upd;
+        RegionData->SrcPitch = lw * 4;
+        RegionData->SrcBpp = 4;
+        RegionData->SrcData = texBuffer[level];
+
+        ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(
+            UpdateTextureRegionsData,
+            FUpdateTextureRegionsData*, RegionData, RegionData,
+            {
+                for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; ++RegionIndex)
+                {
+                    int32 CurrentFirstMip = RegionData->Texture2DResource->GetCurrentFirstMip();
+                    if (RegionData->MipIndex >= CurrentFirstMip)
+                    {
+                        RHIUpdateTexture2D(
+                                           RegionData->Texture2DResource->GetTexture2DRHI(),
+                                           RegionData->MipIndex - CurrentFirstMip,
+                                           RegionData->Regions[RegionIndex],
+                                           RegionData->SrcPitch,
+                                           RegionData->SrcData
+                                           + RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
+                                           + RegionData->Regions[RegionIndex].SrcX * RegionData->SrcBpp
+                                           );
+                    }
+                }
+
+                FMemory::Free(RegionData->Regions);
+                FMemory::Free(RegionData->SrcData);
+                delete RegionData;
+            }
+        );
+    }
+*/
 }

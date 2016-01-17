@@ -24,6 +24,6 @@ private:
     
     int w, h;
     opj_image *image = 0;
-    uint8_t *texBuffer = 0;
-    FUpdateTextureRegion2D *upd = 0;
+    TArray<uint8_t*> texBuffer;
+    int32_t nlevels = 0;
 };
