@@ -15,12 +15,18 @@ public:
     
     UTexture2D *tex = 0;
     bool hasAlpha = false;
+
     
 private:
+
+    UTexture2D *baseTexture;
+
     void DecodeImage();
     void PreProcess();
     void Process();
     void PostProcess();
+
+    UTexture2D* CreateTexture();
     
     int w, h;
     opj_image *image = 0;

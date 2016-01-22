@@ -1,12 +1,33 @@
 // (c) 2016 Avination Virtual Limited. All rights reserved.
-
 #include "AvinationViewer.h"
 #include "TextureAsset.h"
+#include "AvinationViewerGameMode.h"
+
+
+struct MBB :FByteBulkData
+{
+    void SetFilename(FString name);
+#if WITH_EDITOR
+    void setAr(FArchive *ar);
+#endif
+};
+
+void MBB::SetFilename(FString name)
+{
+    Filename = name;
+}
+
+#if WITH_EDITOR
+void MBB::setAr(FArchive *ar)
+{
+    AttachedAr = ar;
+}
+#endif
 
 TextureAsset::TextureAsset()
 {
     decode.BindRaw(this, &TextureAsset::DecodeImage);
-//    preProcess.BindRaw(this, &TextureAsset::PreProcess);
+    preProcess.BindRaw(this, &TextureAsset::PreProcess);
     mainProcess.BindRaw(this, &TextureAsset::Process);
     postProcess.BindRaw(this, &TextureAsset::PostProcess);
 }
@@ -30,6 +51,7 @@ TextureAsset::~TextureAsset()
 
 void TextureAsset::DecodeImage()
 {
+
     AssetBase::Decode();
     
     J2KDecode idec;
@@ -61,12 +83,14 @@ void TextureAsset::DecodeImage()
 
 void TextureAsset::PreProcess()
 {
+
+//    worktex->Serialize();
 }
 
 void TextureAsset::Process()
 {
     texBuffer.Empty();
-    texBuffer.AddZeroed(12);
+    texBuffer.AddZeroed(13);
 
     texBuffer[0] = new uint8_t[w * h * 4];
 
@@ -134,14 +158,14 @@ void TextureAsset::Process()
     nlevels = 1;
 
     int mindimension = h;
-    if (mindimension < w)
+    if (mindimension > w)
         mindimension = w;
     int sw = w;
     int sh = h;
 
     unsigned int *tmpline = new unsigned int[w * 4];
 
-    while (mindimension > 32 && nlevels < 10)
+    while (mindimension > 1 && nlevels < 13)
     {
         texBuffer[nlevels] = new uint8_t[sw * sh]; // reducion will be by 2x2 so number of components included
 
@@ -196,6 +220,10 @@ void TextureAsset::Process()
         nlevels++;
     }
     FMemory::Free(tmpline);
+
+    tex = TextureAsset::CreateTexture();
+    if (tex == nullptr)
+        state = AssetBase::Failed;
 }
 
 void TextureAsset::PostProcess()
@@ -203,94 +231,109 @@ void TextureAsset::PostProcess()
     if (state == AssetBase::Failed)
         return;
 
-    tex = UTexture2D::CreateTransient(w, h);
-    tex->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
+    tex->UpdateResource();
 
-    // this needs to be set acording to use
-    //   tex->SRGB = 0; // normal map 
-    tex->SRGB = true; // difuse maps
+    tex->AddToRoot();
 
-    // for some reason this original doesn't work
-    FTexture2DMipMap Mip = tex->PlatformData->Mips[0];
-    Mip.BulkData.RemoveBulkData();
-    tex->PlatformData->Mips.Empty();
+}
+UTexture2D* TextureAsset::CreateTexture()
+{
+    bool normalMap = false;
+    FString sid = id.ToString();
+    FString ppath = FPaths::GameDir();
 
-    // force just one test
-    //nlevels = 1;
+    ppath = FPaths::Combine(*ppath, TEXT("cache/"),*sid);
+    FPaths::MakeStandardFilename(ppath);
 
+//    UE_LOG(LogTemp, Warning, TEXT("%s"), *ppath);
+
+    FArchive* ar = IFileManager::Get().CreateFileWriter(*ppath);
+    ar->ArIsSaving = true;
+    ar->ArIsPersistent = true;
+
+    UTexture2D* Texture = nullptr;
+    Texture = NewObject<UTexture2D>(GetTransientPackage(),*sid, RF_Standalone | RF_Public);
+
+    if (!Texture)
+    {
+        return nullptr;
+    }
+
+    Texture->PlatformData = new FTexturePlatformData();
+    Texture->PlatformData->SizeX = w;
+    Texture->PlatformData->SizeY = h;
+    Texture->PlatformData->PixelFormat = EPixelFormat::PF_B8G8R8A8;
+    Texture->PlatformData->NumSlices = 1;
+    Texture->bForceMiplevelsToBeResident = false;
+    Texture->bIsStreamable = true;
+
+    int tmp = 0;
     for (int level = 0; level < nlevels; level++)
     {
         int lw = w >> level;
         int lh = h >> level;
 
         FTexture2DMipMap *Mip = new FTexture2DMipMap();
-        Mip->BulkData.Lock(LOCK_READ_WRITE);
+        void* NewMipData = Mip->BulkData.Lock(LOCK_READ_WRITE);
         Mip->SizeX = lw;
         Mip->SizeY = lh;
         int tsize = lw * lh * 4;
-        void* NewMipData = Mip->BulkData.Realloc(tsize);
+        NewMipData = Mip->BulkData.Realloc(tsize);
         FMemory::Memcpy(NewMipData, (void*)texBuffer[level], tsize);
-        tex->PlatformData->Mips.Add(Mip);
+        Texture->PlatformData->Mips.Add(Mip);
         Mip->BulkData.Unlock();
+        MBB* b = (MBB*)&Mip->BulkData;
+        b->SetFilename(ppath);
+        b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SerializeCompressedZLIB);
+        Mip->BulkData.Serialize(*ar,0);
+        tmp = 0;
     }
 
-    tex->UpdateResource();
-    tex->AddToRoot();
-/*
-    struct FUpdateTextureRegionsData
-    {
-        FTexture2DResource* Texture2DResource;
-        int32 MipIndex;
-        uint32 NumRegions;
-        FUpdateTextureRegion2D* Regions;
-        uint32 SrcPitch;
-        uint32 SrcBpp;
-        uint8* SrcData;
-    };
+    ar->FlushCache();
+    ar->Close();
+    delete ar;
 
+    if (nlevels > 6)
+    {
+        int min = nlevels - 6;
+        for (int level = 0; level < min; level++)
+        {
+            FTexture2DMipMap *Mip = &Texture->PlatformData->Mips[level];
+            MBB* b = (MBB*)&Mip->BulkData;
+            b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SingleUse);
+            Mip->BulkData.Lock(LOCK_READ_WRITE);
+            Mip->BulkData.Unlock();
+            b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SerializeCompressedZLIB);
+            tmp++;
+        }
+    }
+
+// another hack ... a absurd
+
+#if WITH_EDITOR
+    FArchive* readAr = IFileManager::Get().CreateFileReader(*ppath, FILEREAD_Silent);
     for (int level = 0; level < nlevels; level++)
     {
-        int lw = w >> level;
-        int lh = h >> level;
-
-        FUpdateTextureRegion2D* upd = new FUpdateTextureRegion2D(0, 0, 0, 0, lw, lh);
-
-        FUpdateTextureRegionsData* RegionData = new FUpdateTextureRegionsData;
-
-        RegionData->Texture2DResource = (FTexture2DResource*)tex->Resource;
-        RegionData->MipIndex = level;
-        RegionData->NumRegions = 1;
-        RegionData->Regions = upd;
-        RegionData->SrcPitch = lw * 4;
-        RegionData->SrcBpp = 4;
-        RegionData->SrcData = texBuffer[level];
-
-        ENQUEUE_UNIQUE_RENDER_COMMAND_ONEPARAMETER(
-            UpdateTextureRegionsData,
-            FUpdateTextureRegionsData*, RegionData, RegionData,
-            {
-                for (uint32 RegionIndex = 0; RegionIndex < RegionData->NumRegions; ++RegionIndex)
-                {
-                    int32 CurrentFirstMip = RegionData->Texture2DResource->GetCurrentFirstMip();
-                    if (RegionData->MipIndex >= CurrentFirstMip)
-                    {
-                        RHIUpdateTexture2D(
-                                           RegionData->Texture2DResource->GetTexture2DRHI(),
-                                           RegionData->MipIndex - CurrentFirstMip,
-                                           RegionData->Regions[RegionIndex],
-                                           RegionData->SrcPitch,
-                                           RegionData->SrcData
-                                           + RegionData->Regions[RegionIndex].SrcY * RegionData->SrcPitch
-                                           + RegionData->Regions[RegionIndex].SrcX * RegionData->SrcBpp
-                                           );
-                    }
-                }
-
-                FMemory::Free(RegionData->Regions);
-                FMemory::Free(RegionData->SrcData);
-                delete RegionData;
-            }
-        );
+        MBB* b = (MBB*)&Texture->PlatformData->Mips[level].BulkData;
+        readAr->AttachBulkData(tex,&Texture->PlatformData->Mips[level].BulkData);
+        b->setAr(readAr);
     }
-*/
+#endif
+
+    if (normalMap)
+    {
+        Texture->LODGroup = TEXTUREGROUP_WorldNormalMap;
+        Texture->CompressionSettings = TC_Normalmap;
+        Texture->SRGB = false;
+    }
+    else
+    {
+        Texture->LODGroup = TEXTUREGROUP_World;
+        Texture->CompressionSettings = TC_Default;
+        Texture->SRGB = true;
+    }
+
+    return Texture;
 }
+
+

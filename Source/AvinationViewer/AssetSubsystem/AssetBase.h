@@ -3,6 +3,30 @@
 #pragma once
 DECLARE_DELEGATE(ProcessDelegate)
 
+struct AssetID
+{
+    FGuid ID;
+    int32_t extraID;
+
+    AssetID()
+    {
+        ID = FGuid();
+        extraID = 0;
+    }
+
+    AssetID(FGuid id)
+    {
+        ID = id;
+        extraID = 0;
+    }
+
+    AssetID(FGuid id, int32_t extraid)
+    {
+        ID = id;
+        extraID = extraid;
+    }
+};
+
 /**
  * 
  */
