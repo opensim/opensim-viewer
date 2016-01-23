@@ -263,7 +263,9 @@ void AssetCache::Tick()
     
     queueLock.Lock();
     
-    if (queues[QueueNumber::Dispatch].Num())
+    int numDispatches = 5;
+    
+    while (numDispatches && queues[QueueNumber::Dispatch].Num())
     {
         TSharedAssetFetchContainerRef fetch = queues[QueueNumber::Dispatch][0];
         
@@ -300,11 +302,12 @@ void AssetCache::Tick()
         queueLock.Unlock();
         
         fetch->Dispatch(dispatches);
+    
+        --numDispatches;
+        
+        queueLock.Lock();
     }
-    else
-    {
-        queueLock.Unlock();
-    }
+    queueLock.Unlock();
 }
 
 void TemplateInstantiator()
