@@ -64,27 +64,6 @@ AssetCache& AssetCache::GetTexCache()
 template<typename T>
 void AssetCache::Fetch(FGuid id, AssetFetchedDelegate delegate)
 {
-    FString sid = id.ToString(EGuidFormats::DigitsWithHyphens).ToLower();
-    FString ppath = FPaths::GameDir();
-    
-    ppath = FPaths::Combine(*ppath, TEXT("cache/"),*sid);
-    FPaths::MakeStandardFilename(ppath);
-
-    if (IFileManager::Get().FileExists(*ppath))
-    {
-        TSharedAssetFetchContainerRef cachedAsset = MakeShareable(new AssetFetchContainer(id, MakeShareable(new T())));
-    
-        if (cachedAsset->asset->GetFromCache(*ppath))
-        {
-            Enqueue(cachedAsset, QueueNumber::Decode);
-            
-            if (!AddCallbackIfEnqueued(id, delegate))
-                return;
-            
-            StartRequests();
-        }
-    }
-    
     FScopeLock l(&queueLock);
     
     if (memCache.Contains(id))
@@ -95,6 +74,30 @@ void AssetCache::Fetch(FGuid id, AssetFetchedDelegate delegate)
         StartRequests();
         
         return;
+    }
+    
+    if (!queueIndex.Contains(id))
+    {
+        FString sid = id.ToString(EGuidFormats::DigitsWithHyphens).ToLower();
+        FString ppath = FPaths::GameDir();
+        
+        ppath = FPaths::Combine(*ppath, TEXT("cache/"),*sid);
+        FPaths::MakeStandardFilename(ppath);
+
+        if (IFileManager::Get().FileExists(*ppath))
+        {
+            TSharedAssetFetchContainerRef cachedAsset = MakeShareable(new AssetFetchContainer(id, MakeShareable(new T())));
+        
+            if (cachedAsset->asset->GetFromCache(*ppath))
+            {
+                Enqueue(cachedAsset, QueueNumber::Decode);
+                
+                if (!AddCallbackIfEnqueued(id, delegate))
+                    return;
+                
+                StartRequests();
+            }
+        }
     }
     
     TSharedAssetFetchContainerRef container = MakeShareable(new AssetFetchContainer(id, MakeShareable(new T())));
