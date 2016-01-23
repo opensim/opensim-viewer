@@ -260,6 +260,15 @@ UTexture2D* TextureAsset::CreateTexture()
         return nullptr;
     }
 
+    *ar << sid;
+    *ar << nlevels;
+    *ar << w;
+    *ar << h;
+    int pixelFormat = (int)EPixelFormat::PF_B8G8R8A8;
+    *ar << pixelFormat;
+    *ar << normalMap;
+    *ar << hasAlpha;
+
     Texture->PlatformData = new FTexturePlatformData();
     Texture->PlatformData->SizeX = w;
     Texture->PlatformData->SizeY = h;
@@ -268,7 +277,7 @@ UTexture2D* TextureAsset::CreateTexture()
     Texture->bForceMiplevelsToBeResident = false;
     Texture->bIsStreamable = true;
 
-    int tmp = 0;
+
     for (int level = 0; level < nlevels; level++)
     {
         int lw = w >> level;
@@ -287,7 +296,6 @@ UTexture2D* TextureAsset::CreateTexture()
         b->SetFilename(ppath);
         b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SerializeCompressedZLIB);
         Mip->BulkData.Serialize(*ar,0);
-        tmp = 0;
     }
 
     ar->FlushCache();
@@ -305,7 +313,6 @@ UTexture2D* TextureAsset::CreateTexture()
             Mip->BulkData.Lock(LOCK_READ_WRITE);
             Mip->BulkData.Unlock();
             b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SerializeCompressedZLIB);
-            tmp++;
         }
     }
 
@@ -346,7 +353,7 @@ bool TextureAsset::GetFromCache(const TCHAR *file)
     decode.BindRaw(this, &TextureAsset::LoadFromFile, sfile);
     preProcess.Unbind();
     mainProcess.Unbind();
-    postProcess.Unbind();
+    postProcess.BindRaw(this, &TextureAsset::PostProcess);
     
     // Returning true here simply means that we support loading from file for this
     // asset type
@@ -355,5 +362,107 @@ bool TextureAsset::GetFromCache(const TCHAR *file)
 
 void TextureAsset::LoadFromFile(FString file)
 {
-    
+    //    UE_LOG(LogTemp, Warning, TEXT("%s"), *ppath);
+    FString sid;
+
+    FArchive* ar = IFileManager::Get().CreateFileReader(*file);
+    if(!ar)
+    {
+        state = AssetBase::Failed;
+        return;
+    }
+
+    ar->ArIsLoading = true;
+    ar->ArIsPersistent = true;
+ 
+    *ar << sid;
+    // name needs to be unique or previus is deleted
+    // and fails because delete needs gamethread
+    int rn = FMath::RandRange(100000, 999999);
+    sid = sid + "-r" + FString::FromInt(rn);
+    tex = nullptr;
+    tex = NewObject<UTexture2D>(GetTransientPackage(), *sid, RF_Standalone | RF_Public);
+
+    if (!tex)
+    {
+        state = AssetBase::Failed;
+        return;
+    }
+
+    int pixelFormat;
+    bool normalMap;
+
+    *ar << nlevels;
+    *ar << w;
+    *ar << h;
+    *ar << pixelFormat;
+    *ar << normalMap;
+    *ar << hasAlpha;
+
+    tex->PlatformData = new FTexturePlatformData();
+    tex->PlatformData->SizeX = w;
+    tex->PlatformData->SizeY = h;
+    tex->PlatformData->PixelFormat = (EPixelFormat) pixelFormat;
+    tex->PlatformData->NumSlices = 1;
+
+    tex->bForceMiplevelsToBeResident = false;
+    tex->bIsStreamable = true;
+
+    int minloadlevel = 0;
+    if (nlevels > 6)
+        minloadlevel = nlevels - 6;
+
+    for (int level = 0; level < nlevels; level++)
+    {
+        int lw = w >> level;
+        int lh = h >> level;
+
+        FTexture2DMipMap *Mip = new FTexture2DMipMap();
+        Mip->SizeX = lw;
+        Mip->SizeY = lh;
+        // we should avoid this load and delete
+        // possible cloning the serializer
+        Mip->BulkData.Serialize(*ar, 0);
+        tex->PlatformData->Mips.Add(Mip);
+        MBB* b = (MBB*)&Mip->BulkData;
+        b->SetFilename(file); // not in serialize
+        if (level < minloadlevel)
+        {
+            b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SingleUse);
+            Mip->BulkData.Lock(LOCK_READ_WRITE);
+            Mip->BulkData.Unlock();
+        }
+        b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SerializeCompressedZLIB);
+    }
+
+
+#if WITH_EDITOR
+    ar->ArIsLoading = false;
+    ar->Seek(0);
+    for (int level = 0; level < nlevels; level++)
+    {
+        MBB* b = (MBB*)&tex->PlatformData->Mips[level].BulkData;
+        ar->AttachBulkData(tex, &tex->PlatformData->Mips[level].BulkData);
+        b->setAr(ar);
+    }
+#else
+    ar->Close();
+    delete ar;
+#endif
+
+    if (normalMap)
+    {
+        tex->LODGroup = TEXTUREGROUP_WorldNormalMap;
+        tex->CompressionSettings = TC_Normalmap;
+        tex->SRGB = false;
+    }
+    else
+    {
+        tex->LODGroup = TEXTUREGROUP_World;
+        tex->CompressionSettings = TC_Default;
+        tex->SRGB = true;
+    }
+
+    nlevels = 0; // so not to try to free them
 }
+
