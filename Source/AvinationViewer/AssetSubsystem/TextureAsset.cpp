@@ -37,16 +37,7 @@ TextureAsset::~TextureAsset()
     if (image)
         opj_image_destroy(image);
     image = 0;
-    if (nlevels > 0)
-    {
-        for (int i = 0; i < nlevels; i++)
-        {
-            if (texBuffer[i])
-                FMemory::Free(texBuffer[i]);
-            texBuffer[i] = nullptr;
-        }
-    }
-    texBuffer.Empty();
+
 }
 
 void TextureAsset::DecodeImage()
@@ -224,6 +215,18 @@ void TextureAsset::Process()
     tex = TextureAsset::CreateTexture();
     if (tex == nullptr)
         state = AssetBase::Failed;
+
+    if (nlevels > 0)
+    {
+        for (int i = 0; i < nlevels; i++)
+        {
+            if (texBuffer[i])
+                FMemory::Free(texBuffer[i]);
+            texBuffer[i] = nullptr;
+        }
+    }
+    texBuffer.Empty();
+    nlevels = 0;
 }
 
 void TextureAsset::PostProcess()
@@ -457,7 +460,6 @@ void TextureAsset::LoadFromFile(FString file)
         tex->CompressionSettings = TC_Default;
         tex->SRGB = true;
     }
-
-    nlevels = 0; // so not to try to free them
+    nlevels = 0;
 }
 
