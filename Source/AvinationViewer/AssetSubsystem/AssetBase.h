@@ -22,7 +22,7 @@ public:
     
 	AssetBase();
 	virtual ~AssetBase();
-    
+    virtual bool GetFromCache(const TCHAR *file);
     void inline SetFailed() { if (stageData.IsValid()) stageData->Empty(); state = AssetState::Failed; }
     
     ProcessDelegate decode; // On dedicated thread

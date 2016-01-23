@@ -16,7 +16,7 @@ public:
     UTexture2D *tex = 0;
     bool hasAlpha = false;
 
-    
+    bool GetFromCache(const TCHAR *file) override;
 private:
 
     UTexture2D *baseTexture;
@@ -26,6 +26,8 @@ private:
     void Process();
     void PostProcess();
 
+    void LoadFromFile();
+    
     UTexture2D* CreateTexture();
     
     int w, h;

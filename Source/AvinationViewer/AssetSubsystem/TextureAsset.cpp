@@ -236,10 +236,11 @@ void TextureAsset::PostProcess()
     tex->AddToRoot();
 
 }
+
 UTexture2D* TextureAsset::CreateTexture()
 {
     bool normalMap = false;
-    FString sid = id.ToString();
+    FString sid = id.ToString(EGuidFormats::DigitsWithHyphens).ToLower();
     FString ppath = FPaths::GameDir();
 
     ppath = FPaths::Combine(*ppath, TEXT("cache/"),*sid);
@@ -336,4 +337,21 @@ UTexture2D* TextureAsset::CreateTexture()
     return Texture;
 }
 
+bool TextureAsset::GetFromCache(const TCHAR *file)
+{
+    // Bend the pointers so the texture is pulled from cache instead of decoding from
+    // network
+    decode.BindRaw(this, &TextureAsset::LoadFromFile);
+    preProcess.Unbind();
+    mainProcess.Unbind();
+    postProcess.Unbind();
+    
+    // Returning true here simply means that we support loading from file for this
+    // asset type
+    return true;
+}
 
+void TextureAsset::LoadFromFile()
+{
+    
+}

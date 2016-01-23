@@ -23,3 +23,8 @@ void AssetBase::Decode()
     stageData->Empty();
     stageData->Append(dec.AsBase64DecodeArray());
 }
+
+bool AssetBase::GetFromCache(const TCHAR *file)
+{
+    return false;
+}

@@ -28,6 +28,9 @@ AssetCache::AssetCache()
 {
     decodeThread = new AssetDecodeThread(this);
     processThread = new AssetProcessThread(this);
+    
+    //FString ppath = FPaths::GameDir();
+    //UE_LOG(LogTemp, Warning, TEXT("Game dir is %s"), *ppath);
 }
 
 AssetCache::~AssetCache()
@@ -61,6 +64,27 @@ AssetCache& AssetCache::GetTexCache()
 template<typename T>
 void AssetCache::Fetch(FGuid id, AssetFetchedDelegate delegate)
 {
+    FString sid = id.ToString(EGuidFormats::DigitsWithHyphens).ToLower();
+    FString ppath = FPaths::GameDir();
+    
+    ppath = FPaths::Combine(*ppath, TEXT("cache/"),*sid);
+    FPaths::MakeStandardFilename(ppath);
+
+    if (IFileManager::Get().FileExists(*ppath))
+    {
+        TSharedAssetFetchContainerRef cachedAsset = MakeShareable(new AssetFetchContainer(id, MakeShareable(new T())));
+    
+        if (cachedAsset->asset->GetFromCache(*ppath))
+        {
+            Enqueue(cachedAsset, QueueNumber::Decode);
+            
+            if (!AddCallbackIfEnqueued(id, delegate))
+                return;
+            
+            StartRequests();
+        }
+    }
+    
     FScopeLock l(&queueLock);
     
     if (memCache.Contains(id))
