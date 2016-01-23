@@ -376,10 +376,7 @@ void TextureAsset::LoadFromFile(FString file)
     ar->ArIsPersistent = true;
  
     *ar << sid;
-    // name needs to be unique or previus is deleted
-    // and fails because delete needs gamethread
-    int rn = FMath::RandRange(100000, 999999);
-    sid = sid + "-r" + FString::FromInt(rn);
+ 
     tex = nullptr;
     tex = NewObject<UTexture2D>(GetTransientPackage(), *sid, RF_Standalone | RF_Public);
 
