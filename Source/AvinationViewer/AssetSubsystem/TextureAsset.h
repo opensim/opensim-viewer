@@ -26,7 +26,7 @@ private:
     void Process();
     void PostProcess();
 
-    void LoadFromFile();
+    void LoadFromFile(FString file);
     
     UTexture2D* CreateTexture();
     

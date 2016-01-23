@@ -341,7 +341,9 @@ bool TextureAsset::GetFromCache(const TCHAR *file)
 {
     // Bend the pointers so the texture is pulled from cache instead of decoding from
     // network
-    decode.BindRaw(this, &TextureAsset::LoadFromFile);
+    FString sfile = file;
+    
+    decode.BindRaw(this, &TextureAsset::LoadFromFile, sfile);
     preProcess.Unbind();
     mainProcess.Unbind();
     postProcess.Unbind();
@@ -351,7 +353,7 @@ bool TextureAsset::GetFromCache(const TCHAR *file)
     return true;
 }
 
-void TextureAsset::LoadFromFile()
+void TextureAsset::LoadFromFile(FString file)
 {
     
 }
