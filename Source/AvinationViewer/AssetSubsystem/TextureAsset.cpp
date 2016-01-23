@@ -432,19 +432,17 @@ void TextureAsset::LoadFromFile(FString file)
         b->SetBulkDataFlags(EBulkDataFlags::BULKDATA_SerializeCompressedZLIB);
     }
 
+    ar->Close();
+    delete ar;
 
 #if WITH_EDITOR
-    ar->ArIsLoading = false;
-    ar->Seek(0);
+    FArchive* readAr = IFileManager::Get().CreateFileReader(*file, FILEREAD_Silent);
     for (int level = 0; level < nlevels; level++)
     {
         MBB* b = (MBB*)&tex->PlatformData->Mips[level].BulkData;
-        ar->AttachBulkData(tex, &tex->PlatformData->Mips[level].BulkData);
-        b->setAr(ar);
+        readAr->AttachBulkData(tex, &tex->PlatformData->Mips[level].BulkData);
+        b->setAr(readAr);
     }
-#else
-    ar->Close();
-    delete ar;
 #endif
 
     if (normalMap)
