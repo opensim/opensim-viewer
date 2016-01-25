@@ -13,12 +13,15 @@ FWhioPlatformFile::~FWhioPlatformFile()
 
 bool FWhioPlatformFile::ShouldBeUsed(IPlatformFile* Inner, const TCHAR* CmdLine) const
 {
+    // Does this ever get called?
 	return true;
 }
 
 bool FWhioPlatformFile::Initialize(IPlatformFile* Inner, const TCHAR* CommandLineParam)
 {
-	return false;
+    LowerLevel = Inner;
+    gamePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(*FPaths::GameDir(), TEXT("cache")));
+	return true;
 }
 
 bool FWhioPlatformFile::Mount(const TCHAR* InWhioFilename, uint32 PakOrder, const TCHAR* InPath)
@@ -34,41 +37,42 @@ bool FWhioPlatformFile::Unmount(const TCHAR* InWhioFilename)
 // BEGIN IPlatformFile Interface
 bool FWhioPlatformFile::FileExists(const TCHAR* Filename)
 {
-	return false;
+    return LowerLevel->FileExists(Filename);
 }
 
 int64 FWhioPlatformFile::FileSize(const TCHAR* Filename)
 {
-	return 0;
+    return LowerLevel->FileSize(Filename);
 }
 
 bool FWhioPlatformFile::DeleteFile(const TCHAR* Filename)
 {
-	return false;
+    return LowerLevel->DeleteFile(Filename);
 }
 
 bool FWhioPlatformFile::IsReadOnly(const TCHAR* Filename)
 {
-	return false;
+    return LowerLevel->IsReadOnly(Filename);
 }
 
 bool FWhioPlatformFile::MoveFile(const TCHAR* To, const TCHAR* From)
 {
-	return false;
+    return LowerLevel->MoveFile(To, From);
 }
 
 bool FWhioPlatformFile::SetReadOnly(const TCHAR* Filename, bool bNewReadOnlyValue)
 {
-	return false;
+    return LowerLevel->SetReadOnly(Filename, bNewReadOnlyValue);
 }
 
 FDateTime FWhioPlatformFile::GetTimeStamp(const TCHAR* Filename)
 {
-	return FDateTime();
+    return LowerLevel->GetTimeStamp(Filename);
 }
 
 void FWhioPlatformFile::SetTimeStamp(const TCHAR* Filename, FDateTime DateTime)
 {
+    LowerLevel->SetTimeStamp(Filename, DateTime);
 }
 
 FDateTime FWhioPlatformFile::GetAccessTimeStamp(const TCHAR* Filename)
@@ -78,67 +82,70 @@ FDateTime FWhioPlatformFile::GetAccessTimeStamp(const TCHAR* Filename)
 
 FString FWhioPlatformFile::GetFilenameOnDisk(const TCHAR* Filename)
 {
-	return FString();
+    return LowerLevel->GetFilenameOnDisk(Filename);
 }
 
 IFileHandle* FWhioPlatformFile::OpenRead(const TCHAR* Filename, bool bAllowWrite)
 {
-	return 0;
+    //if (FPaths::ConvertRelativePathToFull(FString(Filename)).StartsWith(gamePath))
+    //UE_LOG(LogTemp, Warning, TEXT("OpenRead %s"), *FPaths::ConvertRelativePathToFull(FString(Filename)));
+    return LowerLevel->OpenRead(Filename, bAllowWrite);
+
 }
 
 IFileHandle* FWhioPlatformFile::OpenWrite(const TCHAR* Filename, bool bAppend, bool bAllowRead)
 {
-	return 0;
+    return LowerLevel->OpenWrite(Filename, bAppend, bAllowRead);
 }
 
 bool FWhioPlatformFile::DirectoryExists(const TCHAR* Directory)
 {
-	return false;
+    return LowerLevel->DirectoryExists(Directory);
 }
 
 bool FWhioPlatformFile::CreateDirectory(const TCHAR* Directory)
 {
-	return false;
+    return LowerLevel->CreateDirectory(Directory);
 }
 
 bool FWhioPlatformFile::DeleteDirectory(const TCHAR* Directory)
 {
-	return false;
+    return LowerLevel->DeleteDirectory(Directory);
 }
 
 bool FWhioPlatformFile::IterateDirectory(const TCHAR* Directory, IPlatformFile::FDirectoryVisitor& Visitor)
 {
-	return false;
+    return LowerLevel->IterateDirectory(Directory, Visitor);
 }
 
 bool FWhioPlatformFile::IterateDirectoryRecursively(const TCHAR* Directory, IPlatformFile::FDirectoryVisitor& Visitor)
 {
-	return false;
+    return LowerLevel->IterateDirectoryRecursively(Directory, Visitor);
 }
 
 bool FWhioPlatformFile::DeleteDirectoryRecursively(const TCHAR* Directory)
 {
-	return false;
+    return LowerLevel->DeleteDirectoryRecursively(Directory);
 }
 
 bool FWhioPlatformFile::CreateDirectoryTree(const TCHAR* Directory)
 {
-	return false;
+    return LowerLevel->CreateDirectoryTree(Directory);
 }
 
 bool FWhioPlatformFile::CopyFile(const TCHAR* To, const TCHAR* From)
 {
-	return false;
+    return LowerLevel->CopyFile(To, From);
 }
 
 FString FWhioPlatformFile::ConvertToAbsolutePathForExternalAppForRead(const TCHAR* Filename)
 {
-	return FString();
+    return LowerLevel->ConvertToAbsolutePathForExternalAppForRead(Filename);
 }
 
 FString FWhioPlatformFile::ConvertToAbsolutePathForExternalAppForWrite(const TCHAR* Filename)
 {
-	return FString();
+    return LowerLevel->ConvertToAbsolutePathForExternalAppForWrite(Filename);
 }
 
 // END IPlatformFile Interface

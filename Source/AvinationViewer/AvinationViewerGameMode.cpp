@@ -20,6 +20,7 @@
 #include "AssetSubsystem/PrimAsset.h"
 #include "AssetSubsystem/TextureAsset.h"
 #include "AvnCharacter.h"
+#include "DiskSubsystem/IPlatformFileWhio.h"
 
 //#define ONE_OBJECT_TEST
 
@@ -60,6 +61,12 @@ void AAvinationViewerGameMode::HandleMatchHasStarted()
     Super::HandleMatchHasStarted();
     //delete &AssetCache::Get();
     //delete &TextureCache::Get();
+    
+    IPlatformFile& inner = FPlatformFileManager::Get().GetPlatformFile();
+    
+    FWhioPlatformFile *whio = new FWhioPlatformFile();
+    whio->Initialize(&inner, TEXT(""));
+    FPlatformFileManager::Get().SetPlatformFile(*whio);
     
     if (creator)
         delete creator;

@@ -1,6 +1,6 @@
 #pragma once
 
-AVINATIONVIEWER_API DECLARE_LOG_CATEGORY_EXTERN(LogWhio, Log, All);
+//AVINATIONVIEWER_API DECLARE_LOG_CATEGORY_EXTERN(LogWhio, Log, All);
 
 /**
  * Platform file wrapper to be able to use whio files.
@@ -9,7 +9,8 @@ class AVINATIONVIEWER_API FWhioPlatformFile : public IPlatformFile
 {
 	/** Wrapped file */
 	IPlatformFile* LowerLevel;
-
+    FString gamePath;
+    
 public:
 
 	static const TCHAR* GetTypeName()
