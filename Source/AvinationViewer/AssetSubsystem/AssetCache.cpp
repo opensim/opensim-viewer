@@ -96,6 +96,8 @@ void AssetCache::Fetch(FGuid id, AssetFetchedDelegate delegate)
                     return;
                 
                 StartRequests();
+                
+                return;
             }
         }
     }
