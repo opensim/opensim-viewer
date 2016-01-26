@@ -12,7 +12,7 @@ asset_decode_exception::asset_decode_exception(const char *d)
     data = d;
 }
 
-const char *asset_decode_exception::what() const noexcept
+const char *asset_decode_exception::what() const NOEXCEPT
 {
     return "asset_decode_exception";
 }

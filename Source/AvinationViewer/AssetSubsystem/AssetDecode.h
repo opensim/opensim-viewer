@@ -6,12 +6,17 @@
 /**
  * 
  */
+#ifndef _MSC_VER
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif
 
 class asset_decode_exception : public std::exception
 {
 public:
     asset_decode_exception(const char *d);
-    virtual const char *what() const noexcept override;
+    virtual const char *what() const NOEXCEPT override;
     const char *data;
 };
 
