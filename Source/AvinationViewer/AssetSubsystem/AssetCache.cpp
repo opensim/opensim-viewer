@@ -165,12 +165,16 @@ void AssetCache::RequestDone(FHttpRequestPtr request, FHttpResponsePtr response,
             container->asset->state = AssetBase::Failed;
             MoveToQueue(container, QueueNumber::Dispatch);
         }
+
+        TArray<uint8_t> *dataArray = new TArray<uint8_t>();
+
+        *dataArray = response->GetContent();
+
         // Valid response
-        TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data(new TArray<uint8_t>());
-        data->Append((const uint8_t *)response->GetContent().GetData(), response->GetContent().Num());
-      
+        TSharedPtr<TArray<uint8_t>, ESPMode::ThreadSafe> data(dataArray);
+
         container->asset->stageData = data;
-        
+
         MoveToQueue(container, QueueNumber::Decode);
     }
     else
