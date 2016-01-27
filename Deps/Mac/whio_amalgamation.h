@@ -7854,7 +7854,7 @@ extern "C" {
        WHIO_UDB_MAGIC_STRING is the "magic bytes" string for a whio_udb
        data device.
     */
-#define WHIO_UDB_MAGIC_STRING "whio_udb:format version="WHIO_UDB_FORMAT_VERSION":WHIO_SIZE_T_BITS="WHIO_UDB_MAGIC_STRING_BIT_INFO
+#define WHIO_UDB_MAGIC_STRING "whio_udb:format version=20100315:WHIO_SIZE_T_BITS=32"
 
     /**
        The whio_udb_funcs encapsulates the various client-specified

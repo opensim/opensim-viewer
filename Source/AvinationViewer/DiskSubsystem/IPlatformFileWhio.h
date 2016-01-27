@@ -1,5 +1,10 @@
 #pragma once
 
+extern "C"
+{
+#include "whio_amalgamation.h"
+}
+
 //AVINATIONVIEWER_API DECLARE_LOG_CATEGORY_EXTERN(LogWhio, Log, All);
 
 /**
