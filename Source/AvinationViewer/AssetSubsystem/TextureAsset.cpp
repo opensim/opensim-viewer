@@ -251,7 +251,18 @@ UTexture2D* TextureAsset::CreateTexture()
 
 //    UE_LOG(LogTemp, Warning, TEXT("%s"), *ppath);
 
-    FArchive* ar = IFileManager::Get().CreateFileWriter(*ppath);
+    FArchive* ar = 0;
+    
+    bool retried = false;
+    
+    do
+    {
+        ar = IFileManager::Get().CreateFileWriter(*ppath);
+        if (!ar && retried)
+            return 0;
+        retried = true;
+    } while (!ar);
+    
     ar->ArIsSaving = true;
     ar->ArIsPersistent = true;
 
