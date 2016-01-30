@@ -160,7 +160,7 @@ void TextureAsset::Process()
     {
         texBuffer[nlevels] = new uint8_t[sw * sh]; // reducion will be by 2x2 so number of components included
 
-        uint8_t *dest = texBuffer[nlevels];
+        dest = texBuffer[nlevels];
         uint8_t *src = texBuffer[nlevels - 1];
 
         unsigned int *destline;
