@@ -160,7 +160,7 @@ void TextureAsset::Process()
     {
         texBuffer[nlevels] = new uint8_t[sw * sh]; // reducion will be by 2x2 so number of components included
 
-        uint8_t *dest = texBuffer[nlevels];
+        dest = texBuffer[nlevels];
         uint8_t *src = texBuffer[nlevels - 1];
 
         unsigned int *destline;
@@ -251,7 +251,18 @@ UTexture2D* TextureAsset::CreateTexture()
 
 //    UE_LOG(LogTemp, Warning, TEXT("%s"), *ppath);
 
-    FArchive* ar = IFileManager::Get().CreateFileWriter(*ppath);
+    FArchive* ar = 0;
+    
+    bool retried = false;
+    
+    do
+    {
+        ar = IFileManager::Get().CreateFileWriter(*ppath);
+        if (!ar && retried)
+            return 0;
+        retried = true;
+    } while (!ar);
+    
     ar->ArIsSaving = true;
     ar->ArIsPersistent = true;
 
