@@ -41,10 +41,14 @@ public class AvinationViewer : ModuleRules
 		}
 		else if ( Target.Platform == UnrealTargetPlatform.Linux )
 		{
+			var linuxdeps = Path.Combine(depsPath,"Linux");
+			PublicIncludePaths.Add(linuxdeps);
 			PublicAdditionalLibraries.Add("/lib/libz");
 			PublicAdditionalLibraries.Add("/usr/lib64/libopenjp2.so");
+			PublicAdditionalLibraries.Add(Path.Combine(linuxdeps,"libwhio_amalgamation.a"));
 			PublicIncludePaths.Add("/usr/include");
-			PublicIncludePaths.Add("/usr/include/openjpeg-2.1");	
+			PublicIncludePaths.Add("/usr/include/openjpeg-2.1");
+			
 		} 
 		else if ( Target.Platform == UnrealTargetPlatform.Mac )
 		{
