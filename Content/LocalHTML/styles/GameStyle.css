@@ -1,0 +1,41 @@
+body {
+	background-color: #101010;
+	color: red;
+	font-family: Verdana,Arial,Helvetica;
+}
+
+body#loading_screen div {
+	width: 100%;
+	height: 100%;
+	line-height: 100vh;
+	text-align: center;
+	font-size: 48pt;
+}
+
+body#epic_fail > div {
+	width: 100%;
+	height: 100%;
+	text-align: center;
+}
+
+body#epic_fail > div > div {
+	display: inline-block;
+	margin-top: 30vh;
+}
+
+body#epic_fail > div > div h1 {
+	font-size: 48pt;
+}
+
+body#logo_screen > div {
+	text-align: center;
+	height: 100%;
+	display: flex;
+}
+
+body#logo_screen > div > div {
+	margin: auto auto;
+}
+
+body#logo_screen img {
+}

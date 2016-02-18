@@ -1,9 +1,17 @@
 <html>
 <head>
+	<link rel="stylesheet" href="styles/GameStyle.css" />
 </head>
-<body>
-<input type="button" value="Start" onClick="blu_event('level', 'DynamicMap');" /><br />
-<input type="button" value="Options" onClick="blu_event('options', '');" /><br />
-<input type="button" value="Exit" onClick="blu_event('exit', '');" /><br />
+<body id="logo_screen">
+<div>
+<div>
+<img src="images/AVNLogo.png" />
+</div>
+</div>
+<script type="text/javascript">
+setTimeout(function() {
+	blu_event("LoadUrl", "blui://Content/LocalHTML/Unreal.html");
+}, 4000);
+</script>
 </body>
 </html>
