@@ -164,6 +164,16 @@ void FWhioPlatformFile::HandleUnmountCommand(const TCHAR* Cmd, FOutputDevice& Ar
 {
 }
 
+FFileStatData FWhioPlatformFile::GetStatData(const TCHAR* FilenameOrDirectory)
+{
+    return LowerLevel->GetStatData(FilenameOrDirectory);
+}
+
+bool FWhioPlatformFile::IterateDirectoryStat(const TCHAR* Directory, FDirectoryStatVisitor& Visitor)
+{
+    return LowerLevel->IterateDirectoryStat(Directory, Visitor);
+}
+
 #endif
 // END Console commands
 

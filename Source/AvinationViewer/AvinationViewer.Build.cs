@@ -8,7 +8,7 @@ public class AvinationViewer : ModuleRules
 {
 	public AvinationViewer(TargetInfo Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ProceduralMeshComponent", "HTTP", "XmlParser", "RHI", "RenderCore", "UMG", "Slate", "SlateCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ProceduralMeshComponent", "HTTP", "XmlParser", "RHI", "RenderCore", "UMG", "Slate", "SlateCore", "Json" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

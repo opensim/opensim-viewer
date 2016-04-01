@@ -74,6 +74,8 @@ public:
 	virtual bool CopyFile(const TCHAR* To, const TCHAR* From) override;
 	FString ConvertToAbsolutePathForExternalAppForRead(const TCHAR* Filename) override;
 	FString ConvertToAbsolutePathForExternalAppForWrite(const TCHAR* Filename) override;
+    virtual FFileStatData GetStatData(const TCHAR* FilenameOrDirectory) override;
+    virtual bool IterateDirectoryStat(const TCHAR* Directory, FDirectoryStatVisitor& Visitor) override;
 	// END IPlatformFile Interface
 
 	// BEGIN Console commands

@@ -3,6 +3,7 @@
 #pragma once
 #include "AssetBase.h"
 #include "SharedPointer.h"
+#include "Http.h"
 
 DECLARE_DELEGATE_TwoParams(AssetFetchedDelegate, FGuid, TSharedAssetRef)
 

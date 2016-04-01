@@ -25,12 +25,17 @@ public:
     UFUNCTION(BlueprintCallable, Category = "LoginScreen")
     void LoadStartPage();
     
+    UFUNCTION(BlueprintCallable, Category = "LoginScreen")
+    void BeginLogin(FString firstName, FString lastName, FString password);
     virtual void HandleMatchIsWaitingToStart() override;
     virtual void HandleMatchHasStarted() override;
     
 private:
     void RequestDone(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
+    void LoginRequestDone(FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful);
     void LoadLoginScreen();
+    void RealDoConnect(TSharedRef<IHttpRequest> req);
     
     FTimerHandle loadDelayTimer;
+    FTimerHandle loginDelayTimer;
 };
