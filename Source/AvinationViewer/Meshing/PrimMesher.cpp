@@ -1585,14 +1585,15 @@ void PrimMesh::AddRot(FQuat q)
     }
 }
 
-#if VERTEX_INDEXER
-public VertexIndexer PrimMesh::GetVertexIndexer()
+/* #if VERTEX_INDEXER
+VertexIndexer PrimMesh::GetVertexIndexer()
 {
     if (viewerMode && viewerFaces.Count > 0)
         return new VertexIndexer(this);
     return null;
 }
-#endif
+endif
+*/
 
 void PrimMesh::FlipUV(FVector2D& uv)
 {
