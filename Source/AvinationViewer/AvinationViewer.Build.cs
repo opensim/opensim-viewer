@@ -30,7 +30,7 @@ using System.IO;
 
 public class AvinationViewer : ModuleRules
 {
-	public AvinationViewer(TargetInfo Target)
+	public AvinationViewer(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "ProceduralMeshComponent", "HTTP", "XmlParser", "RHI", "RenderCore", "UMG", "Slate", "SlateCore", "Json" });
 
@@ -48,7 +48,7 @@ public class AvinationViewer : ModuleRules
 		//			DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 		//		}
 		// }
-		var thisPath = Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name));
+		var thisPath = ModuleDirectory;
 		var depsPath = Path.Combine(thisPath,"..","..","Deps");
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
@@ -58,7 +58,7 @@ public class AvinationViewer : ModuleRules
 			PublicAdditionalLibraries.Add(Path.Combine(windeps,"zlibwapi.lib"));
 			PublicAdditionalLibraries.Add(Path.Combine(windeps,"openjp2.lib"));
 			PublicAdditionalLibraries.Add(Path.Combine(windeps,"whio_amalgamation.lib"));
-			UEBuildConfiguration.bForceEnableExceptions = true;
+			//Target.bForceEnableExceptions = true;
 //			PrivateIncludePathModuleNames.Add("TextureCompressor");
 //			PrivateIncludePaths.AddRange(new string[] {
 //				"Developer/Windows/WindowsTargetPlatform/Private"});

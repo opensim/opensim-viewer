@@ -29,21 +29,10 @@ using System.Collections.Generic;
 
 public class AvinationViewerTarget : TargetRules
 {
-	public AvinationViewerTarget(TargetInfo Target)
+	public AvinationViewerTarget(TargetInfo Target) : base (Target)
 	{
 		Type = TargetType.Game;
+        ExtraModuleNames.Add("AvinationViewer");
 	}
 
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.AddRange( new string[] { "AvinationViewer" } );
-	}
 }
