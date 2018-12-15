@@ -39,7 +39,7 @@ AAvnCharacter::AAvnCharacter()
   
     UCapsuleComponent* capsuleComponent = GetCapsuleComponent();
     capsuleComponent->CanCharacterStepUpOn = ECB_Yes;
-    capsuleComponent->bShouldUpdatePhysicsVolume = true;
+    //capsuleComponent->bShouldUpdatePhysicsVolume = true;
     //capsuleComponent->bCanEverAffectNavigation = false;
     capsuleComponent->bDynamicObstacle = true;
     capsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
