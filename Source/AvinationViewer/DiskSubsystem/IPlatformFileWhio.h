@@ -72,7 +72,7 @@ public:
 	virtual bool IterateDirectoryRecursively(const TCHAR* Directory, IPlatformFile::FDirectoryVisitor& Visitor) override;
 	virtual bool DeleteDirectoryRecursively(const TCHAR* Directory) override;
 	virtual bool CreateDirectoryTree(const TCHAR* Directory) override;
-	virtual bool CopyFile(const TCHAR* To, const TCHAR* From, EPlatformFileRead ReadFlags, EPlatformFileWrite WriteFlags); override;
+	virtual bool CopyFile(const TCHAR* To, const TCHAR* From, EPlatformFileRead ReadFlags, EPlatformFileWrite WriteFlags) override;
 	FString ConvertToAbsolutePathForExternalAppForRead(const TCHAR* Filename) override;
 	FString ConvertToAbsolutePathForExternalAppForWrite(const TCHAR* Filename) override;
     virtual FFileStatData GetStatData(const TCHAR* FilenameOrDirectory) override;
