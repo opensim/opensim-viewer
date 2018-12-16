@@ -52,7 +52,7 @@ public:
 	bool Unmount(const TCHAR* InWhioFilename);
 
 	// BEGIN IPlatformFile Interface
-	virtual void SetLowerLevel(IPlatformFile* NewLowerLevel)override;
+	virtual void SetLowerLevel(IPlatformFile* NewLowerLevel) override;
 	virtual bool FileExists(const TCHAR* Filename) override;
 	virtual int64 FileSize(const TCHAR* Filename) override;
 	virtual bool DeleteFile(const TCHAR* Filename) override;

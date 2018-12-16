@@ -11,6 +11,10 @@ FWhioPlatformFile::~FWhioPlatformFile()
 {
 }
 
+void FWhioPlatformFile::SetLowerLevel(IPlatformFile* NewLowerLevel)
+{
+}
+
 bool FWhioPlatformFile::ShouldBeUsed(IPlatformFile* Inner, const TCHAR* CmdLine) const
 {
     // Does this ever get called?
