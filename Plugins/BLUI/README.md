@@ -1,5 +1,71 @@
-[![release](https://img.shields.io/github/release/AaronShea/BLUI.svg?style=flat-square)](https://github.com/AaronShea/BLUI/releases)
+[![release](https://img.shields.io/github/release/getnamo/BLUI.svg?style=flat-square)](https://github.com/getnamo/BLUI/releases)
 ![BLUI-logo](https://cloud.githubusercontent.com/assets/1334174/5969395/201a1202-a7f1-11e4-98a4-12bc6793f830.png)
+
+## Getnamo Fork Notes
+
+Fork made to support small additions and changes for certain use cases.
+
+To install check out the latest releases https://github.com/getnamo/BLUI/releases and drag and drop *Plugins* folder into your project root folder
+
+### Download and Fullscreen Support
+
+Contains changes to allow downloading of files via the inbuilt browser.
+
+Updated CEF build to 3.2556 to support fullscreen videos.
+
+### Convenience Blueprints
+
+The native plugin didn't contain any self contained drag and drop examples so I've added some.
+
+![examples](https://i.imgur.com/UOCEHM8.png)
+
+### BluiWidget
+
+A user widget (UMG) blueprint which embeds a BLU texture as an image brush. Contains various utility functions to allow loading and parsing urls easily. Call ```InitBluEye``` with starting url and browser window size to start this widget. See *BluiWorldWidgetActorExample* for an example of how it's used in practice.
+
+
+### BluiWorldWidgetActorExample
+
+Encapsulated *BluiWidget* user widget in an actor. Drag and drop this actor into your scene and it will auto-spawn the required *BluTickActor* to make everything work.
+
+![example output](https://i.imgur.com/bso2ah6.png)
+
+*3 BluiWorldWIdgetActorExample actors with ```youtube.com```, ```blui ue4``` and ```local://test.html``` specified as their URL respectively*
+
+
+#### Url
+
+By default the actor will check the url for ```local://``` protocol and load local content first if detected. This should be placed inside the following directory: ```{project root}/Content/html```. NB: You can still use the vanilla ```blui://``` protocol which will load content relative to your project root.
+
+![local url](https://i.imgur.com/30hk67Z.png)
+
+*e.g. having a test.html file inside your Content/html folder*
+
+
+Basic URL validity is also tested, but you can safely ignore http:// etc. E.g. just specifying youtube.com will resolve correctly
+
+![](https://i.imgur.com/R6we4jO.png)
+
+
+If your URL isn't valid however, it will redirect the string as a search term e.g. typing a sentance or a search term.
+
+![auto-search](https://i.imgur.com/iDoXyFy.png)
+
+
+You can untick *Should Auto Search Invalid Url* to disable this behavior.
+
+#### Resize
+By default the actor has a BLUI resolution of 1000x1000, you can change this by just changing the user widget draw size.
+
+![resize](https://i.imgur.com/kB8X4I5.png)
+
+
+
+### BluTickActor
+
+Instead of ticking in your level bp, I prefer to use a simple actor to do the ticking. Other convenience blueprints may spawn this as necessary so if you use those, you don't ever need to use this directly.
+
+## //End Fork Notes
 
 ## HTML powered UI and HUD for Unreal Engine 4
 (Hit up the wiki for a quick start guide!)
@@ -25,16 +91,7 @@ Features
 
 Setting up the editor and project
 ---------------------------------------
-**Copy** the files located inside the `shipping` folder to your Unreal Engine binaries folder (such as `C:\Program Files\Unreal Engine\4.6\Engine\Binaries\Win64`)
-
-Then copy the `BLUI` folder into the "Plugins" folder within your project directory, and enable the plugin by adding:
-
-```
-PublicDependencyModuleNames.AddRange(new string[] { "Blu" });
-```
-
-To YouProject.Build.cs
-
+Then copy the `BLUI` folder into the "Plugins" folder within your **project** directory, and enable the plugin.
 
 Re-generate your project's Visual Studio file and load up the editor. Then check the plugin list to ensure it has been loaded!
 
@@ -54,20 +111,7 @@ HUD Example Blueprint
 ---------------------------------------
 Within the release, you'll find an ExampleHUD blueprint file, place this into your project's blueprints directory to try it out! (It's a simple UMG widget pre-configures to accept keyboard and mouse input, with a BluEye instance hooked up to a canvas)
 
-[A small demo project to get started!](http://bit.ly/1ODRiTO)
 
-Shipping Your Game (Windows + Linux)
+Shipping Your Game (Linux)
 ---------------------------------------
-Copy all contents of `{Windows/Linux} Shipping` into your packaged game's `GameName/Binaries/{Win64/Linux}`, these are the required files for the Chromium process.
-
-Shipping Your Game (OSX)
----------------------------------------
-Copy `ffmpegsumo.so` and `Chromium Embedded Framework`  from `Mac Shipping`  into your game's app `Contents/MacOS` folder. Then copy all content from `Resources` in `Mac Shipping` into your game's app `Contents/Resources`
-
-Then simply copy `blu_ue4_process.app` next to your game app, and ship!
-
-[Video for Shipping on OSX](http://youtu.be/yMkzinUhN2s)
-
-Videos for a little more help!
----------------------------------------
-[![YoutubeVideo](http://img.youtube.com/vi/VCPhsxd5rTE/0.jpg)](https://www.youtube.com/watch?v=VCPhsxd5rTE)
+Copy all contents of the Linux shipping files into your packaged game's `GameName/Binaries/{Linux}`, these are the required files for the Chromium process.

@@ -6,21 +6,16 @@ using System;
 public class Blu : ModuleRules
 {
 
-	private string ModulePath
-	{
-		get { return ModuleDirectory; }
-	}
-
 	private string ThirdPartyPath
 	{
-		get { return Path.GetFullPath(Path.Combine(ModulePath, "../../ThirdParty/")); }
+		get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "../../ThirdParty/")); }
 	}
 
 	private void stageFiles(String[] filesToStage)
 	{
 		foreach (var f in filesToStage)
 		{
-			RuntimeDependencies.Add(new RuntimeDependency(f));
+			RuntimeDependencies.Add(f);
 		}
 	}
 

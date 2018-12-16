@@ -1,4 +1,20 @@
 #pragma once
+#if PLATFORM_WINDOWS
+#include "WindowsHWrapper.h"
+#include "AllowWindowsPlatformTypes.h"
+#include "AllowWindowsPlatformAtomics.h"
+#endif
+#pragma push_macro("OVERRIDE")
+#undef OVERRIDE // cef headers provide their own OVERRIDE macro
+THIRD_PARTY_INCLUDES_START
+#include "include/cef_client.h"
+#include "include/cef_app.h"
+THIRD_PARTY_INCLUDES_END
+#pragma pop_macro("OVERRIDE")
+#if PLATFORM_WINDOWS
+#include "HideWindowsPlatformAtomics.h"
+#include "HideWindowsPlatformTypes.h"
+#endif
 #include "BluEye.generated.h"
 
 class BrowserClient;
@@ -46,16 +62,26 @@ enum EBluSpecialKeys
 	scrolllockkey = 145 UMETA(DisplayName = "Scroll Lock")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDownloadCompleteSignature, FString, url);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDownloadUpdatedSignature, FString, url, float, percentage);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDownloadComplete);
 
 UCLASS(ClassGroup = Blu, Blueprintable)
 class BLU_API UBluEye : public UObject
 {
-
 	GENERATED_BODY()
 
 	UBluEye(const class FObjectInitializer& PCIP);
 
 public:
+
+	//Event delegates
+	UPROPERTY(BlueprintAssignable, Category = "Blu Browser Events")
+		FDownloadCompleteSignature DownloadComplete;
+
+	UPROPERTY(BlueprintAssignable, Category = "Blu Browser Events")
+		FDownloadUpdatedSignature DownloadUpdated;
+
 	//GENERATED_UCLASS_BODY()
 
 	/** Initialize function, should be called after properties are set */
@@ -82,6 +108,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blu")
 		int32 Height;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blu")
+		bool bEnableWebGL;
+
 	/** Material that will be instanced to load UI texture into it */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blu")
 		UMaterialInterface* BaseMaterial;
@@ -90,17 +119,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Blu")
 		FName TextureParameterName = "BluTexture";
 
+	UFUNCTION(BlueprintCallable, Category = "Blu")
+		UBluEye* SetProperties(const int32 SetWidth,
+							const int32 SetHeight,
+							const bool SetIsTransparent,
+							const bool SetEnabled,
+							const bool SetWebGL,
+							const FString& SetDefaultURL,
+							const FName& SetTextureParameterName,
+							UMaterialInterface* SetBaseMaterial);
+
 	/** Get the texture data from our UI component */
 	UFUNCTION(BlueprintCallable, Category = "Blu")
 		UTexture2D* GetTexture() const;
-
-	/** 
-	* Material instance that contains texture inside it 
-	* @deprecated Please use raw texture using GetTexture method. GetMaterialInstance will be removed in the next release! 
-	*/
-	DEPRECATED(4.8, "Please use raw texture using GetTexture method. GetMaterialInstance will be removed in the next release!")
-	UFUNCTION(BlueprintCallable, Category = "Blu", meta = (DeprecatedFunction, DeprecatedNode, DeprecationMessage = "Please use raw texture using GetTexture method. GetMaterialInstance will be removed in the next release!"))
-		UMaterialInstanceDynamic* GetMaterialInstance() const;
 
 	/** Execute JS code inside the browser */
 	UFUNCTION(BlueprintCallable, Category = "Blu")
@@ -119,6 +150,26 @@ public:
 	/** Load a new URL into the browser */
 	UFUNCTION(BlueprintCallable, Category = "Blu")
 		void LoadURL(const FString& newURL);
+
+	/** Get the currently loaded URL */
+	UFUNCTION(BlueprintPure, Category = "Blu")
+		FString GetCurrentURL();
+
+	/** Trigger Zoom */
+	UFUNCTION(BlueprintCallable, Category = "Blu")
+		void SetZoom(const float scale = 1);
+
+	/** Get our zoom level */
+	UFUNCTION(BlueprintPure, Category = "Blu")
+		float GetZoom();
+
+	//Not ready yet
+	//UFUNCTION(BlueprintCallable, Category = "Blu Test")
+		void Test();
+
+	/** Download a file */
+	UFUNCTION(BlueprintCallable, Category = "Blu")
+		void DownloadFile(const FString& fileUrl);
 
 	/** Trigger a LEFT click in the browser via a Vector2D */
 	UFUNCTION(BlueprintCallable, Category = "Blu")
@@ -221,6 +272,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Blu")
 		UTexture2D* ResizeBrowser(const int32 NewWidth, const int32 NewHeight);
 
+	//This cropping function doesn't work atm
+	//UFUNCTION(BlueprintCallable, Category = "Blu")
+		UTexture2D* CropWindow(const int32 Y, const int32 X, const int32 NewWidth, const int32 NewHeight);
+
 	CefRefPtr<CefBrowser> browser;
 
 	void TextureUpdate(const void* buffer, FUpdateTextureRegion2D * updateRegions, uint32  regionCount);
@@ -244,7 +299,9 @@ public:
 		void processKeyMods(FInputEvent InKey);
 
 		// Store UI state in this UTexture2D
+		UPROPERTY()
 		UTexture2D* Texture;
+
 		UMaterialInstanceDynamic* MaterialInstance;
 
 		CefMouseEvent mouse_event;
@@ -254,4 +311,100 @@ public:
 
 		FBluTextureParams RenderParams;
 
+};
+class RenderHandler : public CefRenderHandler
+{
+	public:
+		UBluEye* parentUI;
+
+		int32 Width;
+		int32 Height;
+
+		// CefRenderHandler interface
+		bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
+
+		void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
+
+		RenderHandler(int32 width, int32 height, UBluEye* ui);
+
+		// CefBase interface
+		// NOTE: Must be at bottom
+	public:
+		IMPLEMENT_REFCOUNTING(RenderHandler)
+};
+
+// for manual render handler
+class BrowserClient : public CefClient, public CefLifeSpanHandler, public CefDownloadHandler, public CefDisplayHandler
+{
+
+	private:
+		FScriptEvent* event_emitter;
+		CefRefPtr<RenderHandler> m_renderHandler;
+
+		// For lifespan
+		CefRefPtr<CefBrowser> m_Browser;
+		int m_BrowserId;
+		bool m_bIsClosing;
+
+	public:
+		BrowserClient(RenderHandler* renderHandler) : m_renderHandler(renderHandler)
+		{
+		
+		};
+
+		virtual CefRefPtr<CefRenderHandler> GetRenderHandler() 
+		{
+			return m_renderHandler;
+		};
+
+		// Getter for renderer
+		virtual CefRefPtr<RenderHandler> GetRenderHandlerCustom()
+		{
+			return m_renderHandler;
+		};
+
+		// Getter for lifespan
+		virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override
+		{
+			return this;
+		}
+
+		virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
+		void SetEventEmitter(FScriptEvent* emitter);
+
+		//CefDownloadHandler
+		virtual void OnBeforeDownload(
+			CefRefPtr<CefBrowser> browser,
+			CefRefPtr<CefDownloadItem> download_item,
+			const CefString& suggested_name,
+			CefRefPtr<CefBeforeDownloadCallback> callback) override;
+
+		virtual void OnDownloadUpdated(
+			CefRefPtr<CefBrowser> browser,
+			CefRefPtr<CefDownloadItem> download_item,
+			CefRefPtr<CefDownloadItemCallback> callback) override;
+
+		//CefLifeSpanHandler
+		virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser,
+			CefRefPtr<CefFrame> frame,
+			const CefString& target_url,
+			const CefString& target_frame_name,
+			WindowOpenDisposition target_disposition,
+			bool user_gesture,
+			const CefPopupFeatures& popupFeatures,
+			CefWindowInfo& windowInfo,
+			CefRefPtr<CefClient>& client,
+			CefBrowserSettings& settings,
+			bool* no_javascript_access) override
+		{
+			return false;
+		}
+
+		// Lifespan methods
+		void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
+		void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
+
+		// NOTE: Must be at bottom
+	public:
+		IMPLEMENT_REFCOUNTING(BrowserClient)
 };
