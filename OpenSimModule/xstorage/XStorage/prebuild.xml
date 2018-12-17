@@ -1,0 +1,44 @@
+   <Project frameworkVersion="v4_0" name="XStorage.Module" path="addon-modules/XStorage/Module" type="Library">
+     <Configuration name="Debug">
+       <Options>
+         <OutputPath>../../../bin/</OutputPath>
+       </Options>
+     </Configuration>
+     <Configuration name="Release">
+       <Options>
+         <OutputPath>../../../bin/</OutputPath>
+       </Options>
+     </Configuration>
+
+     <ReferencePath>../../../bin/</ReferencePath>
+     <Reference name="System" localCopy="false"/>
+     <Reference name="System.Xml"/>
+     <Reference name="System.Drawing"/>
+     <Reference name="System.Runtime.Remoting"/>
+     <Reference name="OpenMetaverseTypes"/>
+     <Reference name="OpenMetaverse"/>
+     <Reference name="Axiom.MathLib"/>
+     <Reference name="OpenSim.Framework"/>
+     <Reference name="OpenSim.Data" />
+     <Reference name="OpenSim.Data.MySQL" />
+     <Reference name="OpenSim.Region.Framework" />
+     <Reference name="OpenSim.Framework.Console"/>
+     <Reference name="OpenSim.Framework.Servers.HttpServer"/>
+     <Reference name="OpenSim.Framework.Statistics"/>
+     <Reference name="OpenSim.Framework.Communications"/>
+     <Reference name="OpenSim.Region.PhysicsModules.SharedBase"/>
+     <Reference name="OpenSim.Services.Interfaces"/>
+     <Reference name="OpenSim.Server.Base"/>
+     <Reference name="OpenSim.Region.Physics.Manager"/>
+     <Reference name="System.Data" />
+     <Reference name="Mono.Addins" />
+     <Reference name="MySql.Data" />
+     <Reference name="Nini" />
+     <Reference name="log4net"/>
+     <Reference name="XMLRPC"/>
+
+     <Files>
+       <Match pattern="*.cs" recurse="true"/>
+       <Match buildAction="EmbeddedResource" path="Resources" pattern="*.migrations"/>
+     </Files>
+   </Project>
