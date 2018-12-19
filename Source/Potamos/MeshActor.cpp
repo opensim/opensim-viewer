@@ -95,81 +95,84 @@ bool AMeshActor::Load(rapidxml::xml_node<> *data)
 
 void AMeshActor::ObjectReady()
 {
-    ClearInstanceComponents(true);
+    OnObjectReady.ExecuteIfBound(this);
+}
 
-    USceneComponent *rootComponent = nullptr;
-  
-    SceneObjectPart *sop = sog->GetRootPart();
-    FString rootName = TEXT("r-");
-    rootName += *sop->uuid.ToString();
+void AMeshActor::BuildObject()
+{
+	ClearInstanceComponents(true);
 
-    // create a component that will hold parts, and other action components
-    // its scale will only be changed on operations that scale all sog
-    // its position  and rotation is the sog one
-    rootComponent = NewObject<USceneComponent>(this, *rootName);
-    SetRootComponent(rootComponent);
+	USceneComponent *rootComponent = nullptr;
 
-    bool ShouldCollide = !sop->isPhantom;
+	SceneObjectPart *sop = sog->GetRootPart();
+	FString rootName = TEXT("r-");
+	rootName += *sop->uuid.ToString();
 
-    // sog absolute position and rotation from root part
-    FVector p = sop->position * 100;
-    RootComponent->SetWorldLocationAndRotation(p, sop->rotation);
-    RootComponent->SetWorldScale3D(FVector(1.0f));
+	// create a component that will hold parts, and other action components
+	// its scale will only be changed on operations that scale all sog
+	// its position  and rotation is the sog one
+	rootComponent = NewObject<USceneComponent>(this, *rootName);
+	SetRootComponent(rootComponent);
 
-    UProceduralMeshComponent *mesh = BuildComponent(sop);
-    sop->DeleteMeshData();
-    bool notphysical = !sop->isPhysical;
+	bool ShouldCollide = !sop->isPhantom;
 
-    mesh->AttachTo(RootComponent);
-    // root part relative position and rotation should always be null
-    // unless explicitly changed (as in edit parts on root prim)
-    mesh->SetRelativeLocation(FVector(0.0f));
-    mesh->SetWorldScale3D(sog->GetRootPart()->scale);
+	// sog absolute position and rotation from root part
+	FVector p = sop->position * 100;
+	RootComponent->SetWorldLocationAndRotation(p, sop->rotation);
+	RootComponent->SetWorldScale3D(FVector(1.0f));
 
-    if (notphysical)
-    {
-        mesh->Mobility = EComponentMobility::Static;
-    }
-    //    if (ShouldCollide)
+	UProceduralMeshComponent *mesh = BuildComponent(sop);
+	sop->DeleteMeshData();
+	bool notphysical = !sop->isPhysical;
+
+	mesh->AttachTo(RootComponent);
+	// root part relative position and rotation should always be null
+	// unless explicitly changed (as in edit parts on root prim)
+	mesh->SetRelativeLocation(FVector(0.0f));
+	mesh->SetWorldScale3D(sog->GetRootPart()->scale);
+
+	if (notphysical)
+	{
+		mesh->Mobility = EComponentMobility::Static;
+	}
+	//    if (ShouldCollide)
 //    {
 //        mesh->SetCollisionProfileName(TEXT("WorldStatic"));
 //        mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 //    }
-    int index = 0;
-    
-    TArray<SceneObjectBase *> parts = sog->GetParts();
-    
-    for (auto it = parts.CreateConstIterator() ; it ; ++it)
-    {
-        sop = (SceneObjectPart *)(*it);
-        
-        // Skip root part
-        if (index > 0)
-        {
-            UProceduralMeshComponent *subMesh = BuildComponent(sop);
-            sop->DeleteMeshData();
+	int index = 0;
 
-            //subMesh->AttachParent = mesh;
-            subMesh->AttachTo(RootComponent);
-            subMesh->SetWorldScale3D(sop->scale);
-            p = sop->position * 100;
-            subMesh->SetRelativeLocationAndRotation(p, sop->rotation);
-//            if (ShouldCollide && sop->ShouldColide)
-//            {
-//                mesh->SetCollisionProfileName(TEXT("WorldStatic"));
-//                mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-//            }
-            if (notphysical)
-            {
-                mesh->Mobility = EComponentMobility::Static;
+	TArray<SceneObjectBase *> parts = sog->GetParts();
 
-            }
-        }
-        
-        ++index;
-    }
-    
-    OnObjectReady.ExecuteIfBound(this);
+	for (auto it = parts.CreateConstIterator(); it; ++it)
+	{
+		sop = (SceneObjectPart *)(*it);
+
+		// Skip root part
+		if (index > 0)
+		{
+			UProceduralMeshComponent *subMesh = BuildComponent(sop);
+			sop->DeleteMeshData();
+
+			//subMesh->AttachParent = mesh;
+			subMesh->AttachTo(RootComponent);
+			subMesh->SetWorldScale3D(sop->scale);
+			p = sop->position * 100;
+			subMesh->SetRelativeLocationAndRotation(p, sop->rotation);
+			//            if (ShouldCollide && sop->ShouldColide)
+			//            {
+			//                mesh->SetCollisionProfileName(TEXT("WorldStatic"));
+			//                mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			//            }
+			if (notphysical)
+			{
+				mesh->Mobility = EComponentMobility::Static;
+
+			}
+		}
+
+		++index;
+	}
 }
 
 void AMeshActor::RegisterComponents()

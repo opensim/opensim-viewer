@@ -1,4 +1,4 @@
-   <Project frameworkVersion="v4_0" name="XStorage.Module" path="addon-modules/XStorage/Module" type="Library">
+   <Project frameworkVersion="v4_6" name="XStorage.Module" path="addon-modules/XStorage/Module" type="Library">
      <Configuration name="Debug">
        <Options>
          <OutputPath>../../../bin/</OutputPath>

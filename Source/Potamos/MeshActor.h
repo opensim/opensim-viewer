@@ -52,6 +52,7 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
     bool Load(rapidxml::xml_node<> *data);
+	void BuildObject();
     void RegisterComponents();
     void GotTexture(FGuid id, TSharedAssetRef asset, UProceduralMeshComponent *mesh, int index, TextureEntry *te);
     SceneObjectGroup *sog;

@@ -220,15 +220,20 @@ bool ObjectCreator::Init()
 
 uint32_t ObjectCreator::Run()
 {
+	UE_LOG(LogGameMode, Warning, TEXT("Made it here"));
+
 #ifndef ONE_OBJECT_TEST
-    const char *path = "/tmp/UnrealViewerData/primsback.xml";
+    const char *path = "/tmp/UnrealViewerData/primsload.xml";
     
     struct stat st;
     if (stat(path, &st) < 0)
     {
-        path = "/UnRealViewer/primsback.xml";
-        if (stat(path, &st) < 0)
-            return 0;
+        path = "/UnRealViewer/primsload.xml";
+		if (stat(path, &st) < 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Scene XML not found"));
+			return 0;
+		}
     }
     int fd = open(path, O_RDONLY);
     
@@ -318,6 +323,7 @@ void ObjectCreator::TickPool()
         ready.RemoveAt(0);
         readyLock.Unlock();
         
+		act->BuildObject();
         act->SetActorHiddenInGame(false);
         act->SetActorLocationAndRotation(act->sog->GetRootPart()->groupPosition * 100, act->sog->GetRootPart()->rotation);
         act->RegisterComponents();
