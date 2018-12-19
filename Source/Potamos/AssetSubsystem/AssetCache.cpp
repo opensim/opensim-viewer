@@ -249,12 +249,12 @@ bool inline AssetCache::MoveToQueue(TSharedAssetFetchContainerRef fetch, int que
 
 FString inline AssetCache::CreateURL(FGuid id)
 {
-    FString url(TEXT("http://grid-a.3dhosting.de:8400/assets/"));
+    FString url(TEXT("http://localhost:9000/assets/"));
     
-    if (id.A > 0x7f000000)
-    {
-        url = TEXT("http://grid-b.3dhosting.de:8400/assets/");
-    }
+//    if (id.A > 0x7f000000)
+//    {
+//        url = TEXT("http://grid-b.3dhosting.de:8400/assets/");
+//    }
     
     url.Append(id.ToString(EGuidFormats::DigitsWithHyphens).ToLower());
 

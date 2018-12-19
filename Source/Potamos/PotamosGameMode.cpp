@@ -221,12 +221,12 @@ bool ObjectCreator::Init()
 uint32_t ObjectCreator::Run()
 {
 #ifndef ONE_OBJECT_TEST
-    const char *path = "/Users/melanie/UnrealViewerData/primsback.xml";
+    const char *path = "/tmp/UnrealViewerData/primsback.xml";
     
     struct stat st;
     if (stat(path, &st) < 0)
     {
-        path = "/Avination/UnRealViewer/primsback.xml";
+        path = "/UnRealViewer/primsback.xml";
         if (stat(path, &st) < 0)
             return 0;
     }
