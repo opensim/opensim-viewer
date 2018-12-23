@@ -1,0 +1,7 @@
+!Texture
+Id: 48ef94dd-937c-496d-9cfe-fb65a13d76a0
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../../Resources/Textures/silver/silver_mtl.png
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}

@@ -1,0 +1,50 @@
+!MaterialAsset
+Id: a20b338a-37d7-4282-94db-6d5724eb38c1
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Attributes:
+    MicroSurface: !MaterialGlossinessMapFeature
+        GlossinessMap: !ComputeBinaryScalar
+            Operator: Add
+            LeftChild: !ComputeTextureScalar
+                Texture: ddc6470b-0d83-47e1-8bc4-78d8fb8c0abc:Materials/iron_rust_blend/iron_mtl
+                FallbackValue:
+                    Value: 1.0
+                Scale: {X: 1.0, Y: 1.0}
+                Offset: {X: 0.0, Y: 0.0}
+            RightChild: !ComputeFloat
+                Value: 0.5
+    Diffuse: !MaterialDiffuseMapFeature
+        DiffuseMap: !ComputeTextureColor
+            Texture: 09a913c3-46c6-4a60-9a38-8fd9a01031e4:Materials/iron_rust_blend/iron_dif
+            FallbackValue:
+                Value: {R: 1.0, G: 1.0, B: 1.0, A: 1.0}
+            Scale: {X: 1.0, Y: 1.0}
+            Offset: {X: 0.0, Y: 0.0}
+            Swizzle: null
+    DiffuseModel: !MaterialDiffuseLambertModelFeature {}
+    Specular: !MaterialMetalnessMapFeature
+        MetalnessMap: !ComputeTextureScalar
+            Texture: ddc6470b-0d83-47e1-8bc4-78d8fb8c0abc:Materials/iron_rust_blend/iron_mtl
+            FallbackValue:
+                Value: 1.0
+            Scale: {X: 1.0, Y: 1.0}
+            Offset: {X: 0.0, Y: 0.0}
+    SpecularModel: !MaterialSpecularMicrofacetModelFeature
+        Fresnel: !MaterialSpecularMicrofacetFresnelSchlick {}
+        Visibility: !MaterialSpecularMicrofacetVisibilitySmithSchlickGGX {}
+        NormalDistribution: !MaterialSpecularMicrofacetNormalDistributionGGX {}
+        Environment: !MaterialSpecularMicrofacetEnvironmentGGXLUT {}
+    Overrides:
+        UVScale: {X: 1.0, Y: 1.0}
+Layers:
+    0748ba3effd7b74bb9ce7be7f4d60de0:
+        Material: d7d58217-e69b-475e-8053-034729537755:Materials/iron_rust_blend/iron_rust
+        BlendMap: !ComputeTextureScalar
+            Texture: a12c704e-80af-4939-8a3e-de750b07973f:Materials/iron_rust_blend/rust_msk
+            FallbackValue:
+                Value: 1.0
+            Scale: {X: 1.0, Y: 1.0}
+            Offset: {X: 0.0, Y: 0.0}
+        Overrides:
+            UVScale: {X: 1.0, Y: 1.0}

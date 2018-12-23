@@ -1,0 +1,6 @@
+!Texture
+Id: 37edc741-403a-4657-9604-d835a840508a
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../../Resources/Textures/rooftile/rooftile_AO.png
+Type: !GrayscaleTextureType {}

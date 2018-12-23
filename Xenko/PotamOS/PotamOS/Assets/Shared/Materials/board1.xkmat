@@ -1,0 +1,58 @@
+!MaterialAsset
+Id: 3d6f9ed0-e5f4-4e7f-a90a-61899e58a330
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Attributes:
+    Surface: !MaterialNormalMapFeature
+        NormalMap: !ComputeBinaryColor
+            Operator: Multiply
+            LeftChild: !ComputeTextureColor
+                Texture: 3eb373b1-ccc3-419e-8019-cea471e7940a:Textures/wood_table_tex_Nml_2
+                FallbackValue:
+                    Value: {R: 1.0, G: 1.0, B: 1.0, A: 1.0}
+                Scale: {X: 1.0, Y: 1.0}
+                Offset: {X: 0.0, Y: 0.0}
+                Swizzle: null
+            RightChild: !ComputeFloat4
+                Value: {X: 0.015, Y: 0.015, Z: 1.0, W: 1.0}
+        ScaleAndBias: false
+        IsXYNormal: true
+    MicroSurface: !MaterialGlossinessMapFeature
+        GlossinessMap: !ComputeBinaryScalar
+            Operator: Multiply
+            LeftChild: !ComputeTextureScalar
+                Texture: f837227f-e8cf-46af-a9b1-4fe53f1fea29:Textures/wood_table_tex_Spe_2
+                FallbackValue:
+                    Value: 1.0
+                Scale: {X: 1.0, Y: 1.0}
+                Offset: {X: 0.0, Y: 0.0}
+            RightChild: !ComputeFloat
+                Value: 0.25
+        Invert: true
+    Diffuse: !MaterialDiffuseMapFeature
+        DiffuseMap: !ComputeTextureColor
+            Texture: 2c85cc8b-1174-4b76-bdfc-54a8a98454d8:Textures/wood_table_tex_Col
+            FallbackValue:
+                Value: {R: 1.0, G: 1.0, B: 1.0, A: 1.0}
+            Scale: {X: 1.0, Y: 1.0}
+            Offset: {X: 0.0, Y: 0.0}
+            Swizzle: null
+    DiffuseModel: !MaterialDiffuseLambertModelFeature {}
+    Specular: !MaterialSpecularMapFeature
+        SpecularMap: !ComputeTextureColor
+            Texture: f837227f-e8cf-46af-a9b1-4fe53f1fea29:Textures/wood_table_tex_Spe_2
+            FallbackValue:
+                Value: {R: 1.0, G: 1.0, B: 1.0, A: 1.0}
+            Scale: {X: 1.0, Y: 1.0}
+            Offset: {X: 0.0, Y: 0.0}
+            Swizzle: null
+        Intensity: !ComputeFloat
+            Value: 0.3
+    SpecularModel: !MaterialSpecularMicrofacetModelFeature
+        Fresnel: !MaterialSpecularMicrofacetFresnelSchlick {}
+        Visibility: !MaterialSpecularMicrofacetVisibilitySmithSchlickGGX {}
+        NormalDistribution: !MaterialSpecularMicrofacetNormalDistributionGGX {}
+        Environment: !MaterialSpecularMicrofacetEnvironmentGGXLUT {}
+    Overrides:
+        UVScale: {X: 1.0, Y: 1.0}
+Layers: {}

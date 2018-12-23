@@ -1,0 +1,22 @@
+!PrefabAsset
+Id: cacf6c79-9f2c-4929-ae06-986931e4386d
+SerializedVersion: {Xenko: 3.1.0.1}
+Tags: []
+Hierarchy:
+    RootParts:
+        - ref!! c69dc21e-3c8b-4947-8dde-1debc662b3a5
+    Parts:
+        -   Entity:
+                Id: c69dc21e-3c8b-4947-8dde-1debc662b3a5
+                Name: plateA
+                Components:
+                    07b7bb3d4f3f4b44af2681be4ace8a52: !TransformComponent
+                        Id: 3dbbb707-3f4f-444b-af26-81be4ace8a52
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 2.0, Y: 2.0, Z: 2.0}
+                        Children: {}
+                    cafe792bb0f47d41b06ddb7be69b43b5: !ModelComponent
+                        Id: 2b79feca-f4b0-417d-b06d-db7be69b43b5
+                        Model: 91a393a6-3c73-4c61-acca-a3924f9e1608:Models/plateA
+                        Materials: {}

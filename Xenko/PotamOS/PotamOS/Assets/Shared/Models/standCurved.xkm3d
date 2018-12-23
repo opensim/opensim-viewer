@@ -1,0 +1,13 @@
+!Model
+Id: dc6226b0-d49c-48ed-af6f-a5c986f9e0ce
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../Resources/Stand/standCurved.fbx
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    e274a7dc94edc1896586423665864236:
+        Name: blinn1
+        MaterialInstance:
+            Material: affa72ab-b874-4df9-b971-5ebb0ea8ac55:Materials/PolishedStone
+Modifiers: {}

@@ -1,0 +1,7 @@
+!Texture
+Id: 3b0a041d-80eb-4d33-a081-f6b26d4a37ea
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../../Resources/Textures/marble/marble_gls.png
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}

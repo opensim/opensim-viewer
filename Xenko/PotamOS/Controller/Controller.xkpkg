@@ -1,0 +1,27 @@
+!Package
+Id: 6e76a1a3-6740-4799-a090-4e74401761c9
+SerializedVersion: {Assets: 0.0.4}
+Meta:
+    Name: Controller
+    Version: 1.0.0.0
+    Authors: []
+    Owners: []
+    Dependencies:
+        -   Name: Xenko
+            Version: 3.0.0.6
+            RootAssets: []
+LocalDependencies: []
+Profiles:
+    -   Name: Shared
+        Platform: Shared
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Shared
+        ResourceFolders:
+            - Resources
+        OutputGroupDirectories: {}
+        ProjectReferences: []
+ExplicitFolders: []
+Bundles: []
+TemplateFolders: []
+RootAssets: []

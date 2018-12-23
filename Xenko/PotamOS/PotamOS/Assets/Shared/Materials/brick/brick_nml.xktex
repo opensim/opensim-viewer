@@ -1,0 +1,6 @@
+!Texture
+Id: bb3dfe60-2be9-4f8d-8861-a9cc28c85fbb
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../../Resources/Textures/brick/brick_nml.png
+Type: !NormalMapTextureType {}

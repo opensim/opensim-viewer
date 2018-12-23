@@ -1,0 +1,51 @@
+!Package
+Id: 093db923-6dc1-48c9-8787-09fa910bc1d8
+SerializedVersion: {Assets: 0.0.4}
+Meta:
+    Name: PotamOS
+    Version: 1.0.0.0
+    Authors: []
+    Owners: []
+    RootNamespace: PotamOS
+    Dependencies:
+        -   Name: Xenko
+            Version: 3.0.0.6
+            RootAssets: []
+LocalDependencies: []
+Profiles:
+    -   Name: Shared
+        Platform: Shared
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Shared
+            -   Path: PotamOS.Game/Effects
+        ResourceFolders:
+            - Resources
+        OutputGroupDirectories: {}
+        ProjectReferences:
+            -   Id: 663b8435-deba-4a63-8162-6e47e73af4f7
+                Location: PotamOS.Game/PotamOS.Game.csproj
+                Type: Library
+    -   Name: Windows
+        Platform: Windows
+        InheritProfiles: []
+        AssetFolders:
+            -   Path: Assets/Windows
+        ResourceFolders: []
+        OutputGroupDirectories: {}
+        ProjectReferences:
+            -   Id: 1eaf8191-edeb-4873-9c26-eca5aab45d77
+                Location: PotamOS.Windows/PotamOS.Windows.csproj
+                Type: Executable
+ExplicitFolders: []
+Bundles: []
+TemplateFolders: []
+RootAssets:
+    - 0c98a7ad-080d-461f-a926-37b97d5e63c8:Textures/PotamOSLogo
+    - 1fb666c1-63b6-4569-8023-73a875eeebf4:SplashScene
+    - 209fe4b4-cd29-4fdc-bd85-ed2058e4a9cc:DynamicScene
+    - 50065c6b-ca58-4f9d-842f-982619f09e62:Materials/PotamusLogo
+    - 624d0a2a-6a0d-4221-9c3d-9d95f7a0c8df:Cube Material
+    - 892ada6c-928a-40a5-afaf-becfbefc4f9d:UI/SplashPage
+    - b1405704-ddbb-4640-b288-327887ba34a3:Materials/silver/silver
+    - f3da68ca-8e9e-40dc-ad9f-eff456d67baf:Models/Cube_2

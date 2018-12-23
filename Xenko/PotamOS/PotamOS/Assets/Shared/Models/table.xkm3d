@@ -1,0 +1,21 @@
+!Model
+Id: 9896ea6a-9f8a-4c5e-98a2-73d6455ed6c7
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../Resources/Models/table.fbx
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    0303d2fe323802f6323802f6323802f6:
+        Name: pole
+        MaterialInstance:
+            Material: 3d6f9ed0-e5f4-4e7f-a90a-61899e58a330:Materials/board1
+    a3b76aad37d511efb4aea277b4aea277:
+        Name: partsA1
+        MaterialInstance:
+            Material: 3d6f9ed0-e5f4-4e7f-a90a-61899e58a330:Materials/board1
+    c0d612c9f00932374c5a75564c5a7556:
+        Name: board1
+        MaterialInstance:
+            Material: 3d6f9ed0-e5f4-4e7f-a90a-61899e58a330:Materials/board1
+Modifiers: {}

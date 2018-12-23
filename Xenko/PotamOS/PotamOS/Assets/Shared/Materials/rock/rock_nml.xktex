@@ -1,0 +1,6 @@
+!Texture
+Id: f4c8980d-04b2-4fad-b091-fd25a884e65d
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../../Resources/Textures/rock/rock_nml.png
+Type: !NormalMapTextureType {}

@@ -1,0 +1,50 @@
+!SceneAsset
+Id: 7d831df9-a2d4-42f1-a3ca-2ad9ea1ae2b5
+SerializedVersion: {Xenko: 3.1.0.1}
+Tags: []
+ChildrenIds:
+    - 1fb666c1-63b6-4569-8023-73a875eeebf4
+    - 209fe4b4-cd29-4fdc-bd85-ed2058e4a9cc
+Offset: {X: 0.0, Y: 0.0, Z: 0.0}
+Hierarchy:
+    RootParts:
+        - ref!! 32f9805e-892b-495a-9634-8c943b682a02
+        - ref!! 6791d012-e98b-46ea-94f7-62ec431176a2
+    Parts:
+        -   Entity:
+                Id: 32f9805e-892b-495a-9634-8c943b682a02
+                Name: Main
+                Components:
+                    b08155d3224530ca2ba088ec500d85ac: !TransformComponent
+                        Id: e00ea48f-57ca-4683-a665-a50e5bab7636
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    8fd38f66e0478f53955e5b0438cfd855: !PotamOS.SceneControl,PotamOS.Game
+                        Id: bcdb208d-c911-4281-9ae9-a2fcc4db4e88
+                        Url: null
+                        ServerUrl: null
+        -   Entity:
+                Id: 6791d012-e98b-46ea-94f7-62ec431176a2
+                Name: Camera
+                Components:
+                    7493c93ca52c9be59613d60cd7da27dd: !TransformComponent
+                        Id: eca2d3af-62d8-4b48-a992-65f9b371895e
+                        Position: {X: 2.6, Y: 0.6, Z: -1.0}
+                        Rotation: {X: 0.0, Y: 0.829037547, Z: 0.0, W: 0.5591929}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    7c26b306c1b2323bcbc125070f90bdee: !CameraComponent
+                        Id: 411542dc-3d84-453c-9dc1-9a67e8837cf1
+                        Name: null
+                        Projection: Perspective
+                        Slot: 355987cd-bdfc-47fc-a9b0-5e7163301e95
+                    21c99b5a5be775573af64811221c761c: !PotamOS.BasicCameraController,PotamOS.Game
+                        Id: 78cdbe3b-f408-481b-84a4-a3bc18676669
+                        KeyboardMovementSpeed: {X: 5.0, Y: 5.0, Z: 5.0}
+                        TouchMovementSpeed: {X: 40.0, Y: 40.0, Z: 20.0}
+                        SpeedFactor: 5.0
+                        KeyboardRotationSpeed: {X: 3.0, Y: 3.0}
+                        MouseRotationSpeed: {X: 90.0, Y: 60.0}
+                        TouchRotationSpeed: {X: 60.0, Y: 40.0}

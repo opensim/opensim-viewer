@@ -1,0 +1,17 @@
+!Model
+Id: 3ac2a424-a709-4646-a8ca-683c5027ce2c
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../Resources/Models/XenkoCrate.fbx
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    e60b5b1aec04dfad5b137e381df5f2e1:
+        Name: XenkoLogo
+        MaterialInstance:
+            Material: 7c254f00-8539-42c1-995e-0c671b9aa856:Materials/LogoD
+    2c46d11775ad23c975ad23c975ad23c9:
+        Name: Fame
+        MaterialInstance:
+            Material: d23a2abc-fb17-4795-8ace-72424b8f42c2:Materials/MaskD
+Modifiers: {}

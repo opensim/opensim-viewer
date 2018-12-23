@@ -1,0 +1,117 @@
+!SceneAsset
+Id: 1fb666c1-63b6-4569-8023-73a875eeebf4
+SerializedVersion: {Xenko: 3.1.0.1}
+Tags: []
+ChildrenIds: []
+Parent: 7d831df9-a2d4-42f1-a3ca-2ad9ea1ae2b5:MainScene
+Offset: {X: 0.0, Y: 0.0, Z: 0.0}
+Hierarchy:
+    RootParts:
+        - ref!! 233734b6-ad89-4a1b-9876-96f4595cd2c8
+        - ref!! f3424ff6-7908-412e-af96-a1a9e99decb7
+        - ref!! 7e373177-f959-40f3-a425-701a9bcce232
+        - ref!! db1be68b-2e92-4892-95f3-51f5012b0f21
+        - ref!! fc1b27d8-07de-4e04-9c10-542ec0e4bedf
+        - ref!! be3c4dbb-1953-44d3-a287-4b60e5e2b402
+    Parts:
+        -   Entity:
+                Id: 233734b6-ad89-4a1b-9876-96f4595cd2c8
+                Name: Directional light
+                Components:
+                    4a7ce4d0021553cd443fe36e1d604058: !TransformComponent
+                        Id: 7dcca24a-ea3b-4786-bd95-380813bedf0a
+                        Position: {X: 0.0, Y: 2.0, Z: 0.0}
+                        Rotation: {X: 1.131334E-08, Y: -0.9659258, Z: -0.258819044, W: -4.222196E-08}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    954b60538488f9fabfa5ade12cb4cd0f: !LightComponent
+                        Id: 45eb0a62-9cb4-4df3-bc12-989074967b4d
+                        Type: !LightDirectional
+                            Color: !ColorRgbProvider
+                                Value: {R: 1.0, G: 1.0, B: 1.0}
+                            Shadow:
+                                Enabled: true
+                                Filter: !LightShadowMapFilterTypePcf
+                                    FilterSize: Filter5x5
+                                Size: Large
+                                DepthRange: {}
+                                PartitionMode: !LightDirectionalShadowMap.PartitionLogarithmic {}
+                                ComputeTransmittance: false
+                                BiasParameters: {}
+                        Intensity: 20.0
+        -   Entity:
+                Id: 7e373177-f959-40f3-a425-701a9bcce232
+                Name: Ground
+                Components:
+                    e87fa18a1ddb1777aa95af034ff4a301: !TransformComponent
+                        Id: c4494078-cde1-44c2-a191-2d3937b817ee
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    a98a5bb2dd7410e94f2695e5d593f406: !ModelComponent
+                        Id: 53e82f32-afde-4a01-a588-7d40f8de2cd2
+                        Model: 55c65f35-8261-4f37-b823-eff7e679ff87:Ground
+                        Materials: {}
+        -   Entity:
+                Id: be3c4dbb-1953-44d3-a287-4b60e5e2b402
+                Name: PrimCube
+                Components:
+                    997c11d1cd88bb287e387dc7c453d01a: !TransformComponent
+                        Id: 87318024-ba6f-493d-be71-fe2636b5d282
+                        Position: {X: 0.0, Y: 0.5, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    f2ff7f3939f3e6fba20466b4c2954b35: !ModelComponent
+                        Id: 1291dc1c-8514-4648-b962-1968ba3920de
+                        Model: f3da68ca-8e9e-40dc-ad9f-eff456d67baf:Models/Cube_2
+                        Materials: {}
+        -   Entity:
+                Id: db1be68b-2e92-4892-95f3-51f5012b0f21
+                Name: Sphere
+                Components:
+                    8b6306c88a9358dfe8035eacde7b6867: !TransformComponent
+                        Id: 05ea0f3c-b736-4d33-a905-3767e2c8c96a
+                        Position: {X: -0.588283658, Y: 0.5, Z: -1.17109215}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    6661c306a7a24948ecaf6eadcf59c19f: !ModelComponent
+                        Id: 6efeea9a-6bd3-47ea-bbdb-3145d61f0177
+                        Model: 3c2fd175-df32-4da2-a070-ea257deceef3:Sphere
+                        Materials: {}
+        -   Entity:
+                Id: f3424ff6-7908-412e-af96-a1a9e99decb7
+                Name: Skybox
+                Components:
+                    3c26bc5b79f70a32b6ca6270cdad552c: !TransformComponent
+                        Id: c8f50987-077b-4a9e-b2c2-eeca3b5363d6
+                        Position: {X: 0.0, Y: 2.0, Z: -2.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    e5d78250740552237e645f2368940b50: !BackgroundComponent
+                        Id: 3d0d1861-ce01-4195-b21a-e9b4efab70d8
+                        Texture: 508545b4-1683-41dd-85aa-441f3c09eb19:Skybox texture
+                    87999b2f5ff0b2055141922171bf636a: !LightComponent
+                        Id: 366993b9-873c-4403-bd72-e716ba9cac80
+                        Type: !LightSkybox
+                            Skybox: c0d2933e-9118-4e7c-8041-3a0388297660:Skybox
+        -   Entity:
+                Id: fc1b27d8-07de-4e04-9c10-542ec0e4bedf
+                Name: UI
+                Components:
+                    06a0e603f57d473e80d82a8e50ba0ca7: !TransformComponent
+                        Id: 84df501f-8de4-479f-8a59-9e04781aa397
+                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    512b010ee02b370fb9f15166a11645f6: !UIComponent
+                        Id: 495ee27e-86fc-47da-a1a9-9d5c539da923
+                        Page: 892ada6c-928a-40a5-afaf-becfbefc4f9d:UI/SplashPage
+                        Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
+                        Size: {X: 1.0, Y: 1.0, Z: 1.0}
+                    0a5df82cae9230dd5dde31593f67e831: !PotamOS.Address,PotamOS.Game
+                        Id: dc266dd3-6dbd-4503-bf53-09f5c029d818

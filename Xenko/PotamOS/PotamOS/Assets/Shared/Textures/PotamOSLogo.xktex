@@ -1,0 +1,7 @@
+!Texture
+Id: 0c98a7ad-080d-461f-a926-37b97d5e63c8
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: PotamOSLogo.png
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}

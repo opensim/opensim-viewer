@@ -1,0 +1,7 @@
+!Texture
+Id: 5418ca92-aa61-4ae4-a339-b4ac3e69b18c
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../../Resources/Textures/brick/brick_AO.png
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}

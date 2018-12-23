@@ -1,0 +1,7 @@
+!Texture
+Id: 94b38b32-7c21-4fc3-9b32-d1f75ed5e294
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../Resources/Textures/xenko_coin_a_occlusion.png
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}

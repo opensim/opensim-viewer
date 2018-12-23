@@ -1,0 +1,75 @@
+!UIPageAsset
+Id: 892ada6c-928a-40a5-afaf-becfbefc4f9d
+SerializedVersion: {Xenko: 2.1.0.1}
+Tags: []
+Design:
+    Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
+Hierarchy:
+    RootParts:
+        - !Grid ref!! f04e6956-ad40-40f4-a33f-6ecefafd7247
+    Parts:
+        -   UIElement: !EditText
+                Id: dbb351d3-7f26-4a8d-b993-b16c0d4eb509
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 24}
+                DrawLayerNumber: 5
+                CanBeHitByUser: true
+                Width: 930.0
+                Height: 48.0
+                VerticalAlignment: Top
+                Margin: {Left: 230.0, Top: 92.0, Right: 120.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
+                Name: AddressBar
+                Padding: {Left: 8.0, Top: 4.0, Right: 8.0, Bottom: 8.0}
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+                ActiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 3
+                InactiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 4
+                MouseOverImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 5
+                CaretColor: {R: 240, G: 240, B: 240, A: 255}
+                CaretWidth: 1.0
+                SelectionColor: {R: 240, G: 240, B: 240, A: 255}
+                IMESelectionColor: {R: 240, G: 255, B: 240, A: 255}
+                MaxLength: 1024
+                MaxLines: 1
+                CaretFrequency: 1.0
+                Text: hippo://
+        -   UIElement: !TextBlock
+                Id: e275cbab-9b13-4077-adc9-b287d2c6fd40
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 156.0
+                Height: 40.0
+                HorizontalAlignment: Left
+                VerticalAlignment: Top
+                Margin: {Left: 60.0, Top: 100.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
+                Text: Where to?
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 28, G: 22, B: 22, A: 255}
+        -   UIElement: !Grid
+                Id: f04e6956-ad40-40f4-a33f-6ecefafd7247
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 1280.0
+                Height: 642.0
+                Margin: {Bottom: 78.0}
+                Name: Grid
+                Children:
+                    8450766a357a0e9b49249ab09677f9f6: !EditText ref!! dbb351d3-7f26-4a8d-b993-b16c0d4eb509
+                    50fd4e622c33f276c3508dc142df69a1: !TextBlock ref!! e275cbab-9b13-4077-adc9-b287d2c6fd40
+                RowDefinitions: {}
+                ColumnDefinitions: {}
+                LayerDefinitions: {}

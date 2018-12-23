@@ -1,0 +1,7 @@
+!Texture
+Id: 2396bb6e-7ac8-4038-b626-922b6788e73e
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../../../Resources/Textures/rooftile/rooftile_gls.png
+Type: !ColorTextureType
+    ColorKeyColor: {R: 255, G: 0, B: 255, A: 255}

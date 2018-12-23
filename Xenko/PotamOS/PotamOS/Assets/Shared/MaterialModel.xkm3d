@@ -1,0 +1,19 @@
+!Model
+Id: d4525ef0-18ca-4a16-bafb-e3c921ba6dfc
+SerializedVersion: {Xenko: 2.0.0.0}
+Tags: []
+Source: ../../Resources/Models/MaterialModel.fbx
+Skeleton: null
+PivotPosition: {X: 0.0, Y: 0.0, Z: 0.0}
+Materials:
+    ebc0cfec026ffd470b819cfcb1ca2cbf:
+        Name: MaterialA
+        MaterialInstance:
+            Material: 80b1069d-74ea-49a9-9bee-0bed80709098:MaterialTestA
+    07d84ca53b7823d8fcdf7c46dab24576:
+        Name: MaterialB
+        MaterialInstance:
+            Material: 5ff1ff61-e209-4060-85dc-2eea91bf2c47:MaterialTestB
+Modifiers: {}
+~SourceHashes:
+    737831bc5baaf1d6938c1fe31d62878d~../../Resources/Models/MaterialModel.fbx: 2af68f6f63000a4c8b6f9af14e7d0962
