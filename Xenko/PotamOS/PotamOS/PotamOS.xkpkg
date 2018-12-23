@@ -44,8 +44,19 @@ RootAssets:
     - 0c98a7ad-080d-461f-a926-37b97d5e63c8:Textures/PotamOSLogo
     - 1fb666c1-63b6-4569-8023-73a875eeebf4:SplashScene
     - 209fe4b4-cd29-4fdc-bd85-ed2058e4a9cc:DynamicScene
+    - 3c2fd175-df32-4da2-a070-ea257deceef3:Sphere
+    - 479ca029-893f-4066-a1d2-167620d9bb87:Ground Material
     - 50065c6b-ca58-4f9d-842f-982619f09e62:Materials/PotamusLogo
+    - 508545b4-1683-41dd-85aa-441f3c09eb19:Skybox texture
+    - 51e3a67d-b555-46ed-b6f0-4faa21681fa8:StandsPrefabs/CircularStand
+    - 55c65f35-8261-4f37-b823-eff7e679ff87:Ground
     - 624d0a2a-6a0d-4221-9c3d-9d95f7a0c8df:Cube Material
+    - 67b08fb8-a4de-406a-8912-41439c6d5224:Sphere Material
+    - 7d831df9-a2d4-42f1-a3ca-2ad9ea1ae2b5:MainScene
     - 892ada6c-928a-40a5-afaf-becfbefc4f9d:UI/SplashPage
     - b1405704-ddbb-4640-b288-327887ba34a3:Materials/silver/silver
+    - b37bc9af-d57e-4c6a-9a2b-8e1de226e3c8:Models/Stand
+    - b5aa19df-6482-4cd9-8431-7586fe4e6460:Materials/DullSilver
+    - bd946240-6982-4b76-bded-020dc5776aa0:GraphicsCompositor
+    - c0d2933e-9118-4e7c-8041-3a0388297660:Skybox
     - f3da68ca-8e9e-40dc-ad9f-eff456d67baf:Models/Cube_2
