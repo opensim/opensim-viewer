@@ -42,6 +42,7 @@ Bundles: []
 TemplateFolders: []
 RootAssets:
     - 0c98a7ad-080d-461f-a926-37b97d5e63c8:Textures/PotamOSLogo
+    - 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
     - 1fb666c1-63b6-4569-8023-73a875eeebf4:SplashScene
     - 209fe4b4-cd29-4fdc-bd85-ed2058e4a9cc:DynamicScene
     - 3436cfe0-3280-4e8c-a525-d1a93246791f:Textures/metal03_gls
@@ -62,5 +63,6 @@ RootAssets:
     - b5aa19df-6482-4cd9-8431-7586fe4e6460:Materials/DullSilver
     - bd946240-6982-4b76-bded-020dc5776aa0:GraphicsCompositor
     - c0d2933e-9118-4e7c-8041-3a0388297660:Skybox
+    - c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
     - d698c940-6faf-4b56-a03c-082da04d1882:Materials/RedCoating
     - f3da68ca-8e9e-40dc-ad9f-eff456d67baf:Models/Cube_2
