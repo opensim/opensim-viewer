@@ -44,7 +44,9 @@ RootAssets:
     - 0c98a7ad-080d-461f-a926-37b97d5e63c8:Textures/PotamOSLogo
     - 1fb666c1-63b6-4569-8023-73a875eeebf4:SplashScene
     - 209fe4b4-cd29-4fdc-bd85-ed2058e4a9cc:DynamicScene
+    - 3436cfe0-3280-4e8c-a525-d1a93246791f:Textures/metal03_gls
     - 3c2fd175-df32-4da2-a070-ea257deceef3:Sphere
+    - 401f765a-eca8-4eb2-8586-0f5a9acb63ef:Textures/simple_ground_ao
     - 479ca029-893f-4066-a1d2-167620d9bb87:Ground Material
     - 50065c6b-ca58-4f9d-842f-982619f09e62:Materials/PotamusLogo
     - 508545b4-1683-41dd-85aa-441f3c09eb19:Skybox texture
@@ -54,6 +56,7 @@ RootAssets:
     - 67b08fb8-a4de-406a-8912-41439c6d5224:Sphere Material
     - 7d831df9-a2d4-42f1-a3ca-2ad9ea1ae2b5:MainScene
     - 892ada6c-928a-40a5-afaf-becfbefc4f9d:UI/SplashPage
+    - 8cdfa9c9-cdbf-46a3-b3d9-1ace5da397f4:Textures/gum01_gls
     - b1405704-ddbb-4640-b288-327887ba34a3:Materials/silver/silver
     - b37bc9af-d57e-4c6a-9a2b-8e1de226e3c8:Models/Stand
     - b5aa19df-6482-4cd9-8431-7586fe4e6460:Materials/DullSilver
