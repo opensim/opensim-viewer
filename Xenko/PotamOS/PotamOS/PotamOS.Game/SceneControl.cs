@@ -13,10 +13,11 @@ using Xenko.Core.Mathematics;
 using Xenko.Engine;
 using Xenko.Input;
 using Xenko.Physics;
+using PotamOS.Interfaces;
 
 namespace PotamOS
 {
-    public class SceneControl : SyncScript
+    public class SceneControl : SyncScript, IEngine
     {
         private Task<Scene> loadingTask;
         private CancellationTokenSource loadCancellation;
@@ -39,6 +40,22 @@ namespace PotamOS
         /// The url of the server-side currently connected to
         ///
         public string ServerUrl { get; set; }
+
+        public String Name
+        {
+            get { return "Xenko"; }
+        }
+
+        /// <summary>
+        /// The coordinate system of Xenko.
+        /// TODO: Create the right vector!!!
+        /// </summary>
+        private static readonly Vector3 WorldOrientation = new Vector3(); 
+
+        public Vector3 CoordinateSystem
+        {
+            get { return WorldOrientation; }
+        }
                 
         public override void Start()
         {

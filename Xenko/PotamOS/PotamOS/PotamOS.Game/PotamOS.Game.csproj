@@ -10,4 +10,8 @@
       <PrivateAssets>contentfiles;analyzers</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PotamOS.Interfaces\PotamOS.Interfaces.csproj" />
+  </ItemGroup>
 </Project>
