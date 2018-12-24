@@ -46,11 +46,13 @@ RootAssets:
     - 209fe4b4-cd29-4fdc-bd85-ed2058e4a9cc:DynamicScene
     - 3c2fd175-df32-4da2-a070-ea257deceef3:Sphere
     - 479ca029-893f-4066-a1d2-167620d9bb87:Ground Material
+    - 48ef94dd-937c-496d-9cfe-fb65a13d76a0:Materials/silver/silver_mtl
     - 50065c6b-ca58-4f9d-842f-982619f09e62:Materials/PotamusLogo
     - 508545b4-1683-41dd-85aa-441f3c09eb19:Skybox texture
     - 55c65f35-8261-4f37-b823-eff7e679ff87:Ground
     - 624d0a2a-6a0d-4221-9c3d-9d95f7a0c8df:Cube Material
     - 67b08fb8-a4de-406a-8912-41439c6d5224:Sphere Material
+    - 67b9ce93-4026-46d1-9edb-1f3d8b568098:Materials/silver/silver_dif
     - 7d831df9-a2d4-42f1-a3ca-2ad9ea1ae2b5:MainScene
     - 892ada6c-928a-40a5-afaf-becfbefc4f9d:UI/SplashPage
     - b1405704-ddbb-4640-b288-327887ba34a3:Materials/silver/silver
