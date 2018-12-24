@@ -19,3 +19,5 @@ Materials:
         MaterialInstance:
             Material: 97e8bbcd-8131-4f5a-9942-dbeeaab59228:Materials/board1B
 Modifiers: {}
+~SourceHashes:
+    f9dfaca05e2d207e88016ff8ff27e116~../../../Resources/Models/tableB.fbx: f4739af3b3a5eee04b8f16c84110a638

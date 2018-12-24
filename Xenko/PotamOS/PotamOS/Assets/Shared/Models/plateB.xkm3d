@@ -11,3 +11,5 @@ Materials:
         MaterialInstance:
             Material: affa72ab-b874-4df9-b971-5ebb0ea8ac55:Materials/PolishedStone
 Modifiers: {}
+~SourceHashes:
+    7afd16e9d2abdd72a160c0b3f9efbc36~../../../Resources/Stand/plateB.fbx: 884234ac026b41e915a059d7de8e9e6b

@@ -11,3 +11,5 @@ Materials:
         MaterialInstance:
             Material: 1931cbf4-241d-4d36-85e9-2a66e44d0891:Materials/marble/marble
 Modifiers: {}
+~SourceHashes:
+    c5a57c5e8d2b6113a9e162ac173a35c8~../../Resources/Models/box.fbx: 63047528a4b8c7fc888656181dd4dc07

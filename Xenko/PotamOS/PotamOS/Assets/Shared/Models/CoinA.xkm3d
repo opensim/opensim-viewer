@@ -11,3 +11,5 @@ Materials:
         MaterialInstance:
             Material: 63e70bc3-fef6-480a-9eae-e8e6a0d99db3:Materials/coin
 Modifiers: {}
+~SourceHashes:
+    fe639f7f7ecfdfc528e2489b1c4b5d06~../../../Resources/Models/XenkoCoin.fbx: f00d518ee22cd1edef712f91c53faceb

@@ -15,3 +15,5 @@ Materials:
         MaterialInstance:
             Material: c6893968-76c9-4fc8-8531-b56df6a4dbff:Materials/MaterialB
 Modifiers: {}
+~SourceHashes:
+    c13a9fc7a02cdca3be1fb480fb4fd507~../../../Resources/Models/MaterialModel.fbx: 2af68f6f63000a4c8b6f9af14e7d0962

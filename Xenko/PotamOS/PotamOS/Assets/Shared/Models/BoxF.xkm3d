@@ -15,3 +15,5 @@ Materials:
         MaterialInstance:
             Material: 8ee2bb5a-d112-4a91-8d12-2b67566b8b89:Materials/FrameA
 Modifiers: {}
+~SourceHashes:
+    e6c251c1baab4f4653c8ebdd9835f74c~../../../Resources/Models/XenkoCrate.fbx: 6e3a5526c1cdb7001c9b7ea51ac583a0

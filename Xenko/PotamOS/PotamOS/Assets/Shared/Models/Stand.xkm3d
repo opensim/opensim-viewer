@@ -15,3 +15,5 @@ Materials:
         MaterialInstance:
             Material: d698c940-6faf-4b56-a03c-082da04d1882:Materials/RedCoating
 Modifiers: {}
+~SourceHashes:
+    b70e3a87db154501f917a6bba866aa35~../../../Resources/Stand/Pd_ground.FBX: c170a2977ef51a92b83f375a71be5f26

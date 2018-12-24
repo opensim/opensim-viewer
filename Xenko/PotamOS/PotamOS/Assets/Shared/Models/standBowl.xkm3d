@@ -11,3 +11,5 @@ Materials:
         MaterialInstance:
             Material: affa72ab-b874-4df9-b971-5ebb0ea8ac55:Materials/PolishedStone
 Modifiers: {}
+~SourceHashes:
+    77b12f99aa8dbd83d3f6e67e5f38d42d~../../../Resources/Stand/standBowl.fbx: 3a9256a73afacbf5bc0852d6ae92a196

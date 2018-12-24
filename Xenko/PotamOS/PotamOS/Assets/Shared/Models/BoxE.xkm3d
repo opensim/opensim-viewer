@@ -15,3 +15,5 @@ Materials:
         MaterialInstance:
             Material: d23a2abc-fb17-4795-8ace-72424b8f42c2:Materials/MaskD
 Modifiers: {}
+~SourceHashes:
+    a49445a276f68c6908969c479af92fef~../../../Resources/Models/XenkoCrate.fbx: 6e3a5526c1cdb7001c9b7ea51ac583a0
