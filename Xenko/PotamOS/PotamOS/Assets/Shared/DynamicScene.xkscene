@@ -8,7 +8,6 @@ Offset: {X: 0.0, Y: 0.0, Z: 0.0}
 Hierarchy:
     RootParts:
         - ref!! 7b7a7def-623d-40e1-b7f8-213164ca207b
-        - ref!! e552d676-f8bb-4037-8cc4-9b11297949dd
         - ref!! 492c2d1e-f46b-4063-8ec0-968ff26226d2
     Parts:
         -   Entity:
@@ -48,13 +47,3 @@ Hierarchy:
                         Id: 1e7cba9e-8803-49ef-bea4-0373d2eaafcd
                         Model: 55c65f35-8261-4f37-b823-eff7e679ff87:Ground
                         Materials: {}
-        -   Entity:
-                Id: e552d676-f8bb-4037-8cc4-9b11297949dd
-                Name: CircularStand
-                Components:
-                    80afb4590d62f3ae7f525dffe18aeacf: !TransformComponent
-                        Id: 8621e09b-77b5-4bc7-882c-619a95655d32
-                        Position: {X: 1.0893774, Y: 0.0, Z: 2.10541677}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}

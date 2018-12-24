@@ -75,11 +75,11 @@ namespace PotamOS
             if (Url == "SplashScene")
             {
                 Url = "DynamicScene";
-                camera.Transform.Position.Z = 3.5F;
+//                camera.Transform.Position.Z = 3.5F;
             }
             else
                 Url = "SplashScene";
-                camera.Transform.Position.Z = -1F;
+//                camera.Transform.Position.Z = -1F;
         }
         
         private void LoadScene()
