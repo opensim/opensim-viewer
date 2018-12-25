@@ -77,4 +77,7 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)PotamOS.Controller.dll.config" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
