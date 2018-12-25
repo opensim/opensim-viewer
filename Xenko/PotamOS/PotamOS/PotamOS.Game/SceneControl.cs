@@ -97,7 +97,8 @@ namespace PotamOS
             if (Url == "SplashScene")
             {
                 Url = "DynamicScene";
-                //Controller.GoTo(HppoStr);
+                //                camera.Transform.Position.Z = 3.5F;
+                Controller.GoTo(HppoStr);
             }
             else
                 Url = "SplashScene";
