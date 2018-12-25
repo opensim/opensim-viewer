@@ -78,6 +78,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)PotamOS.Controller.dll.config" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)PotamOS.Controller.dll.config" "$(TargetDir)" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
