@@ -17,9 +17,6 @@ namespace PotamOS
 
         public override void Start()
         {
-            // Initialization of the script.
-            var fileWriter = new TextWriterLogListener(new FileStream("Potamos.log", FileMode.Create));
-            GlobalLogger.GlobalMessageLogged += fileWriter;
         }
     }
 }

@@ -39,8 +39,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Xenko.Core.Mathematics">
-      <HintPath>..\Deps\Xenko.Core.Mathematics.dll</HintPath>
+    <Reference Include="Xenko.Core.Mathematics, Version=3.0.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Deps\Xenko.Core.Mathematics.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

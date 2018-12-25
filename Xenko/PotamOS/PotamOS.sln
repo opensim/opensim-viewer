@@ -1,3 +1,4 @@
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.136
@@ -33,12 +34,15 @@ Global
 		Testing|Windows = Testing|Windows
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Any CPU.Build.0 = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Mixed Platforms.Build.0 = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Windows.ActiveCfg = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Windows.Build.0 = Release|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Any CPU.ActiveCfg = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Any CPU.Build.0 = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Any CPU.Deploy.0 = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Mixed Platforms.ActiveCfg = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Mixed Platforms.Build.0 = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Mixed Platforms.Deploy.0 = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Windows.ActiveCfg = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Windows.Build.0 = AppStore|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.AppStore|Windows.Deploy.0 = AppStore|Any CPU
 		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -57,18 +61,21 @@ Global
 		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Release|Windows.ActiveCfg = Release|Any CPU
 		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Release|Windows.Build.0 = Release|Any CPU
 		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Release|Windows.Deploy.0 = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Any CPU.ActiveCfg = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Any CPU.Build.0 = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Mixed Platforms.Build.0 = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Windows.ActiveCfg = Release|Any CPU
-		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Windows.Build.0 = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Any CPU.Build.0 = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Mixed Platforms.Build.0 = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Windows.ActiveCfg = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Windows.Build.0 = Release|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Any CPU.ActiveCfg = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Any CPU.Build.0 = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Any CPU.Deploy.0 = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Mixed Platforms.ActiveCfg = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Mixed Platforms.Build.0 = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Mixed Platforms.Deploy.0 = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Windows.ActiveCfg = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Windows.Build.0 = Testing|Any CPU
+		{1EAF8191-EDEB-4873-9C26-ECA5AAB45D77}.Testing|Windows.Deploy.0 = Testing|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Any CPU.ActiveCfg = AppStore|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Any CPU.Build.0 = AppStore|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Mixed Platforms.ActiveCfg = AppStore|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Mixed Platforms.Build.0 = AppStore|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Windows.ActiveCfg = AppStore|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.AppStore|Windows.Build.0 = AppStore|Any CPU
 		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -81,12 +88,12 @@ Global
 		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Release|Windows.ActiveCfg = Release|Any CPU
 		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Release|Windows.Build.0 = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Any CPU.ActiveCfg = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Any CPU.Build.0 = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Mixed Platforms.Build.0 = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Windows.ActiveCfg = Release|Any CPU
-		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Windows.Build.0 = Release|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Any CPU.ActiveCfg = Testing|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Any CPU.Build.0 = Testing|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Mixed Platforms.ActiveCfg = Testing|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Mixed Platforms.Build.0 = Testing|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Windows.ActiveCfg = Testing|Any CPU
+		{663B8435-DEBA-4A63-8162-6E47E73AF4F7}.Testing|Windows.Build.0 = Testing|Any CPU
 		{6E7B5514-8285-4497-9382-96FE71417812}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
 		{6E7B5514-8285-4497-9382-96FE71417812}.AppStore|Any CPU.Build.0 = Release|Any CPU
 		{6E7B5514-8285-4497-9382-96FE71417812}.AppStore|Mixed Platforms.ActiveCfg = Release|Any CPU

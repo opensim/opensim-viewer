@@ -5,7 +5,8 @@ New viewer for OpenSim-based worlds. Currently it uses the Xenko game engine for
 Structure:
 
 * [Controller](Controller): the brains of the viewer
-* [Xenko](Xenko): graphics frontend
 * [OpenSimModules](OpenSimModules): additional modules required on the server side
+* [Deps](Deps): external libraries needed
+* [Xenko](Xenko): graphics frontend
 
 To develop: open [Xenko/PotamOS/PotamOS.sln](Xenko/PotamOS/PotamOS.sln)

@@ -65,6 +65,7 @@ namespace PotamOS
             // Initialization of the script.
             var fileWriter = new TextWriterLogListener(new FileStream("Potamos.log", FileMode.Create));
             GlobalLogger.GlobalMessageLogged += fileWriter;
+            Log.Info("Starting");
 
             // Start the controller
             controller = new PotamOSController(this);
@@ -96,8 +97,7 @@ namespace PotamOS
             if (Url == "SplashScene")
             {
                 Url = "DynamicScene";
-                //                camera.Transform.Position.Z = 3.5F;
-                Controller.GoTo(HppoStr);
+                //Controller.GoTo(HppoStr);
             }
             else
                 Url = "SplashScene";
@@ -110,7 +110,6 @@ namespace PotamOS
             {
                 Content.Unload(Instance);
 
-                // If we were the last user, detach. Ideally scripts should cooperate differently
                 if (!Content.IsLoaded(Url))
                 {
                     Instance.Parent = null;
@@ -119,6 +118,7 @@ namespace PotamOS
                 Instance = null;
             }
 
+            Log.Info("Loading scene " + Url);
             Instance = Content.Load<Scene>(Url);
             loadingTask = Task.FromResult(Instance);
             // Once loaded, add it to the scene

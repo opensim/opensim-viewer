@@ -21,6 +21,11 @@ Hierarchy:
                         Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
                         Scale: {X: 1.0, Y: 1.0, Z: 1.0}
                         Children: {}
+                    09e0f3b8637e5157eda68ff88736728a: !PotamOS.SceneControl,PotamOS.Game
+                        Id: abdcd3e9-54a4-4d4d-9c07-759b9bbed364
+                        Url: null
+                        HppoStr: null
+                        Controller: null
         -   Entity:
                 Id: 6791d012-e98b-46ea-94f7-62ec431176a2
                 Name: Camera
@@ -36,3 +41,11 @@ Hierarchy:
                         Name: null
                         Projection: Perspective
                         Slot: 355987cd-bdfc-47fc-a9b0-5e7163301e95
+                    efcabe3a9d567e868b21ea4c83dab2c7: !PotamOS.BasicCameraController,PotamOS.Game
+                        Id: 8a58cb53-c3a5-497c-b4ae-8e52061868d8
+                        KeyboardMovementSpeed: {X: 5.0, Y: 5.0, Z: 5.0}
+                        TouchMovementSpeed: {X: 40.0, Y: 40.0, Z: 20.0}
+                        SpeedFactor: 5.0
+                        KeyboardRotationSpeed: {X: 3.0, Y: 3.0}
+                        MouseRotationSpeed: {X: 90.0, Y: 60.0}
+                        TouchRotationSpeed: {X: 60.0, Y: 40.0}

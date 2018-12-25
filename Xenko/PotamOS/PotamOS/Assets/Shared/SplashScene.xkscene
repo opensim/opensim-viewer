@@ -113,3 +113,5 @@ Hierarchy:
                         Page: 892ada6c-928a-40a5-afaf-becfbefc4f9d:UI/SplashPage
                         Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
                         Size: {X: 1.0, Y: 1.0, Z: 1.0}
+                    1309334c9bd7c42dd2a5f32d4aaf4081: !PotamOS.Address,PotamOS.Game
+                        Id: b8be82d2-b176-4863-b11e-e53c0e12799d

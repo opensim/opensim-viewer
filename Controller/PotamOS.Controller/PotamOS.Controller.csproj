@@ -31,12 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\Deps\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Deps\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Deps\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\Deps\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,10 +50,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="Xenko.Core.Mathematics, Version=3.0.0.6, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Deps\Xenko.Core.Mathematics.dll</HintPath>
+      <HintPath>..\..\Deps\Xenko.Core.Mathematics.dll</HintPath>
     </Reference>
-    <Reference Include="XMLRPC">
-      <HintPath>..\Deps\XMLRPC.dll</HintPath>
+    <Reference Include="XMLRPC, Version=1.10.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Deps\XMLRPC.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
