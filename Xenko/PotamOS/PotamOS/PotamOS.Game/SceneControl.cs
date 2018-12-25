@@ -14,13 +14,13 @@ using Xenko.Engine;
 using Xenko.Input;
 using Xenko.Physics;
 using PotamOS.Interfaces;
+using PotamOS.Controller;
 
 namespace PotamOS
 {
     public class SceneControl : SyncScript, IEngine
     {
         private Task<Scene> loadingTask;
-        private CancellationTokenSource loadCancellation;
 
         /// <summary>
         /// The loaded scene
@@ -39,7 +39,7 @@ namespace PotamOS
         ///
         /// The url of the server-side currently connected to
         ///
-        public string ServerUrl { get; set; }
+        public string HppoStr { get; set; }
 
         public String Name
         {
@@ -47,16 +47,17 @@ namespace PotamOS
         }
 
         /// <summary>
-        /// The coordinate system of Xenko.
-        /// TODO: Create the right vector!!!
+        /// The cordinate system of this engine wrt OpenSim
+        /// TODO: FIXME
         /// </summary>
-        private static readonly Vector3 WorldOrientation = new Vector3(); 
+        public Vector3 CoordinateSystem { get; } = new Vector3();
 
-        public Vector3 CoordinateSystem
+        private PotamOSController controller;
+        public PotamOSController Controller
         {
-            get { return WorldOrientation; }
+            get { return controller; }
         }
-                
+
         public override void Start()
         {
             base.Start();
@@ -64,6 +65,9 @@ namespace PotamOS
             // Initialization of the script.
             var fileWriter = new TextWriterLogListener(new FileStream("Potamos.log", FileMode.Create));
             GlobalLogger.GlobalMessageLogged += fileWriter;
+
+            // Start the controller
+            controller = new PotamOSController(this);
 
             Url = "SplashScene";
             LoadScene();
@@ -74,7 +78,7 @@ namespace PotamOS
             if (ChangeScene)
             {
                 ToggleScene();
-                Log.Info("Changing scene to " + Url + ". Current server is " + ServerUrl);
+                Log.Info("Changing scene to " + Url + ". Current server is " + HppoStr);
                 LoadScene();
                 ChangeScene = false;
             }
@@ -92,7 +96,8 @@ namespace PotamOS
             if (Url == "SplashScene")
             {
                 Url = "DynamicScene";
-//                camera.Transform.Position.Z = 3.5F;
+                //                camera.Transform.Position.Z = 3.5F;
+                Controller.GoTo(HppoStr);
             }
             else
                 Url = "SplashScene";

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\PotamOS.Controller\PotamOS.Controller.csproj" />
     <ProjectReference Include="..\..\PotamOS.Interfaces\PotamOS.Interfaces.csproj" />
   </ItemGroup>
 </Project>

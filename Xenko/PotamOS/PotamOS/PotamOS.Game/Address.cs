@@ -34,7 +34,7 @@ namespace PotamOS
 
                 Entity main = Entity.Scene.Parent.Entities.First(e => e.Name == "Main");
                 SceneControl controller = main.Get<SceneControl>();
-                controller.ServerUrl = abar.Text;
+                controller.HppoStr = abar.Text;
                 controller.ChangeScene = true;
                 
 //                new EventKey<String>("InternetLocations").Broadcast(abar.Text);
