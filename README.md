@@ -1,6 +1,11 @@
-# opensim-viewer
+# opensim-viewer (PotamOS)
 
-This viewer project, formerly known as the Avination Viewer. It started with Unreal, and we're switching to Xenko.
-The project is in an early development stage. 
+New viewer for OpenSim-based worlds. Currently it uses the Xenko game engine for rendering. See (Xenko/README.md) for the exact version.
 
-You will need Unreal Engine 4 and the Unreal Editor to do much with the Unreal frontend. And you will need Xenko to do something with the Xenko frontend.
+Structure:
+
+* (Controller): the brains of the viewer
+* (Xenko): graphics frontend
+* (OpenSimModules): additional modules required on the server side
+
+To develop: open [Xenko/PotamOS/PotamOS.sln]
