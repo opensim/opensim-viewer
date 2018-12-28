@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -20,7 +21,7 @@ namespace PotamOS.Controller.Network
         /// Caller check for null!
         /// </summary>
         /// <param name="url"></param>
-        /// <returns>Typically, html</returns>
+        /// <returns>Typically, html or xml</returns>
         public static string Get(string url)
         {
             try
@@ -41,6 +42,23 @@ namespace PotamOS.Controller.Network
             }
 
             return null;
+        }
+
+        public async static void Post(string url, Dictionary<string, string> values, Action<string> action)
+        {
+            HttpClient client = new HttpClient();
+            var content = new FormUrlEncodedContent(values);
+            
+            var response = await client.PostAsync(url, content);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                m_log.WarnFormat("[Controller]: Response from post was BadRequest");
+                return;
+            }
+
+            action(responseString);
         }
 
         /// <summary>

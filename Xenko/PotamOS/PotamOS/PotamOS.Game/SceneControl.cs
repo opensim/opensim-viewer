@@ -13,6 +13,8 @@ using Xenko.Core.Mathematics;
 using Xenko.Engine;
 using Xenko.Input;
 using Xenko.Physics;
+using Xenko.UI.Controls;
+using HtmlAgilityPack;
 using PotamOS.Interfaces;
 using PotamOS.Controller;
 
@@ -28,6 +30,14 @@ namespace PotamOS
         [DataMemberIgnore]
         public Scene Instance { get; private set; }
 
+        enum State {
+            WaitingForAddress = 0,
+            WaitingToEnter = 1,
+            DynamicScene = 2
+        };
+        
+        private State m_State = State.WaitingForAddress;
+        
         [DefaultValue(false)]
         public bool ChangeScene { get; set; } = false;
 
@@ -52,6 +62,8 @@ namespace PotamOS
         /// </summary>
         public Vector3 CoordinateSystem { get; } = new Vector3();
 
+        private HtmlDocument m_CurrentHtmlDoc = null;
+
         private PotamOSController controller;
         public PotamOSController Controller
         {
@@ -65,6 +77,7 @@ namespace PotamOS
             // Initialization of the script.
             var fileWriter = new TextWriterLogListener(new FileStream("Potamos.log", FileMode.Create));
             GlobalLogger.GlobalMessageLogged += fileWriter;
+
             Log.Info("Starting");
 
             // Start the controller
@@ -76,35 +89,48 @@ namespace PotamOS
 
         public override void Update()
         {
-            if (ChangeScene)
+            if (Url == "DynamicScene" && Input.DownKeys.Any(e => e.Equals(Keys.Escape)))
             {
-                ToggleScene();
-                Log.Info("Changing scene to " + Url + ". Current server is " + HppoStr);
-                LoadScene();
-                ChangeScene = false;
+                NewPage(UIPages.Splash, "");
             }
-            
-            if (Input.DownKeys.Any(e => e.Equals(Keys.Escape)) && Url == "DynamicScene") {
-                ToggleScene();
-                LoadScene();
-            }
+        }
 
-        }
-        
-        private void ToggleScene()
+        public void Goto(string hppo)
         {
-            Entity camera = Entity.Scene.Entities.First(e => e.Name == "Camera" );
-            if (Url == "SplashScene")
-            {
-                Url = "DynamicScene";
-                //                camera.Transform.Position.Z = 3.5F;
-                Controller.GoTo(HppoStr);
-            }
-            else
-                Url = "SplashScene";
-//                camera.Transform.Position.Z = -1F;
+            HppoStr = hppo;
+            Controller.GoToAsync(HppoStr);
         }
         
+        public void SubmitForm(Scene hs)
+        {
+            Log.Info("SubmitForm");
+
+            Entity ui = hs.Entities.First(e => e.Name == "UI");
+            UIComponent uic = ui.Get<UIComponent>();
+            EditText nameBox = (EditText)uic.Page.RootElement.FindName("Name");
+            Log.Info("Entered name is " + nameBox.Text);
+
+            foreach (var n in m_CurrentHtmlDoc.DocumentNode.SelectNodes("//form/input"))
+                Log.Info(n.Id + ":" + n.Name + ":" + string.Join<HtmlAttribute>(",", n.Attributes));
+
+            HtmlNode nameNode = m_CurrentHtmlDoc.DocumentNode.SelectNodes("//form/input").First(n => n.GetAttributeValue("name", string.Empty) == "NAME");
+            nameNode.SetAttributeValue("value", nameBox.Text);
+
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            foreach (var n in m_CurrentHtmlDoc.DocumentNode.SelectNodes("//form/input"))
+                if (n.HasAttributes) {
+                    string name  = n.GetAttributeValue("name", string.Empty);
+                    string value = n.GetAttributeValue("value", string.Empty);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        Log.Info(name + " - " + value);
+                        data.Add(name, value);
+                    }
+                }
+
+            Controller.SubmitFormAsync(data);
+        }
+
         private void LoadScene()
         {
             if (Instance != null)
@@ -126,6 +152,48 @@ namespace PotamOS
             if (Instance != null)
                 Instance.Parent = Entity.Scene;
 
+        }
+
+        public void NewPage(UIPages page, string html)
+        {
+            Log.Info("New page " + page);
+
+            switch (page)
+            {
+                case (UIPages.Handshake):
+                    Url = "HandshakeScene";
+                    break;
+                case (UIPages.DynamicScene):
+                    Url = "DynamicScene";
+                    break;
+                case (UIPages.Splash):
+                default:
+                    Url = "SplashScene";
+                    break;
+            }
+            // Synchronous
+            LoadScene();
+
+            if (page == UIPages.Handshake)
+            {
+                m_CurrentHtmlDoc = new HtmlDocument();
+                m_CurrentHtmlDoc.LoadHtml(html);
+                Log.Info(html);
+                string regionName = "DEFAULT";
+                foreach (var i in m_CurrentHtmlDoc.DocumentNode.SelectNodes("//form/input"))
+                {
+                    if (i.HasAttributes && i.GetAttributeValue("name", string.Empty) == "REGION")
+                    {
+                        regionName = i.GetAttributeValue("value", regionName);
+                        Log.Info("Region is " + regionName);
+                    }
+                }
+                // This doesn't update the text on the screen. I'm missing something...
+                Entity ui = Entity.Scene.Entities.First(e => e.Name == "UI");
+                UIComponent uic = ui.Get<UIComponent>();
+                TextBlock regionBlock = (TextBlock)uic.Page.RootElement.FindName("RegionBlock");
+                regionBlock.Text = regionBlock.Text + " " + regionName;
+            }
         }
     }
 }

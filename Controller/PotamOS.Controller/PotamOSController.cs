@@ -21,20 +21,25 @@ namespace PotamOS.Controller
         }
 
         private Handshaker handshaker;
+        private Hppo m_Hppo; // currently connected simulator
 
         public PotamOSController(IEngine eng)
         {
             engine = eng;
         }
 
-        public bool GoTo(string hppo)
+        public void GoToAsync(string hppo)
         {
             m_log.DebugFormat("[Controller]: Request to go to {0}", hppo);
             HppoInfo hinfo = new HppoInfo(hppo);
             handshaker = new Handshaker(hinfo);
-            bool success = handshaker.Handshake();
+            Task.Run(() => handshaker.Handshake());
+        }
 
-            return success;
+        public void SubmitFormAsync(Dictionary<string, string> data)
+        {
+            Task.Run(() => handshaker.SubmitForm(data));
+
         }
     }
 }

@@ -23,7 +23,7 @@ namespace OpenSim.PotamOS.Handlers
     {
         private static readonly ILog m_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly string index_html_1 = "<html>\n <body>  <form method=\"POST\">\n NAME: <input type = \"text\" /><br>";
+        private static readonly string index_html_1 = "<html>\n <body>  <form method=\"POST\">\n Your Name: <input name=\"NAME\" type = \"text\" /><br>";
         private static readonly string index_html_2 = "<input name=\"METHOD\" type=\"hidden\" value=\"ENTER\" /><input type = \"submit\" value = \"ENTER\" ></form ></body ></html >\n";
 
         public HppoDefaultHandler() : base("GET", "/hppo")
@@ -60,7 +60,7 @@ namespace OpenSim.PotamOS.Handlers
             }
             httpResponse.StatusCode = (int)OSHttpStatusCode.SuccessOk;
             httpResponse.ContentType = "text/html"; 
-            region = string.Format("<input name=\"REGION\" type=\"text\"value=\"{0}\" /><br>", region);
+            region = string.Format("Region: <input name=\"REGION\" type=\"text\"value=\"{0}\" /><br>", region);
             return PotamOSUtils.StringToBytes(index_html_1 + region + index_html_2);
 
         }
@@ -162,8 +162,9 @@ namespace OpenSim.PotamOS.Handlers
             // We found the region
             m_log.DebugFormat("[PotamOS]: Found requested region {0} at {1}", region, gregion.ServerURI);
             httpResponse.StatusCode = (int)OSHttpStatusCode.SuccessOk;
-            httpResponse.AddHeader("X-OS-REGION", string.Format("{0}={1}", region, HttpUtility.UrlEncode(gregion.ServerURI)));
-            return PotamOSUtils.StringToBytes("");
+            httpResponse.ContentType = "text/plain";
+            string simUrl = string.Format("{0}={1}", region, HttpUtility.UrlEncode(gregion.ServerURI));
+            return PotamOSUtils.StringToBytes(simUrl);
         }
 
         private byte[] BadRequest(IOSHttpResponse httpResponse)
