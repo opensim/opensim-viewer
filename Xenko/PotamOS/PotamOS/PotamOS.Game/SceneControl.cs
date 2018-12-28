@@ -16,7 +16,6 @@ using Xenko.Physics;
 using Xenko.UI.Controls;
 using HtmlAgilityPack;
 using PotamOS.Interfaces;
-using PotamOS.Controller;
 
 namespace PotamOS
 {
@@ -64,8 +63,8 @@ namespace PotamOS
 
         private HtmlDocument m_CurrentHtmlDoc = null;
 
-        private PotamOSController controller;
-        public PotamOSController Controller
+        private IController controller;
+        public IController Controller
         {
             get { return controller; }
         }
@@ -81,7 +80,7 @@ namespace PotamOS
             Log.Info("Starting");
 
             // Start the controller
-            controller = new PotamOSController(this);
+            controller = new ControllerAsync(this);
 
             Url = "SplashScene";
             LoadScene();
@@ -98,7 +97,7 @@ namespace PotamOS
         public void Goto(string hppo)
         {
             HppoStr = hppo;
-            Controller.GoToAsync(HppoStr);
+            Controller.Goto(HppoStr);
         }
         
         public void SubmitForm(Scene hs)
@@ -128,7 +127,7 @@ namespace PotamOS
                     }
                 }
 
-            Controller.SubmitFormAsync(data);
+            Controller.SubmitForm(data);
         }
 
         private void LoadScene()

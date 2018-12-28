@@ -1,0 +1,119 @@
+!UIPageAsset
+Id: ac55c214-6b20-4ff3-85ac-319e5f4cff5a
+SerializedVersion: {Xenko: 2.1.0.1}
+Tags: []
+Design:
+    Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
+Hierarchy:
+    RootParts:
+        - !Grid ref!! a968b869-e5a6-46aa-aaa2-2444a86952c5
+    Parts:
+        -   UIElement: !TextBlock
+                Id: 0663e6ea-e8bb-4ac3-8f6d-64d98f1ed0d7
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 225.0
+                Height: 42.0
+                HorizontalAlignment: Left
+                Margin: {Left: 240.0, Top: 346.0, Bottom: 332.0}
+                Name: RegionBlock
+                Text: 'Destination:'
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+        -   UIElement: !TextBlock
+                Id: 0f7fc7f4-36dd-4b01-b82d-e0772ddff663
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                HorizontalAlignment: Center
+                VerticalAlignment: Center
+                Margin: {}
+                Text: Enter
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+        -   UIElement: !TextBlock
+                Id: 2db06a96-376e-4516-b1f4-00c2aaad74d1
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 179.0
+                Height: 39.0
+                HorizontalAlignment: Left
+                VerticalAlignment: Top
+                Margin: {Left: 240.0, Top: 267.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
+                Name: NameBlock
+                Text: Your Name
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+        -   UIElement: !EditText
+                Id: 45b8cc7b-0756-483b-8a51-4c4c40bf15a9
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 5
+                Width: 550.0
+                Height: 45.0
+                VerticalAlignment: Top
+                Margin: {Left: 490.0, Top: 261.0, Right: 240.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
+                Name: Name
+                Padding: {Left: 8.0, Top: 4.0, Right: 8.0, Bottom: 8.0}
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 20.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+                ActiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 3
+                InactiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 4
+                MouseOverImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 5
+                CaretColor: {R: 240, G: 240, B: 240, A: 255}
+                CaretWidth: 1.0
+                SelectionColor: {R: 240, G: 240, B: 240, A: 255}
+                IMESelectionColor: {R: 240, G: 255, B: 240, A: 255}
+                CaretFrequency: 1.0
+                Text: Hippo
+        -   UIElement: !Button
+                Id: 603aa585-6806-4703-96b4-359cbb893f04
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 2
+                CanBeHitByUser: true
+                Width: 227.0
+                Height: 60.0
+                HorizontalAlignment: Right
+                VerticalAlignment: Bottom
+                Margin: {Right: 258.0, Bottom: 82.0}
+                Name: EnterButton
+                Padding: {Left: 10.0, Top: 5.0, Right: 10.0, Bottom: 7.0}
+                Content: !TextBlock ref!! 0f7fc7f4-36dd-4b01-b82d-e0772ddff663
+                ClickMode: Press
+                PressedImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 2
+                NotPressedImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 1
+                MouseOverImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+        -   UIElement: !Grid
+                Id: a968b869-e5a6-46aa-aaa2-2444a86952c5
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Margin: {}
+                Children:
+                    0a8fe19a7176864ce0564f77c58e7b5a: !TextBlock ref!! 2db06a96-376e-4516-b1f4-00c2aaad74d1
+                    00c5462870b233f7dcda2330077e3ed8: !EditText ref!! 45b8cc7b-0756-483b-8a51-4c4c40bf15a9
+                    338bc7e24417f4830c20fd7f429cdc91: !TextBlock ref!! 0663e6ea-e8bb-4ac3-8f6d-64d98f1ed0d7
+                    1ea85afb9f369d53a7e259828cc71de5: !Button ref!! 603aa585-6806-4703-96b4-359cbb893f04
+                RowDefinitions: {}
+                ColumnDefinitions: {}
+                LayerDefinitions: {}

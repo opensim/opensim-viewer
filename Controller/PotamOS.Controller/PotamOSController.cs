@@ -28,17 +28,17 @@ namespace PotamOS.Controller
             engine = eng;
         }
 
-        public void GoToAsync(string hppo)
+        public void Goto(string hppo)
         {
             m_log.DebugFormat("[Controller]: Request to go to {0}", hppo);
             HppoInfo hinfo = new HppoInfo(hppo);
             handshaker = new Handshaker(hinfo);
-            Task.Run(() => handshaker.Handshake());
+            handshaker.Handshake();
         }
 
-        public void SubmitFormAsync(Dictionary<string, string> data)
+        public void SubmitForm(Dictionary<string, string> data)
         {
-            Task.Run(() => handshaker.SubmitForm(data));
+            handshaker.SubmitForm(data);
 
         }
     }
