@@ -17,11 +17,11 @@ namespace PotamOS.Controller.Network.Tests
         [TestMethod()]
         public void GetTest()
         {
-            string response = HttpRequests.Get(goodurl);
+            string response = HttpRequests.Get(goodurl, true);
             Assert.IsNotNull(response, "Call to Google should return something.");
 
             response = null;
-            response = HttpRequests.Get(badurl);
+            response = HttpRequests.Get(badurl, true);
             Assert.IsNull(response, "Call to Badhost should return null.");
         }
     }

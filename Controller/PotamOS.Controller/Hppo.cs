@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Web;
 using Xenko.Core.Mathematics;
 using log4net;
@@ -37,9 +38,9 @@ namespace PotamOS.Controller
             PathToScene = hppo.AbsolutePath;
 
             string[] parts = PathToScene.Split('/');
-            Region = parts[0];
-            if (parts.Length > 1)
-                Parcel = parts[1];
+            Region = parts[1];
+            if (parts.Length > 2)
+                Parcel = parts[2];
 
             float x = 128, y = 128, z = 25;
             if (!string.IsNullOrEmpty(hppo.Query))
@@ -49,6 +50,9 @@ namespace PotamOS.Controller
             }
             Position = new Vector3(x, y, z);
             PositionStr = string.Format("x={0}&y={1}&z={2}", x, y, z);
+
+            m_log.DebugFormat("[Controller]: Hppo with h={0} r={1} p={2} {3}", Gatekeeper.ToString(), Region, Parcel, PositionStr);
+            m_log.InfoFormat("[Controller]: New Hppo {0}", ToString());
         }
 
         protected HppoInfo(HppoInfo info)
@@ -63,7 +67,14 @@ namespace PotamOS.Controller
 
         public override String ToString()
         {
-            return Scheme + "://" + Gatekeeper + "/" + Region + "/" + Parcel + "?" + PositionStr;
+            StringBuilder str = new StringBuilder(Gatekeeper.ToString() + "hppo/");
+            if (!string.IsNullOrEmpty(Region))
+                str.Append(Region);
+            if (!string.IsNullOrEmpty(Parcel))
+                str.Append("/" + Parcel);
+            if (!string.IsNullOrEmpty(PositionStr))
+                str.Append("?" + PositionStr);
+            return str.ToString();
         }
     }
 

@@ -43,7 +43,6 @@ namespace OpenSim.PotamOS.Handlers
 
             string resource = GetParam(path);
             resource = Uri.UnescapeDataString(resource).Trim(PotamOSUtils.DirectorySeparatorChars);
-            //m_log.DebugFormat("[Wifi]: resource {0}", resource);
 
             Request request = CreateRequest(resource, httpRequest);
 
@@ -55,9 +54,10 @@ namespace OpenSim.PotamOS.Handlers
             string region = "DEFAULT";
             if (resource != string.Empty)
             {
-                string[] parts = Path.Split('/');
+                string[] parts = resource.Split('/');
                 region = parts[0];
             }
+            m_log.DebugFormat("[PotamOS]: region is {0} ({1})", region, resource);
             httpResponse.StatusCode = (int)OSHttpStatusCode.SuccessOk;
             httpResponse.ContentType = "text/html"; 
             region = string.Format("Region: <input name=\"REGION\" type=\"text\"value=\"{0}\" /><br>", region);

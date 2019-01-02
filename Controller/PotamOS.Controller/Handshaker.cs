@@ -12,6 +12,8 @@ using PotamOS.Controller.Network;
 using PotamOS.Interfaces;
 using log4net;
 
+using PotamOS.Controller.Scene;
+
 namespace PotamOS.Controller
 {
     public class Handshaker
@@ -24,12 +26,12 @@ namespace PotamOS.Controller
         public Handshaker(HppoInfo hinfo)
         {
             m_HppoInfo = hinfo;
-            url = hinfo.Gatekeeper.ToString() + "hppo";
+            url = hinfo.ToString();
         }
 
         public void Handshake()
         {
-            string html = HttpRequests.Get(url);
+            string html = HttpRequests.Get(url, true);
             if (html != null)
                 PotamOSController.Engine.NewPage(UIPages.Handshake, html);
         }
@@ -64,21 +66,23 @@ namespace PotamOS.Controller
                 string simUrl = HttpUtility.UrlDecode(parts[1]);
                 if (!simUrl.EndsWith("/"))
                     simUrl += "/";
-                m_log.InfoFormat("[Controller]: Simulator url is {0}", simUrl);
+                m_log.InfoFormat("[Controller]: Simulator url is {0}, region name is {1}", simUrl, name);
 
                 // Tell the engine we're a-go
                 PotamOSController.Engine.NewPage(UIPages.DynamicScene, string.Empty);
 
                 // Finally get the scene
-                string sceneXml = HttpRequests.Get(simUrl + "hppo/scene");
-                if (sceneXml == null)
+                string url = simUrl + "hppo/scene" + (xregion == "DEFAULT" ? "" : "/" + name);
+                try
                 {
-                    m_log.DebugFormat("[Controller]: Failed to get the scene from {0}", simUrl);
-                    PotamOSController.Engine.NewPage(UIPages.Splash, string.Empty);
-                    return;
+                    HttpRequests.GetStream(url, SceneManager.Instance.LoadSceneFromXml);
+                    m_log.DebugFormat("[Controller]: YIPPIE! Got the scene!");
                 }
-
-                m_log.DebugFormat("[Controller]: YIPPIE! Got the scene! {0}", sceneXml.Substring(0, 200));
+                catch (Exception e)
+                {
+                    m_log.WarnFormat("[Controller]: Problem with GetStream request to {0}, {1}", url, e);
+                    PotamOSController.Engine.NewPage(UIPages.Splash, string.Empty);
+                }
                 //Hppo hppo = new Hppo(m_HppoInfo);
                 //  ...
                 //return hppo;
