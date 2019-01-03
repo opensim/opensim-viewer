@@ -3,7 +3,6 @@ Id: f85db9b4-9b7c-4aa0-99e4-f5b0a3cadd14
 SerializedVersion: {Xenko: 3.1.0.1}
 Tags: []
 ChildrenIds: []
-Parent: 7d831df9-a2d4-42f1-a3ca-2ad9ea1ae2b5:MainScene
 Offset: {X: 0.0, Y: 0.0, Z: 0.0}
 Hierarchy:
     RootParts:
@@ -11,7 +10,6 @@ Hierarchy:
         - ref!! b12df08a-94dc-48f3-913d-b58c7cda8a9b
         - ref!! 3ce2aae7-625f-4ad0-a7eb-0907f853976e
         - ref!! 58444341-407e-407a-84d8-44efab2b1a3b
-        - ref!! 96c4cc75-e9ea-4c94-8d3a-640a5d3c4fdb
     Parts:
         -   Entity:
                 Id: 2de34f9c-135c-43b6-8d13-11fbbe4f9bda
@@ -66,23 +64,6 @@ Hierarchy:
                         Id: e2e4bb30-afea-4258-9acb-c1657d6d6f2d
                         Model: f3da68ca-8e9e-40dc-ad9f-eff456d67baf:Models/Cube_2
                         Materials: {}
-        -   Entity:
-                Id: 96c4cc75-e9ea-4c94-8d3a-640a5d3c4fdb
-                Name: UI
-                Components:
-                    62093110364163f560ccde81866ef41c: !TransformComponent
-                        Id: 4b7fce95-9f02-4864-9734-cbb58c16bda4
-                        Position: {X: 0.0, Y: 0.0, Z: 0.0}
-                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
-                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
-                        Children: {}
-                    517ac0732b26149bb12397daa4de3886: !UIComponent
-                        Id: 99308c74-280a-4eb0-aa66-514e0d4108b9
-                        Page: ac55c214-6b20-4ff3-85ac-319e5f4cff5a:UI/HandshakePageTmp
-                        Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
-                        Size: {X: 1.0, Y: 1.0, Z: 1.0}
-                    432df357413dc5cb0f5989ef52649110: !PotamOS.EnterButton,PotamOS.Game
-                        Id: 933a036e-da72-4f84-963a-3cbb30fcb2c7
         -   Entity:
                 Id: b12df08a-94dc-48f3-913d-b58c7cda8a9b
                 Name: Skybox

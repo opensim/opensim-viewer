@@ -7,6 +7,7 @@ Parent: 7d831df9-a2d4-42f1-a3ca-2ad9ea1ae2b5:MainScene
 Offset: {X: 0.0, Y: 0.0, Z: 0.0}
 Hierarchy:
     RootParts:
+        - ref!! c1e741e4-9004-419d-beec-1663d7c72bd2
         - ref!! 492c2d1e-f46b-4063-8ec0-968ff26226d2
     Parts:
         -   Entity:
@@ -32,3 +33,20 @@ Hierarchy:
                             Shadow:
                                 BiasParameters:
                                     DepthBias: 0.001
+        -   Entity:
+                Id: c1e741e4-9004-419d-beec-1663d7c72bd2
+                Name: Skybox
+                Components:
+                    3c26bc5b79f70a32b6ca6270cdad552c: !TransformComponent
+                        Id: 4c5c1156-0682-4481-8e8e-265c57daa661
+                        Position: {X: 0.0, Y: 2.0, Z: -2.0}
+                        Rotation: {X: 0.0, Y: 0.0, Z: 0.0, W: 1.0}
+                        Scale: {X: 1.0, Y: 1.0, Z: 1.0}
+                        Children: {}
+                    e5d78250740552237e645f2368940b50: !BackgroundComponent
+                        Id: 150cb676-2844-454d-965f-d01f05c05389
+                        Texture: 508545b4-1683-41dd-85aa-441f3c09eb19:Skybox texture
+                    87999b2f5ff0b2055141922171bf636a: !LightComponent
+                        Id: eda5db13-d9ad-4a20-a3b9-ee614f283ede
+                        Type: !LightSkybox
+                            Skybox: c0d2933e-9118-4e7c-8041-3a0388297660:Skybox

@@ -42,7 +42,7 @@ Hierarchy:
                 MaxLength: 1024
                 MaxLines: 1
                 CaretFrequency: 1.0
-                Text: hippo://
+                Text: hppo://
         -   UIElement: !TextBlock
                 Id: e275cbab-9b13-4077-adc9-b287d2c6fd40
                 DependencyProperties: {}

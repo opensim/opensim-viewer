@@ -19,6 +19,9 @@ using PotamOS.Interfaces;
 
 namespace PotamOS
 {
+    /// <summary>
+    /// This script is supposed to be attached to the Main Entity in the Main scene
+    /// </summary>
     public class SceneControl : SyncScript, IEngine
     {
         private Task<Scene> loadingTask;
@@ -34,9 +37,9 @@ namespace PotamOS
             WaitingToEnter = 1,
             DynamicScene = 2
         };
-        
+
         private State m_State = State.WaitingForAddress;
-        
+
         [DefaultValue(false)]
         public bool ChangeScene { get; set; } = false;
 
@@ -44,7 +47,7 @@ namespace PotamOS
         /// The url of the scene to load
         /// </summary>
         public string Url { get; set; }
-        
+
         ///
         /// The url of the server-side currently connected to
         ///
@@ -63,6 +66,8 @@ namespace PotamOS
 
         private HtmlDocument m_CurrentHtmlDoc = null;
 
+        private UIControlScript m_UIControl;
+
         private IController controller;
         public IController Controller
         {
@@ -73,7 +78,6 @@ namespace PotamOS
         {
             base.Start();
 
-            // Initialization of the script.
             var fileWriter = new TextWriterLogListener(new FileStream("Potamos.log", FileMode.Create));
             GlobalLogger.GlobalMessageLogged += fileWriter;
 
@@ -81,6 +85,9 @@ namespace PotamOS
 
             // Start the controller
             controller = new ControllerAsync(this);
+
+            // Get the reference to the UI controller object
+            m_UIControl = Entity.Get<UIControlScript>();
 
             Url = "SplashScene";
             LoadScene();
@@ -100,20 +107,17 @@ namespace PotamOS
             Controller.Goto(HppoStr);
         }
         
-        public void SubmitForm(Scene hs)
+        public void SubmitForm(string uname)
         {
             Log.Info("SubmitForm");
 
-            Entity ui = hs.Entities.First(e => e.Name == "UI");
-            UIComponent uic = ui.Get<UIComponent>();
-            EditText nameBox = (EditText)uic.Page.RootElement.FindName("Name");
-            Log.Info("Entered name is " + nameBox.Text);
+            Log.Info("Entered name is " + uname);
 
             foreach (var n in m_CurrentHtmlDoc.DocumentNode.SelectNodes("//form/input"))
                 Log.Info(n.Id + ":" + n.Name + ":" + string.Join<HtmlAttribute>(",", n.Attributes));
 
             HtmlNode nameNode = m_CurrentHtmlDoc.DocumentNode.SelectNodes("//form/input").First(n => n.GetAttributeValue("name", string.Empty) == "NAME");
-            nameNode.SetAttributeValue("value", nameBox.Text);
+            nameNode.SetAttributeValue("value", uname);
 
             Dictionary<string, string> data = new Dictionary<string, string>();
             foreach (var n in m_CurrentHtmlDoc.DocumentNode.SelectNodes("//form/input"))
@@ -132,6 +136,7 @@ namespace PotamOS
 
         private void LoadScene()
         {
+            Log.Info("LoadScene " + Url);
             if (Instance != null)
             {
                 Content.Unload(Instance);
@@ -159,19 +164,18 @@ namespace PotamOS
 
             switch (page)
             {
-                case (UIPages.Handshake):
-                    Url = "HandshakeScene";
-                    break;
                 case (UIPages.DynamicScene):
                     Url = "DynamicScene";
                     break;
                 case (UIPages.Splash):
+                case (UIPages.Handshake):
                 default:
                     Url = "SplashScene";
                     break;
             }
-            // Synchronous
-            LoadScene();
+            if ((Url == "DynamicScene") ||
+                (Url == "SplashScene"))
+                LoadScene();
 
             if (page == UIPages.Handshake)
             {
@@ -187,11 +191,13 @@ namespace PotamOS
                         Log.Info("Region is " + regionName);
                     }
                 }
-                // This doesn't update the text on the screen. I'm missing something...
-                Entity ui = Entity.Scene.Entities.First(e => e.Name == "UI");
-                UIComponent uic = ui.Get<UIComponent>();
-                TextBlock regionBlock = (TextBlock)uic.Page.RootElement.FindName("RegionBlock");
-                regionBlock.Text = regionBlock.Text + " " + regionName;
+                m_UIControl.CloseAddressPanel();
+                m_UIControl.ShowLoginGrid(regionName);
+            }
+            else if (page == UIPages.Splash)
+            {
+                m_UIControl.CloseLoginGrid();
+                m_UIControl.ShowAddressPanel();
             }
         }
     }

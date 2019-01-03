@@ -5,7 +5,6 @@ Tags: []
 ChildrenIds:
     - 1fb666c1-63b6-4569-8023-73a875eeebf4
     - 209fe4b4-cd29-4fdc-bd85-ed2058e4a9cc
-    - f85db9b4-9b7c-4aa0-99e4-f5b0a3cadd14
 Offset: {X: 0.0, Y: 0.0, Z: 0.0}
 Hierarchy:
     RootParts:
@@ -27,6 +26,14 @@ Hierarchy:
                         Url: null
                         HppoStr: null
                         Controller: null
+                    d5c39f34eba1e532a88622c7b1f0cc72: !PotamOS.UIControlScript,PotamOS.Game
+                        Id: 0aea7f63-9a32-4004-b475-7db7149390de
+                        UILibrary: 75dae4c8-fb3b-4b71-937b-4b823d78544d:UI/PotamOSUILibrary
+                    0f37764a2265e1dd91d6fa37bf89ba3b: !UIComponent
+                        Id: 725de988-fb9f-4113-a24e-3dd59205e430
+                        Page: 9025cad8-5648-4d85-a727-0a0d8c5a7c49:UI/SimplePage
+                        Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
+                        Size: {X: 1.0, Y: 1.0, Z: 1.0}
         -   Entity:
                 Id: 6791d012-e98b-46ea-94f7-62ec431176a2
                 Name: Camera

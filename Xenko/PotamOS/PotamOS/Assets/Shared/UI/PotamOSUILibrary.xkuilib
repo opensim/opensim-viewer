@@ -1,0 +1,217 @@
+!UILibraryAsset
+Id: 75dae4c8-fb3b-4b71-937b-4b823d78544d
+SerializedVersion: {Xenko: 2.1.0.1}
+Tags: []
+Design:
+    Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
+PublicUIElements:
+    9c7fab6d-7d94-4693-875c-ecac86cb4fe9: AddressBarPanel
+    586083a9-aaf2-4fac-9fdd-030d311e0d4a: LoginGrid
+Hierarchy:
+    RootParts:
+        - !StackPanel ref!! 9c7fab6d-7d94-4693-875c-ecac86cb4fe9
+        - !Grid ref!! 586083a9-aaf2-4fac-9fdd-030d311e0d4a
+    Parts:
+        -   UIElement: !ModalElement
+                Id: 031eb14b-058c-4eeb-a751-c24b82f3261f
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 2
+                CanBeHitByUser: true
+                Width: 937.0
+                Height: 48.0
+                VerticalAlignment: Top
+                Margin: {Left: 282.0, Right: 61.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
+                Padding: {}
+                Content: !EditText ref!! afd90e91-98a1-4d33-b6b0-6768c0cab58b
+                OverlayColor: {R: 0, G: 0, B: 0, A: 153}
+        -   UIElement: !ModalElement
+                Id: 0e701a3c-ee96-4145-a3af-89e0ca0c4f6d
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 2
+                CanBeHitByUser: true
+                Width: 468.0
+                Height: 40.0
+                VerticalAlignment: Top
+                Margin: {Left: 411.0, Top: 66.0, Right: 401.0}
+                Padding: {}
+                Content: !EditText ref!! c582eed7-dc05-478f-8ba7-0a67ccf39f48
+                OverlayColor: {R: 0, G: 0, B: 0, A: 153}
+        -   UIElement: !Grid
+                Id: 586083a9-aaf2-4fac-9fdd-030d311e0d4a
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 1280.0
+                Height: 503.0
+                Margin: {Top: 217.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
+                Name: LoginGrid
+                Children:
+                    09b997239a74e4b47a713a7bfc98df08: !TextBlock ref!! 6c1d7276-0435-4221-8355-6ef95af362a2
+                    7e3794ab334eac66760b34fe617b8001: !ModalElement ref!! 0e701a3c-ee96-4145-a3af-89e0ca0c4f6d
+                    574b9d902c0056e91be37c23ed6ed49a: !TextBlock ref!! e30a6bbf-4b6a-4c9c-9083-04acf888e661
+                    dc052837ed73b2b94d04fc9c54a3e054: !ModalElement ref!! 6026d143-8a94-46c0-b5a2-3d210e03eb73
+                RowDefinitions: {}
+                ColumnDefinitions: {}
+                LayerDefinitions: {}
+        -   UIElement: !ModalElement
+                Id: 6026d143-8a94-46c0-b5a2-3d210e03eb73
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 2
+                CanBeHitByUser: true
+                Width: 232.0
+                Height: 54.0
+                VerticalAlignment: Bottom
+                Margin: {Left: 636.0, Right: 412.0, Bottom: 109.0}
+                Padding: {}
+                Content: !Button ref!! 78186779-50f2-4abb-be1e-1cd812303b7b
+                OverlayColor: {R: 0, G: 0, B: 0, A: 153}
+        -   UIElement: !TextBlock
+                Id: 629cb330-4d2e-44c6-9a86-6e7f342025a6
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                HorizontalAlignment: Center
+                VerticalAlignment: Center
+                Margin: {}
+                Text: Enter
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+        -   UIElement: !TextBlock
+                Id: 6c1d7276-0435-4221-8355-6ef95af362a2
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 196.0
+                Height: 35.0
+                HorizontalAlignment: Left
+                VerticalAlignment: Top
+                Margin: {Left: 196.0, Top: 66.0}
+                Name: Yourname
+                Text: 'Your name:'
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+        -   UIElement: !Button
+                Id: 78186779-50f2-4abb-be1e-1cd812303b7b
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 2
+                CanBeHitByUser: true
+                Margin: {}
+                Name: Enter
+                Padding: {Left: 10.0, Top: 5.0, Right: 10.0, Bottom: 7.0}
+                Content: !TextBlock ref!! 629cb330-4d2e-44c6-9a86-6e7f342025a6
+                PressedImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 2
+                NotPressedImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 1
+                MouseOverImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+        -   UIElement: !StackPanel
+                Id: 9c7fab6d-7d94-4693-875c-ecac86cb4fe9
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 1280.0
+                Height: 53.0
+                VerticalAlignment: Top
+                Margin: {Top: 26.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
+                Name: AddressBarPanel
+                Children:
+                    bb04058c03bdb0630ae96bf67234348d: !ModalElement ref!! 031eb14b-058c-4eeb-a751-c24b82f3261f
+                    041a66d85944d39f7c4c10a923526f36: !TextBlock ref!! bc1284c1-5f94-4bf9-912b-bc1bc6b7da11
+        -   UIElement: !EditText
+                Id: afd90e91-98a1-4d33-b6b0-6768c0cab58b
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 5
+                CanBeHitByUser: true
+                Width: 912.0
+                Height: 43.0
+                Margin: {}
+                Name: Address
+                Padding: {Left: 8.0, Top: 4.0, Right: 8.0, Bottom: 8.0}
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+                ActiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 3
+                InactiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 4
+                MouseOverImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 5
+                CaretColor: {R: 240, G: 240, B: 240, A: 255}
+                CaretWidth: 1.0
+                SelectionColor: {R: 240, G: 240, B: 240, A: 255}
+                IMESelectionColor: {R: 240, G: 255, B: 240, A: 255}
+                CaretFrequency: 1.0
+                Text: hppo://
+        -   UIElement: !TextBlock
+                Id: bc1284c1-5f94-4bf9-912b-bc1bc6b7da11
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 176.0
+                Height: 40.0
+                HorizontalAlignment: Left
+                VerticalAlignment: Top
+                Margin: {Left: 106.0, Top: -40.0}
+                Name: Whereto
+                Text: Where to?
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+        -   UIElement: !EditText
+                Id: c582eed7-dc05-478f-8ba7-0a67ccf39f48
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                DrawLayerNumber: 5
+                CanBeHitByUser: true
+                Margin: {}
+                Name: Name
+                Padding: {Left: 8.0, Top: 4.0, Right: 8.0, Bottom: 8.0}
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
+                ActiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 3
+                InactiveImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 4
+                MouseOverImage: !SpriteFromSheet
+                    Sheet: 1be3340c-b797-4557-bff7-d9be92dfdb42:XenkoUIDesigns
+                    CurrentFrame: 5
+                CaretColor: {R: 240, G: 240, B: 240, A: 255}
+                CaretWidth: 1.0
+                SelectionColor: {R: 240, G: 240, B: 240, A: 255}
+                IMESelectionColor: {R: 240, G: 255, B: 240, A: 255}
+                CaretFrequency: 1.0
+                Text: Hippo
+        -   UIElement: !TextBlock
+                Id: e30a6bbf-4b6a-4c9c-9083-04acf888e661
+                DependencyProperties: {}
+                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
+                Width: 196.0
+                Height: 35.0
+                HorizontalAlignment: Left
+                VerticalAlignment: Top
+                Margin: {Left: 156.0, Top: 149.0}
+                Name: Destination
+                Text: 'Destination:'
+                Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
+                TextSize: 30.0
+                TextColor: {R: 240, G: 240, B: 240, A: 255}
