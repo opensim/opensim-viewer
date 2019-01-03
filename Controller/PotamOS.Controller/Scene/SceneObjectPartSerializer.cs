@@ -451,7 +451,8 @@ namespace PotamOS.Controller.Scene
 
         private static void ProcessShpPathBegin(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathBegin = (ushort)reader.ReadElementContentAsInt("PathBegin", String.Empty);
+            ushort pbegin = (ushort)reader.ReadElementContentAsInt("PathBegin", String.Empty);
+            prim.PrimData.PathBegin = Primitive.UnpackBeginCut(pbegin);
         }
 
         private static void ProcessShpPathCurve(Primitive prim, XmlReader reader)
@@ -461,62 +462,74 @@ namespace PotamOS.Controller.Scene
 
         private static void ProcessShpPathEnd(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathEnd = (ushort)reader.ReadElementContentAsInt("PathEnd", String.Empty);
+            ushort pend = (ushort)reader.ReadElementContentAsInt("PathEnd", String.Empty);
+            prim.PrimData.PathEnd = Primitive.UnpackEndCut(pend);
         }
 
         private static void ProcessShpPathRadiusOffset(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathRadiusOffset = (sbyte)reader.ReadElementContentAsInt("PathRadiusOffset", String.Empty);
+            sbyte proff = (sbyte)reader.ReadElementContentAsInt("PathRadiusOffset", String.Empty);
+            prim.PrimData.PathRadiusOffset = Primitive.UnpackPathTwist(proff);
         }
 
         private static void ProcessShpPathRevolutions(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathRevolutions = (byte)reader.ReadElementContentAsInt("PathRevolutions", String.Empty);
+            byte prev = (byte)reader.ReadElementContentAsInt("PathRevolutions", String.Empty);
+            prim.PrimData.PathRevolutions = Primitive.UnpackPathRevolutions(prev);
         }
 
         private static void ProcessShpPathScaleX(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathScaleX = (byte)reader.ReadElementContentAsInt("PathScaleX", String.Empty);
+            byte psx = (byte)reader.ReadElementContentAsInt("PathScaleX", String.Empty);
+            prim.PrimData.PathScaleX = Primitive.UnpackPathScale(psx);
         }
 
         private static void ProcessShpPathScaleY(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathScaleY = (byte)reader.ReadElementContentAsInt("PathScaleY", String.Empty);
+            byte psy = (byte)reader.ReadElementContentAsInt("PathScaleY", String.Empty);
+            prim.PrimData.PathScaleY = Primitive.UnpackPathScale(psy);
         }
 
         private static void ProcessShpPathShearX(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathShearX = (byte)reader.ReadElementContentAsInt("PathShearX", String.Empty);
+            sbyte pshx = (sbyte)reader.ReadElementContentAsInt("PathShearX", String.Empty);
+            prim.PrimData.PathShearX = Primitive.UnpackPathShear(pshx);
         }
 
         private static void ProcessShpPathShearY(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathShearY = (byte)reader.ReadElementContentAsInt("PathShearY", String.Empty);
+            sbyte pshy = (sbyte)reader.ReadElementContentAsInt("PathShearY", String.Empty);
+            prim.PrimData.PathShearY = Primitive.UnpackPathShear(pshy);
         }
 
         private static void ProcessShpPathSkew(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathSkew = (sbyte)reader.ReadElementContentAsInt("PathSkew", String.Empty);
+            sbyte psk = (sbyte)reader.ReadElementContentAsInt("PathSkew", String.Empty);
+            prim.PrimData.PathSkew = Primitive.UnpackPathTwist(psk);
         }
 
         private static void ProcessShpPathTaperX(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathTaperX = (sbyte)reader.ReadElementContentAsInt("PathTaperX", String.Empty);
+            sbyte ptpx = (sbyte)reader.ReadElementContentAsInt("PathTaperX", String.Empty);
+            prim.PrimData.PathTaperX = Primitive.UnpackPathTaper(ptpx);
         }
 
         private static void ProcessShpPathTaperY(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathTaperY = (sbyte)reader.ReadElementContentAsInt("PathTaperY", String.Empty);
+            sbyte ptpy = (sbyte)reader.ReadElementContentAsInt("PathTaperY", String.Empty);
+            prim.PrimData.PathTaperY = Primitive.UnpackPathTaper(ptpy);
         }
 
         private static void ProcessShpPathTwist(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathTwist = (sbyte)reader.ReadElementContentAsInt("PathTwist", String.Empty);
+            sbyte ptht = (sbyte)reader.ReadElementContentAsInt("PathTwist", String.Empty);
+            prim.PrimData.PathTwist = Primitive.UnpackPathTwist(ptht);
         }
 
         private static void ProcessShpPathTwistBegin(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.PathTwistBegin = (sbyte)reader.ReadElementContentAsInt("PathTwistBegin", String.Empty);
+            sbyte pthtb = (sbyte)reader.ReadElementContentAsInt("PathTwistBegin", String.Empty);
+            prim.PrimData.PathTwistBegin = Primitive.UnpackPathTwist(pthtb);
         }
 
         private static void ProcessShpPCode(Primitive prim, XmlReader reader)
@@ -526,17 +539,20 @@ namespace PotamOS.Controller.Scene
 
         private static void ProcessShpProfileBegin(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.ProfileBegin = (ushort)reader.ReadElementContentAsInt("ProfileBegin", String.Empty);
+            ushort pb = (ushort)reader.ReadElementContentAsInt("ProfileBegin", String.Empty);
+            prim.PrimData.ProfileBegin = Primitive.UnpackBeginCut(pb);
         }
 
         private static void ProcessShpProfileEnd(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.ProfileEnd = (ushort)reader.ReadElementContentAsInt("ProfileEnd", String.Empty);
+            ushort pe = (ushort)reader.ReadElementContentAsInt("ProfileEnd", String.Empty);
+            prim.PrimData.ProfileEnd = Primitive.UnpackEndCut(pe);
         }
 
         private static void ProcessShpProfileHollow(Primitive prim, XmlReader reader)
         {
-            prim.PrimData.ProfileHollow = (ushort)reader.ReadElementContentAsInt("ProfileHollow", String.Empty);
+            ushort ph = (ushort)reader.ReadElementContentAsInt("ProfileHollow", String.Empty);
+            prim.PrimData.ProfileHollow = Primitive.UnpackProfileHollow(ph);
         }
 
         private static void ProcessShpState(Primitive prim, XmlReader reader)
