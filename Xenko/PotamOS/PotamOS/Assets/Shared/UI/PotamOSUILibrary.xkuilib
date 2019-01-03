@@ -6,11 +6,11 @@ Design:
     Resolution: {X: 1280.0, Y: 720.0, Z: 1000.0}
 PublicUIElements:
     9c7fab6d-7d94-4693-875c-ecac86cb4fe9: AddressBarPanel
-    586083a9-aaf2-4fac-9fdd-030d311e0d4a: LoginGrid
+    40ffc0c2-4dc1-4f46-8898-707df0b7fa05: LoginPopup
 Hierarchy:
     RootParts:
         - !StackPanel ref!! 9c7fab6d-7d94-4693-875c-ecac86cb4fe9
-        - !Grid ref!! 586083a9-aaf2-4fac-9fdd-030d311e0d4a
+        - !ModalElement ref!! 40ffc0c2-4dc1-4f46-8898-707df0b7fa05
     Parts:
         -   UIElement: !ModalElement
                 Id: 031eb14b-058c-4eeb-a751-c24b82f3261f
@@ -20,6 +20,7 @@ Hierarchy:
                 CanBeHitByUser: true
                 Width: 937.0
                 Height: 48.0
+                HorizontalAlignment: Center
                 VerticalAlignment: Top
                 Margin: {Left: 282.0, Right: 61.0}
                 MaximumWidth: 3.40282347E+38
@@ -29,50 +30,37 @@ Hierarchy:
                 Content: !EditText ref!! afd90e91-98a1-4d33-b6b0-6768c0cab58b
                 OverlayColor: {R: 0, G: 0, B: 0, A: 153}
         -   UIElement: !ModalElement
-                Id: 0e701a3c-ee96-4145-a3af-89e0ca0c4f6d
+                Id: 40ffc0c2-4dc1-4f46-8898-707df0b7fa05
                 DependencyProperties: {}
                 BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
                 DrawLayerNumber: 2
                 CanBeHitByUser: true
-                Width: 468.0
-                Height: 40.0
-                VerticalAlignment: Top
-                Margin: {Left: 411.0, Top: 66.0, Right: 401.0}
+                Width: 1079.0
+                Height: 378.0
+                Margin: {Left: 108.0, Top: 256.0, Right: 93.0, Bottom: 86.0}
+                Name: LoginPopup
                 Padding: {}
-                Content: !EditText ref!! c582eed7-dc05-478f-8ba7-0a67ccf39f48
+                Content: !Grid ref!! 586083a9-aaf2-4fac-9fdd-030d311e0d4a
                 OverlayColor: {R: 0, G: 0, B: 0, A: 153}
         -   UIElement: !Grid
                 Id: 586083a9-aaf2-4fac-9fdd-030d311e0d4a
                 DependencyProperties: {}
                 BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
-                Width: 1280.0
-                Height: 503.0
-                Margin: {Top: 217.0}
+                Width: 973.0
+                Height: 311.5
+                Margin: {Top: 217.0, Bottom: 252.0}
                 MaximumWidth: 3.40282347E+38
                 MaximumHeight: 3.40282347E+38
                 MaximumDepth: 3.40282347E+38
                 Name: LoginGrid
                 Children:
                     09b997239a74e4b47a713a7bfc98df08: !TextBlock ref!! 6c1d7276-0435-4221-8355-6ef95af362a2
-                    7e3794ab334eac66760b34fe617b8001: !ModalElement ref!! 0e701a3c-ee96-4145-a3af-89e0ca0c4f6d
+                    efc03f1a1ede720463cabc907b1f3f40: !EditText ref!! c582eed7-dc05-478f-8ba7-0a67ccf39f48
                     574b9d902c0056e91be37c23ed6ed49a: !TextBlock ref!! e30a6bbf-4b6a-4c9c-9083-04acf888e661
-                    dc052837ed73b2b94d04fc9c54a3e054: !ModalElement ref!! 6026d143-8a94-46c0-b5a2-3d210e03eb73
+                    39bf8e2641910a8a5b11f16b12140693: !Button ref!! 78186779-50f2-4abb-be1e-1cd812303b7b
                 RowDefinitions: {}
                 ColumnDefinitions: {}
                 LayerDefinitions: {}
-        -   UIElement: !ModalElement
-                Id: 6026d143-8a94-46c0-b5a2-3d210e03eb73
-                DependencyProperties: {}
-                BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
-                DrawLayerNumber: 2
-                CanBeHitByUser: true
-                Width: 232.0
-                Height: 54.0
-                VerticalAlignment: Bottom
-                Margin: {Left: 636.0, Right: 412.0, Bottom: 109.0}
-                Padding: {}
-                Content: !Button ref!! 78186779-50f2-4abb-be1e-1cd812303b7b
-                OverlayColor: {R: 0, G: 0, B: 0, A: 153}
         -   UIElement: !TextBlock
                 Id: 629cb330-4d2e-44c6-9a86-6e7f342025a6
                 DependencyProperties: {}
@@ -92,7 +80,7 @@ Hierarchy:
                 Height: 35.0
                 HorizontalAlignment: Left
                 VerticalAlignment: Top
-                Margin: {Left: 196.0, Top: 66.0}
+                Margin: {Left: 106.0, Top: 57.0}
                 Name: Yourname
                 Text: 'Your name:'
                 Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
@@ -104,7 +92,13 @@ Hierarchy:
                 BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
                 DrawLayerNumber: 2
                 CanBeHitByUser: true
-                Margin: {}
+                Width: 359.0
+                Height: 55.0
+                VerticalAlignment: Bottom
+                Margin: {Left: 371.0, Right: 266.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
                 Name: Enter
                 Padding: {Left: 10.0, Top: 5.0, Right: 10.0, Bottom: 7.0}
                 Content: !TextBlock ref!! 629cb330-4d2e-44c6-9a86-6e7f342025a6
@@ -140,6 +134,9 @@ Hierarchy:
                 Width: 912.0
                 Height: 43.0
                 Margin: {}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
                 Name: Address
                 Padding: {Left: 8.0, Top: 4.0, Right: 8.0, Bottom: 8.0}
                 Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
@@ -180,7 +177,13 @@ Hierarchy:
                 BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
                 DrawLayerNumber: 5
                 CanBeHitByUser: true
-                Margin: {}
+                Width: 422.0
+                Height: 45.984375
+                VerticalAlignment: Top
+                Margin: {Left: 318.0, Top: 57.0, Right: 256.0}
+                MaximumWidth: 3.40282347E+38
+                MaximumHeight: 3.40282347E+38
+                MaximumDepth: 3.40282347E+38
                 Name: Name
                 Padding: {Left: 8.0, Top: 4.0, Right: 8.0, Bottom: 8.0}
                 Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont
@@ -205,11 +208,10 @@ Hierarchy:
                 Id: e30a6bbf-4b6a-4c9c-9083-04acf888e661
                 DependencyProperties: {}
                 BackgroundColor: {R: 0, G: 0, B: 0, A: 0}
-                Width: 196.0
+                Width: 231.0
                 Height: 35.0
                 HorizontalAlignment: Left
-                VerticalAlignment: Top
-                Margin: {Left: 156.0, Top: 149.0}
+                Margin: {Left: 71.0, Top: 151.0, Bottom: 165.5}
                 Name: Destination
                 Text: 'Destination:'
                 Font: c90f3988-0544-4cbe-993f-13af7d9c23c6:XenkoDefaultFont

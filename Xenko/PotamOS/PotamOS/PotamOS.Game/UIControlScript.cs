@@ -30,7 +30,7 @@ namespace PotamOS
         private UIPage m_Page;
 
         private StackPanel m_AddressPanel; 
-        private Grid m_LoginGrid; 
+        private ModalElement m_LoginGrid;
 
         /// <summary>
         /// UI library 
@@ -100,6 +100,7 @@ namespace PotamOS
             m_Page = Entity.Get<UIComponent>().Page;
             InitializeAddressPanel();
             InitializeLoginGrid();
+            CloseLoginGrid();
             // Add the two to the overlay
             var overlay = (Grid)m_Page.RootElement;
             overlay.Children.Add(m_AddressPanel);
@@ -125,19 +126,18 @@ namespace PotamOS
         
         private void InitializeLoginGrid()
         {
-            m_LoginGrid = UILibrary.InstantiateElement<Grid>("LoginGrid");
+            m_LoginGrid = UILibrary.InstantiateElement<ModalElement>("LoginPopup");
             Button enter = m_LoginGrid.FindVisualChildOfType<Button>("Enter");
             enter.Click += delegate
             {
                 Log.Info("Mouse button clicked");
                 EditText name = m_LoginGrid.FindVisualChildOfType<EditText>("Name");
                 m_SceneController.SubmitForm(name.Text);
-                
+
                 CloseLoginGrid();
             };
-            CloseLoginGrid();
         }
-        
+
         public void ShowAddressPanel()
         {
             m_AddressPanel.Visibility = Visibility.Visible;
