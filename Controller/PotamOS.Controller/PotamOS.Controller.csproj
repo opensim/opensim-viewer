@@ -61,6 +61,8 @@
   <ItemGroup>
     <Compile Include="Handshaker.cs" />
     <Compile Include="Hppo.cs" />
+    <Compile Include="Meshing\PrimMesher.cs" />
+    <Compile Include="Meshing\SculptMesher.cs" />
     <Compile Include="Network\HttpRequests.cs" />
     <Compile Include="PotamOSController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
